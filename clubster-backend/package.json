@@ -1,0 +1,15 @@
+{
+  "name": "clubster-backend",
+  "version": "1.0.0",
+  "description": "Bakcend of application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "Adnan Yunus"
+  },
+  "author": "",
+  "license": "ISC"
+}
