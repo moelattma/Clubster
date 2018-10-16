@@ -4,7 +4,7 @@
   "description": "Bakcend of application",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "NODE_ENV=development & nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
     "jsonwebtoken": "^8.3.0",
     "mongoose": "^5.3.3",
     "morgan": "^1.9.1",
+    "nodemon": "^1.18.4",
     "validator": "^10.8.0"
   }
 }
