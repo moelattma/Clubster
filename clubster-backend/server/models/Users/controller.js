@@ -57,4 +57,12 @@ exports.createUser = (req, res) => {
 
 exports.findUser = (req,res) => {
   // Code to login a user to our mongo collection
+  const {email, password} = req.body;
+  User.findOne({email: email}).then((user) =>
+  	if (!user){
+  		return res.status(400).json({'Error': 'User does not exist'});	//Complain if user doesn't exist
+  	}
+  	else {
+  		bcrypt.compare(password, user.password).then({}).catch((err)=> console.log(err));	//Bcrypt verification
+	}).catch((err) => console.log(err));
 }
