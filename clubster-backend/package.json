@@ -4,7 +4,7 @@
   "description": "Bakcend of application",
   "main": "index.js",
   "scripts": {
-    "dev": "NODE_ENV=development & nodemon index.js"
+    "dev": "SET NODE_ENV=development & nodemon index.js"
   },
   "repository": {
     "type": "git",
