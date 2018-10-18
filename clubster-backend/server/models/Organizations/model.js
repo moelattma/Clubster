@@ -31,7 +31,7 @@ const Organization = new Schema({
   EventsChair: {
     type: String,
     required: false
-  }
+  },
   CommunicationChair: {
     type: String,
     required: false
