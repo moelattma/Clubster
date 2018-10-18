@@ -24,8 +24,8 @@ exports.createUser = (req, res) => {
   		}
   		else{
   			// This makes the default profile picture (e.g. fb blank person)
-  			const avatar = gravatar.url(req.body.email, { 
-  				s: '200', 
+  			const avatar = gravatar.url(req.body.email, {
+  				s: '200',
   				r: 'PG',
   				d: 'mm',
 
@@ -43,26 +43,39 @@ exports.createUser = (req, res) => {
   			// Hashes the user's chosen password to make it more secure
   			bcrypt.hash(password, numberOfSaltIterations, function(err, hash){
  				if (err) throw err;
- 				newUser.password = hash; 
+ 				newUser.password = hash;
  				newUser.save().then(user => res.json(user).catch(err => console.log(err))); // Push the new user onto the db if successful, else display error
   			});
   		}
 
   	});
-  } 
+  }
   else {
   	return res.status(400).json({'Error':'Missing fields'});
   }
 };
 
 exports.findUser = (req,res) => {
-  // Code to login a user to our mongo collection
-  const {email, password} = req.body;
-  User.findOne({email: email}).then((user) =>
-  	if (!user){
-  		return res.status(400).json({'Error': 'User does not exist'});	//Complain if user doesn't exist
-  	}
-  	else {
-  		bcrypt.compare(password, user.password).then({}).catch((err)=> console.log(err));	//Bcrypt verification
-	}).catch((err) => console.log(err));
+  const {email, username, password} = req.body;
+  User.findOne({email:email}).then((user) => {
+    if(!user) {
+      return res.status(400).json({'Error': 'User does not exist'});
+    } else {
+      bcrypt.compare(password, user.password).then(same => {
+      if (same) {
+        const payload = { id: user.id, name: user.name, avatar: user.avatar };
+        jwt.sign(payload,secret,{ expiresIn: 3600 }, (err, token) => {
+            res.json({
+              token: token
+            });
+          }
+        );
+        return res.status(201).header('x-auth', token.send());
+      } else {
+        return res.status(400).json({'Error':'Password is incorrect'});
+      }
+  }).catch((err) => console.log(err));
+}
+});
+
 }
