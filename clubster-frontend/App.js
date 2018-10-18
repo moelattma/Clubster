@@ -1,12 +1,32 @@
 import React from 'react';
-import { TouchableOpacity, TextInput, StyleSheet, Text, View, Dimensions } from 'react-native';
-import Login from './Login'
+import{AppRegistry, StyleSheet, Text, View } from 'react-native';
 
-const { width:WIDTH } = Dimensions.get('window');
+
+import SignUp from './components/Component1/SignUp';
+
+// const { width:WIDTH } = Dimensions.get('window');
+
+
 export default class App extends React.Component {
   render() {
+
     return (
-      <Login></Login>
+       <View style ={styles.container}>
+        <SignUp></SignUp>
+      </View>
+      // <Login></Login>
+
     );
   }
 }
+AppRegistry.registerComponent('App', ()=> App);
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1, 
+    justifyContent: 'center',
+    backgroundColor: '#36485f',
+    paddingLeft: 60,
+    paddingRight:60,
+  }
+})
