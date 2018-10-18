@@ -15,7 +15,7 @@ export default class SignUp extends React.Component {
         </View> 
       
         {/* Content for  Name  */}
-        <TextInput style ={styles.textinput} placeholder ="Your Full Name" underlineColorAndroid ={'transparent'} />
+        <TextInput style ={styles.textinput} placeholder ="User name" underlineColorAndroid ={'transparent'} />
 
         {/* Content for Email  */}
         <TextInput style ={styles.textinput} placeholder ="Your email" underlineColorAndroid ={'transparent'} />
