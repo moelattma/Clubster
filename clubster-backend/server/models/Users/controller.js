@@ -17,6 +17,10 @@ var numberOfSaltIterations = 12;
 exports.createUser = (req, res) => {
   //Code to register a User in our Mongo Collection
   const {username, name, email, password} = req.body; // Destructuring the req.body (i.e. extracting info)
+  console.log(username);
+  console.log(name);
+  console.log(password);
+  console.log(email);
   if (username && name && email && password){
   	User.findOne({email:email}).then((user)=> {
   		if (user){ // If the user already exists, reject duplicate account
@@ -56,21 +60,17 @@ exports.createUser = (req, res) => {
 };
 
 exports.findUser = (req,res) => {
-  const {email, username, password} = req.body;
-  User.findOne({email:email}).then((user) => {
+  const {username,password} = req.body;
+  User.findOne({username:username}).then((user) => {
     if(!user) {
+
       return res.status(400).json({'Error': 'User does not exist'});
     } else {
       bcrypt.compare(password, user.password).then(same => {
       if (same) {
-        const payload = { id: user.id, name: user.name, avatar: user.avatar };
-        jwt.sign(payload,secret,{ expiresIn: 3600 }, (err, token) => {
-            res.json({
-              token: token
-            });
-          }
-        );
-        return res.status(201).header('x-auth', token.send());
+        const payload = { _id: user._id, name: user.name, avatar: user.avatar };
+        let token = jwt.sign(payload,'secret');
+        return res.status(201).send({token});
       } else {
         return res.status(400).json({'Error':'Password is incorrect'});
       }

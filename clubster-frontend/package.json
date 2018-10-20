@@ -9,8 +9,16 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "expo": "^30.0.1",
+    "expo-cli": "^2.2.0",
+    "express": "^4.16.4",
+    "mongoose": "^5.3.4",
+    "npm": "^6.4.1",
     "react": "16.3.1",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz"
+    "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz",
+    "react-native-navigation": "^1.1.490",
+    "react-navigation": "^2.18.0",
+    "whatwg-fetch": "^2.0.4"
   }
 }

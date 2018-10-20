@@ -1,15 +1,42 @@
 import React from 'react';
 import { TouchableOpacity, TextInput, StyleSheet, Text, View, Dimensions } from 'react-native';
-
+import axios from 'axios';
 const { width:WIDTH } = Dimensions.get('window');
 export default class Login extends React.Component {
+  state = {                                                 //state initialization
+    username: '',
+    password: ''
+  };
+  handleUserNameChange = username => this.setState({ username });     //ES6 fucntions that keep track of usernames and passwords
+  handlePasswordChange = password => this.setState({password});
+  handleLogin = () => {
+    const {username, password} = this.state;                        //Destructuring
+    console.log(username + ' ' + password);
+    if(username && password) {
+      axios.post('http://localhost:3000/api/login', {               //POST with payload
+        username,
+        password
+      })
+      .then(response => {
+        if(response.status == 201) {
+          this.props.navigation.navigate("ClubsPage");              //Navigate to CLubs page if successful
+      }})
+      .catch((err) => {
+        console.log(err);                                           //Err
+      });
+    } else {
+      console.log('error');                                          //errors printing
+    }
+  }
+
   render() {
-    return (
+  return (
       <View style={styles.container}>
-        <TextInput
+        <TextInput                                                  //TextInputs with onChangeText built in
            style={styles.input}
            placeholder={'Username'}
            placeholderTextColor={'rgba(255, 255, 255, 0.9)'}
+           onChangeText = {this.handleUserNameChange}
            underlineColorAndroid='transparent'
          />
 
@@ -17,15 +44,16 @@ export default class Login extends React.Component {
           style={styles.input}
           placeholder={'Password'}
           placeholderTextColor={'rgba(255, 255, 255, 0.9)'}
+          onChangeText = {this.handlePasswordChange}
           underlineColorAndroid='transparent'
           secureTextEntry={true}
         />
 
-        <TouchableOpacity style={styles.login}>
+        <TouchableOpacity style={styles.login} onPress = {this.handleLogin.bind(this)}>
           <Text style={styles.loginText}> Log In </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.signup} onPress={this.prop}>
+        <TouchableOpacity style={styles.signup} onPress = {() => this.props.navigation.navigate('SignUp')} >
           <Text style={styles.signupText}> Sign Up </Text>
         </TouchableOpacity>
       </View>
@@ -47,7 +75,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     borderBottomColor: '#f8f8f8',
     borderBottomWidth: 1
-  }, 
+  },
   login: {
     alignSelf: 'center',
     backgroundColor: '#59cbbd',
