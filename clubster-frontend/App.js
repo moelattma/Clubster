@@ -1,14 +1,24 @@
 import React, { Component } from 'react';
-import { AppRegistry, StyleSheet, View } from 'react-native';
+import { AppRegistry, 
+  StyleSheet, 
+  View, 
+} from 'react-native';
 
-import Login from './components/Login';
+// import Login from './components/Login';
+//import SignUp from './components/SignUp';
+import ClubsPage from './components/ClubsPage';
+//import Boxes from './components/Boxes';
 
+ 
 export default class App extends Component {
+  
   render() {
     return (
-      <View style ={styles.container}>
-        <Login></Login>
-      </View>
+      // <View style ={styles.container}>
+      //   <ClubsPage></ClubsPage>
+      // </View>
+      <ClubsPage></ClubsPage>     
+
     );
   }
 }
