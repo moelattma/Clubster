@@ -73,7 +73,11 @@ export default class SignUp extends Component {
 
 const styles = StyleSheet.create({
   regForm: {
-    alignSelf: 'stretch'
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: '#36485f',
+    paddingLeft: 60,
+    paddingRight: 60
   },
   header: {
     fontSize: 24,

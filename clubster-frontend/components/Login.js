@@ -3,12 +3,9 @@ import { TouchableOpacity, TextInput, StyleSheet, Text, View, Dimensions } from 
 import axios from 'axios';
 const { width:WIDTH } = Dimensions.get('window');
 export default class Login extends React.Component {
-  state = {                                                 //state initialization
-    username: '',
-    password: ''
-  };
-  handleUserNameChange = username => this.setState({ username });     //ES6 fucntions that keep track of usernames and passwords
-  handlePasswordChange = password => this.setState({password});
+  state = { username: '', password: '' };                           //state initialization
+  handleUserNameChange = username => this.setState({ username });   //ES6 fucntions that keep track of usernames and passwords
+  handlePasswordChange = password => this.setState({ password });
   handleLogin = () => {
     const {username, password} = this.state;                        //Destructuring
     console.log(username + ' ' + password);
@@ -19,26 +16,26 @@ export default class Login extends React.Component {
       })
       .then(response => {
         if(response.status == 201) {
-          this.props.navigation.navigate("ClubsPage");              //Navigate to CLubs page if successful
+          this.props.navigation.navigate('UserHome');               //Navigate to CLubs page if successful
       }})
       .catch((err) => {
         console.log(err);                                           //Err
       });
     } else {
-      console.log('error');                                          //errors printing
+      console.log('error');                                         //errors printing
     }
   }
 
   render() {
-  return (
+    return (
       <View style={styles.container}>
         <TextInput                                                  //TextInputs with onChangeText built in
-           style={styles.input}
-           placeholder={'Username'}
-           placeholderTextColor={'rgba(255, 255, 255, 0.9)'}
-           onChangeText = {this.handleUserNameChange}
-           underlineColorAndroid='transparent'
-         />
+          style={styles.input}
+          placeholder={'Username'}
+          placeholderTextColor={'rgba(255, 255, 255, 0.9)'}
+          onChangeText = {this.handleUserNameChange}
+          underlineColorAndroid='transparent'
+        />
 
         <TextInput
           style={styles.input}
@@ -63,7 +60,11 @@ export default class Login extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    alignSelf: 'stretch'
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: '#36485f',
+    paddingLeft: 60,
+    paddingRight: 60
   },
   inputContainer: {
     marginTop: 10

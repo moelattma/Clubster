@@ -1,20 +1,16 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { TouchableOpacity,  
   StyleSheet, 
   Text, 
   View, 
-   } from 'react-native';
+} from 'react-native';
 
-
-export default class Boxes extends React.Component {
-  
+export default class ClubsPage extends Component {
   render() {
     return (
         // Container for the whole body
         <View style={styles.body}>
-            <Text style={styles.header}>
-             Clubs
-            </Text>
+            <Text style={styles.header}> Clubs </Text>
 
             {/* Using Flexbox 1 to align box 1 and 2 in same row
             which takes 2/3 of the main body */}
@@ -46,36 +42,8 @@ export default class Boxes extends React.Component {
                         Club4
                     </Text>
                 </TouchableOpacity>
-
             </View>
-
-            {/* Using flexBox3 to use to align the bottom row 
-            which takes 1/3 of the body */}
-            <View style={styles.flexBox3}>
-
-                <TouchableOpacity>
-                    <Text style={styles.insideText}>
-                        Notification
-                    </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity>
-                    <Text style={styles.insideText}>
-                        People
-                    </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity>
-                    <Text style={styles.insideText}>
-                        Profile
-                    </Text>
-                </TouchableOpacity>
-            </View>
-
-            <Text style={{alignSelf: 'flex-end', color: 'white', fontStyle: 'italic'}}>
-                  Powered by CLUBSTER
-        </Text>
-      </View>
+        </View>
     );
   }
 }
@@ -83,17 +51,16 @@ export default class Boxes extends React.Component {
 const styles = StyleSheet.create({
     body : {
         flex: 1,
-        paddingTop: 50,
+        paddingTop: 25,
         backgroundColor: '#36485f',
         alignItems: 'stretch',
     },
     header: {
         color : 'white', 
         fontWeight: 'bold', 
-        fontSize: 50,
+        fontSize: 35,
         fontStyle: 'italic',
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignSelf: 'center',
     },
     flexBox1: {
         flex: 3,
