@@ -1,6 +1,9 @@
 import React from 'react';
 import { TouchableOpacity, TextInput, StyleSheet, Text, View, Dimensions } from 'react-native';
 import axios from 'axios';
+import setAuthToken from '../utils/setAuthToken';
+import jwt_decode from 'jwt-decode';
+
 const { width:WIDTH } = Dimensions.get('window');
 export default class Login extends React.Component {
   state = { username: '', password: '' };                           //state initialization
@@ -15,9 +18,9 @@ export default class Login extends React.Component {
         password
       })
       .then(response => {
-        if(response.status == 201) {
-          this.props.navigation.navigate('UserHome');               //Navigate to CLubs page if successful
-      }})
+        console.log(response.data.token);
+        this.props.navigation.navigate('UserHome');               //Navigate to CLubs page if successful
+      })
       .catch((err) => {
         console.log(err);                                           //Err
       });

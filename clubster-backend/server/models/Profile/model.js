@@ -21,15 +21,11 @@ const Profile = new Schema({
     required: true,
     minlength: 4
   },
-  hobbies: 
+  hobbies:
     {
       type: [String],
       required: true,
-      minlength: 5,
-      trim: true,
-      unique:true
     },
-  
   social: {
     youtube: {
       type: String

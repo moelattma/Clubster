@@ -40,6 +40,10 @@ const Organization = new Schema({
     type: String,
     required: false
   },
+  title: {
+    type: String,
+    required: true
+  },
   description: {
       type: String,
       required: true,

@@ -4,7 +4,7 @@
   "description": "Bakcend of application",
   "main": "index.js",
   "scripts": {
-    "dev": "NODE_ENV=development & nodemon index.js"
+    "dev": "adb reverse tcp:3000 tcp:3000 && NODE_ENV=development & nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -20,10 +20,12 @@
     "express": "^4.16.4",
     "gravatar": "^1.6.0",
     "jsonwebtoken": "^8.3.0",
-    "mongoose": "^5.3.3",
+    "mongoose": "^5.3.6",
     "morgan": "^1.9.1",
     "node-gyp": "^3.8.0",
     "nodemon": "^1.18.4",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
     "validator": "^10.8.0"
   }
 }

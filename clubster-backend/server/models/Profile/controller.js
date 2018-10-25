@@ -3,22 +3,20 @@
 * author: ayunus@ucsc.edu
 */
 
-// grabs scheme in the profile/model 
+// grabs scheme in the profile/model
 const Profile = require('./model');
 
 exports.profileSubmission = (req, res) => {
-    console.log(req.body);
     const {major, social, hobbies } = req.body; // destructure, pull value and assign it
-    console.log(hobbies);
-    let id = "5bcf8d006097c0496c0c705";
-    let email = "obareach@ucsc.edu";
+    let email = req.user;
+    console.log(email);
     // making new profile object
     const newProfile = {
-        user: id,
+        user: req.user._id,
         major: major,
-        hobbies: hobbies.split(','),
+        hobbies: hobbies.toString().split(','),
         social: {
-            youtube: social.youtube, 
+            youtube: social.youtube,
             facebook: social.facebook,
             linkedin: social.linkedin,
             instagram: social.instagram,
@@ -28,7 +26,7 @@ exports.profileSubmission = (req, res) => {
     Profile.findOne({email: email}).then((profile)=>{
         if(profile){
             Profile.findOneAndUpdate(
-                {user: id},
+                {user: req.user._id},
                 {$set: newProfile},
                 {new: true}
             ).then((profile) => res.json(profile))

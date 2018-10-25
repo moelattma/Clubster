@@ -21,7 +21,7 @@ exports.createUser = (req, res) => {
   console.log(name);
   console.log(password);
   console.log(email);
-  if (username && name && email && password){
+  if (username && name && email && password) {
   	User.findOne({email:email}).then((user)=> {
   		if (user){ // If the user already exists, reject duplicate account
   			return res.status(400).json({'Error':'User already exists'});
@@ -31,8 +31,7 @@ exports.createUser = (req, res) => {
   			const avatar = gravatar.url(req.body.email, {
   				s: '200',
   				r: 'PG',
-  				d: 'mm',
-
+  				d: 'mm'
   			});
 
   			// Creates a new User
@@ -46,9 +45,9 @@ exports.createUser = (req, res) => {
 
   			// Hashes the user's chosen password to make it more secure
   			bcrypt.hash(password, numberOfSaltIterations, function(err, hash){
- 				if (err) throw err;
- 				newUser.password = hash;
- 				newUser.save().then(user => res.json(user).catch(err => console.log(err))); // Push the new user onto the db if successful, else display error
+ 				     if (err) throw err;
+ 				     newUser.password = hash;
+ 				     newUser.save().then(user => res.json(user)).catch(err => console.log(err)); // Push the new user onto the db if successful, else display error
   			});
   		}
 
@@ -69,9 +68,13 @@ exports.findUser = (req,res) => {
       bcrypt.compare(password, user.password).then(same => {
       if (same) {
         const payload = { _id: user._id, name: user.name, avatar: user.avatar };
-        let token = jwt.sign(payload,'secret');
-        return res.status(201).send({token});
-      } else {
+        let token = jwt.sign(payload,'secret', {expiresIn: 3600}, (err, token) => {
+          res.json({
+            success: true,
+            token: 'Bearer ' + token
+          });
+        });
+        } else {
         return res.status(400).json({'Error':'Password is incorrect'});
       }
   }).catch((err) => console.log(err));
