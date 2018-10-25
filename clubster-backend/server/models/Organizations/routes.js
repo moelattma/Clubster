@@ -6,11 +6,11 @@
 const router = require('express').Router();
 const controller = require('./controller');
 
-router.get('/organization/all', (req, res) => {
+router.get('/organizations/all', (req, res) => {
 	controller.getAllClubs(req, res);
 });
 
-router.post('/organization/new', (req, res) => {
+router.post('/organizations/new', (req, res) => {
 	controller.addOrg(req, res);
 });
 

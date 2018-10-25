@@ -12,35 +12,19 @@ const Schema = mongoose.Schema;
 * Creation of User Schema. We specify a const variable with fields: name, email, password, avatar, array of clubs where user is member, and array of clubs where user is admin.
 */
 const Organization = new Schema({
-  President: {
+  president: {
     type: String,   //Specifiers
     required: true
   },
-  VicePresident: {
+  admins: {
+    type: [Schema.Types.ObjectId],
+    ref: 'users'
+  },
+  name: {
     type: String,
     required: true
   },
-  Treasurer: {
-    type: String,
-    required: true
-  },
-  Secretary: {
-    type: String,
-    required: true
-  },
-  EventsChair: {
-    type: String,
-    required: false
-  },
-  CommunicationChair: {
-    type: String,
-    required: false
-  },
-  WebMaster: {
-    type: String,
-    required: false
-  },
-  title: {
+  acronym: {
     type: String,
     required: true
   },
