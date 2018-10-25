@@ -16,6 +16,7 @@ router.post('/organizations/new', (req, res) => {
 });
 
 router.get('/organizations',passport.authenticate('jwt', { session: false }), (req, res) => {
+	console.log('just bhe');
 	controller.getUserClubs(req, res);
 });
 

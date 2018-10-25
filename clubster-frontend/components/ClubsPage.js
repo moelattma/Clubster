@@ -1,11 +1,29 @@
 import React, { Component } from 'react';
-import { TouchableOpacity,  
+import { 
+    TouchableOpacity,  
   StyleSheet, 
   Text, 
   View, 
 } from 'react-native';
+import axios from 'axios';
+
 
 export default class ClubsPage extends Component {
+
+    constructor() { // Initializing state
+        super();
+        this.state = {
+            arrClubsAdmin: []
+        }
+    }
+
+    componentDidMount() {
+        axios.get("http://localhost:3000/api/organizations").then((response) => {
+            this.state.arrClubsAdmin = response.data; // Setting up state variable
+            console.log(this.state.arrClubsAdmin);
+        }).catch((err) => console.log(err));
+    };
+
   render() {
     return (
         // Container for the whole body

@@ -9,8 +9,10 @@ const User = require('../Users/model');
 
 
 exports.getUserClubs = (req, res) => {
+	console.log("here!!!");
 	User.findOne({id:req.body._id}).populate('arrayClubsAdmin').then((user) => {
-		return res.status(201).json({'user': user});							//populates array that user is admin of
+		console.log(user);
+		return res.status(201).json({'user': user});	//populates array that user is admin of
 	}).catch((err) => console.log(err));
 };
 
