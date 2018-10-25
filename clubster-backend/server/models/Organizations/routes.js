@@ -5,6 +5,7 @@
 
 const router = require('express').Router();
 const controller = require('./controller');
+const passport = require('passport');
 
 router.get('/organizations/all', (req, res) => {
 	controller.getAllClubs(req, res);
@@ -12,6 +13,10 @@ router.get('/organizations/all', (req, res) => {
 
 router.post('/organizations/new', (req, res) => {
 	controller.addOrg(req, res);
+});
+
+router.get('/organizations',passport.authenticate('jwt', { session: false }), (req, res) => {
+	controller.getUserClubs(req, res);
 });
 
 module.exports = router;

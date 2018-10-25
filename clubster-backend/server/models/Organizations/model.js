@@ -16,10 +16,10 @@ const Organization = new Schema({
     type: String,   //Specifiers
     required: true
   },
-  admins: {
-    type: [Schema.Types.ObjectId],
+  admins: [{
+    type: Schema.Types.ObjectId,
     ref: 'users'
-  },
+  }],
   name: {
     type: String,
     required: true

@@ -40,12 +40,20 @@ const User = new Schema({
     type: Array,
     required: false
   },
-  arrayClubsAdmin: {
-    type: Array,
+  arrayClubsAdmin: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Organization',
     required: false
-  }
+  }]
 });
 
+User.statics.clubMemberPushing = async function(admin, organization) {
+  await this.findByIdAndUpdate(admin, { $push: { arrayClubsMember: organization._id } });
+}
+
+User.statics.clubAdminPushing = async function(admin, organization) {
+  await this.findByIdAndUpdate(admin, { $push: { arrayClubsAdmin: organization._id } });
+}
 /*
 * Export so that other js files can use this schema
 */
