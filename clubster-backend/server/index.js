@@ -11,7 +11,8 @@ const passport = require('passport');
 const {databasePassword, databaseUsername} = require('../config')
 
 mongoose.Promise = global.Promise; // let's us use try catch
-mongoose.connect(`mongodb://${databaseUsername}:${databasePassword}@ds131963.mlab.com:31963/clubster`);
+mongoose.set('useCreateIndex', true);
+mongoose.connect(`mongodb://${databaseUsername}:${databasePassword}@ds131963.mlab.com:31963/clubster`, { useNewUrlParser: true });
 mongoose.connection
     .once('open', () => console.log('Mongodb running'))
     .on('error', err => console.log(err)); // to use routes
