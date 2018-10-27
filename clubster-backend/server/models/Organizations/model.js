@@ -52,6 +52,14 @@ const Organization = new Schema({
   }],
 });
 
+Organization.statics.addMemberToClub = async function(organizationID, memberID) {
+  await this.findByIdAndUpdate(organizationID, { $push: { members: memberID } });
+}
+
+Organization.statics.addAdminToClub = async function(organizationID, adminID) {
+  await this.findByIdAndUpdate(organizationID, { $push: { admins: adminID } });
+}
+
 /*
 * Export so that other js files can use this schema
 */
