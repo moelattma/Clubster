@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const controller = require('./controller');
 const passport = require('passport');
+
 router.get('/notifications', (req, res) => {
 	controller.grabNotifications(req, res);
 });
