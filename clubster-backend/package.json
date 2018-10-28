@@ -4,7 +4,7 @@
   "description": "Bakcend of application",
   "main": "index.js",
   "scripts": {
-    "dev": "adb reverse tcp:3000 tcp:3000 && NODE_ENV=development & nodemon index.js"
+    "dev": "NODE_ENV=development & nodemon index.js"
   },
   "repository": {
     "type": "git",

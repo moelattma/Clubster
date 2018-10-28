@@ -1,26 +1,28 @@
 import React from 'react';
-import { TouchableOpacity, TextInput, StyleSheet, Text, View, Dimensions } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, Dimensions } from 'react-native';
+import { TextField } from 'react-native-material-textfield';
 import axios from 'axios';
 const { width:WIDTH } = Dimensions.get('window');
 
 export default class Login extends React.Component {
-  state = { username: '', password: '' };                           //state initialization
-  handleUserNameChange = username => this.setState({ username });   //ES6 fucntions that keep track of usernames and passwords
-  handlePasswordChange = password => this.setState({ password });
+  state = { 
+    username: '', 
+    password: '' 
+  };                           
+
   handleLogin = () => {
-    const {username, password} = this.state;                        //Destructuring
-    console.log(username + ' ' + password);
+    const { username, password } = this.state;                        //Destructuring
     if(username && password) {
       axios.post('http://localhost:3000/api/login', {               //POST with payload
         username,
         password
       })
       .then(response => {
-        if(response.status == 201) {
-          this.props.navigation.navigate('UserHome');               //Navigate to CLubs page if successful
+        if(response.status == 200) {
+          this.props.navigation.navigate('HomeNavigation');               //Navigate to Clubs page if successful
       }})
       .catch((err) => {
-        console.log(err);                                           //Err
+        console.log('Not a valid account: ', err);                                           //Err
       });
     } else {
       console.log('error');                                         //errors printing
@@ -30,21 +32,23 @@ export default class Login extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <TextInput                                                  //TextInputs with onChangeText built in
-          style={styles.input}
-          placeholder={'Username'}
-          placeholderTextColor={'rgba(255, 255, 255, 0.9)'}
-          onChangeText = {this.handleUserNameChange}
-          underlineColorAndroid='transparent'
+        <TextField                                                  //TextInputs with onChangeText built in
+          inputContainerStyle={styles.textContainer}
+          label="Username"
+          baseColor="rgba(255, 255, 255, 0.75)"
+          textColor="rgba(255, 255, 255, 1)"
+          onChangeText={username => this.setState({ username })}
+          returnKeyType='next'
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder={'Password'}
-          placeholderTextColor={'rgba(255, 255, 255, 0.9)'}
-          onChangeText = {this.handlePasswordChange}
-          underlineColorAndroid='transparent'
+        <TextField
+          inputContainerStyle={styles.textContainer}
+          label="Password"
+          baseColor="rgba(255, 255, 255, 0.75)"
+          textColor="rgba(255, 255, 255, 1)"
+          onChangeText={password => this.setState({ password })}
           secureTextEntry={true}
+          returnKeyType='none'
         />
 
         <TouchableOpacity style={styles.login} onPress = {this.handleLogin.bind(this)}>
@@ -70,19 +74,17 @@ const styles = StyleSheet.create({
   inputContainer: {
     marginTop: 10
   },
-  input: {
-    alignSelf: 'stretch',
-    height: 40,
-    marginBottom: 30,
-    color: '#fff',
-    borderBottomColor: '#f8f8f8',
+  textContainer: {
+    borderBottomColor: 'rgba(255, 255, 255, 0.9)',
     borderBottomWidth: 1
   },
   login: {
     alignSelf: 'center',
     backgroundColor: '#59cbbd',
     height: 40,
-    width: WIDTH / 2
+    width: WIDTH / 2,
+    marginTop: 15,
+    marginBottom: 2
   },
   loginText: {
     color: '#fff',

@@ -30,7 +30,7 @@ export default class ClubsPage extends Component {
         // Container for the whole body
         <View style={styles.body}>
             <TouchableOpacity style={{alignItems: 'flex-end', marginRight: '1%', marginTop: '0.4%'}} 
-                onPress = {() => this.props.navigation.navigate("SearchClubs")}>
+                onPress = {() => this.props.navigation.navigate('ClubSearch')}>
                 <Icon name="ios-search-outline" size={44} color={'rgba(255, 255, 255, 0.9)'}/>
             </TouchableOpacity>
 

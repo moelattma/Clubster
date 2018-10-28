@@ -3,7 +3,7 @@
   "main": "node_modules/expo/AppEntry.js",
   "private": true,
   "scripts": {
-    "start": "adb reverse tcp:3000 tcp:3000 && expo start",
+    "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "eject": "expo eject"
@@ -19,6 +19,7 @@
     "react": "16.3.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz",
     "react-native-elements": "^0.19.1",
+    "react-native-material-textfield": "^0.12.0",
     "react-navigation": "^2.18.0",
     "underscore": "^1.9.1",
     "whatwg-fetch": "^2.0.4"

@@ -43,7 +43,7 @@ export default class SearchClubs extends Component {
     renderHeader = () => {
         return (
             <View style={styles.header}>
-                <TouchableOpacity style={{ marginLeft: 10, marginRight: 10 }} onPress={() => this.props.navigation.navigate('ClubsPage')} >
+                <TouchableOpacity style={{ marginLeft: 10, marginRight: 10 }} onPress={() => this.props.navigation.navigate('ClubPage')} >
                     <Icon
                         name="md-arrow-back"
                         size={38}
@@ -64,10 +64,6 @@ export default class SearchClubs extends Component {
         );
     }
 
-    _onPressItem = (item) => {
-
-    }
-
     renderSeparator = () => {
         return (
             <View
@@ -85,7 +81,7 @@ export default class SearchClubs extends Component {
         <ListItem
             roundAvatar
             title={item.name}
-            onPressItem={this._onPressItem}
+            onPress={() => this.props.navigation.navigate('ClubProfile', { item })}
             subtitle={item.description}
             containerStyle={{ borderBottomWidth: 0 }}
         />

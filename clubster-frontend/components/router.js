@@ -5,66 +5,62 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Login from './Login/Login';
 import SignUp from './Login/SignUp';
 import HomeNavigation from "./Login/HomeNavigation";
-import ClubsPage from './Clubs/ClubsPage'
+import ClubPage from './Clubs/ClubPage'
 import Notifications from './Notifications'
 import Profile from './Profile'
-import SearchClubs from './Clubs/SearchClubs'
-import ClubsNavigation from "./Clubs/ClubsNavigation"
+import ClubSearch from './Clubs/ClubSearch'
+import ClubNavigation from "./Clubs/ClubNavigation"
+import ClubProfile from './Clubs/ClubProfile'
 
 export const LoginNavigator = createStackNavigator(
     {
-      LoginScreen: { screen: Login },
-      SignUp: { screen: SignUp },
-      HomeNavigation: {
-        screen: HomeNavigation,
-        navigationOptions: {
-          title: "ClubsPage"
-        }
-      }
+        Login: { screen: Login },
+        SignUp: { screen: SignUp },
+        HomeNavigation: { screen: HomeNavigation }
     },
     {
-      headerMode: 'none'
+        headerMode: 'none'
     }
 );
 
 export const HomeNavigator = createBottomTabNavigator(
     {
-        Notifications: { 
-            screen: Notifications, 
+        Notifications: {
+            screen: Notifications,
             navigationOptions: {
-                tabBarIcon: ({tintColor}) => (
-                    <Icon name="ios-notifications-outline" size={42}/> 
+                tabBarIcon: ({ tintColor }) => (
+                    <Icon name="ios-notifications-outline" size={42} />
                 ),
             }
         },
-        ClubsNavigation: { 
-            screen: ClubsNavigation,
+        ClubNavigation: {
+            screen: ClubNavigation,
             navigationOptions: {
-                tabBarIcon: ({tintColor}) => (
-                    <Icon name="ios-people-outline" size={48}/>
+                tabBarIcon: ({ tintColor }) => (
+                    <Icon name="ios-people-outline" size={48} />
                 )
             }
         },
-        Profile: { 
+        Profile: {
             screen: Profile,
             navigationOptions: {
-                tabBarIcon: ({tintColor}) => (
-                    <Icon name="ios-person-outline" size={44}/>
+                tabBarIcon: ({ tintColor }) => (
+                    <Icon name="ios-person-outline" size={44} />
                 )
             }
-        
+
         }
     },
 
     {
         animationEnabled: true,
         swipeEnabled: true,
-        initialRouteName: "ClubsNavigation",
+        initialRouteName: "ClubNavigation",
         tabBarOptions: {
-            activeBackgroundColor: '#36485f', 
-            inactiveBackgroundColor: '#36485f', 
-            activeTintColor: '#36485f', 
-            showLabel: false, 
+            activeBackgroundColor: '#36485f',
+            inactiveBackgroundColor: '#36485f',
+            activeTintColor: '#36485f',
+            showLabel: false,
             showIcon: true
         }
     }
@@ -72,11 +68,12 @@ export const HomeNavigator = createBottomTabNavigator(
 
 export const ClubsterNavigator = createStackNavigator(
     {
-        ClubsPage: { screen: ClubsPage },
-        SearchClubs: { screen: SearchClubs }
+        ClubPage: { screen: ClubPage },
+        ClubSearch: { screen: ClubSearch },
+        ClubProfile: { screen: ClubProfile }
     },
     {
-        initialRouteName: 'ClubsPage',
+        initialRouteName: 'ClubPage',
         headerMode: 'none',
     }
 );
