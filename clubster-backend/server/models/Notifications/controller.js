@@ -12,9 +12,7 @@ const User = require('../Users/model')
 
 exports.grabNotifications = (req, res) => {
   //gets all notifications based on the userid
-  console.log(req.body._id);
-  const {id} = req.headers;
-  Notifications.find({id: req.body._id}).then((notifications) => {
+  Notifications.find({idOfReciever: req.body._id}).then((notifications) => {
 		if (!notifications)
 		{
 			return res.status(400).json({'Error':'No notifications found'});

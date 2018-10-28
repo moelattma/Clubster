@@ -10,7 +10,7 @@ const morgan = require('morgan');
 const passport = require('passport');
 const {databasePassword, databaseUsername} = require('../config')
 
-mongoose.Promise = global.Promise; // let's us use try catch
+mongoose.Promise = global.Promise; // let's us use then catch
 mongoose.set('useCreateIndex', true);
 mongoose.connect(`mongodb://${databaseUsername}:${databasePassword}@ds131963.mlab.com:31963/clubster`, { useNewUrlParser: true });
 mongoose.connection
