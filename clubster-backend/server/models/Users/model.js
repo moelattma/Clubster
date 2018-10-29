@@ -47,8 +47,8 @@ const User = new Schema({
   }]
 });
 
-User.statics.clubMemberPushing = async function(admin, organization) {
-  await this.findByIdAndUpdate(admin, { $push: { arrayClubsMember: organization._id } });
+User.statics.clubMemberPushing = async function(member, organization) {
+  await this.findByIdAndUpdate(member, { $push: { arrayClubsMember: organization._id } });
 }
 
 User.statics.clubAdminPushing = async function(admin, organization) {
@@ -57,4 +57,4 @@ User.statics.clubAdminPushing = async function(admin, organization) {
 /*
 * Export so that other js files can use this schema
 */
-module.exports = mongoose.model('User', User);
+module.exports = mongoose.model('users', User);

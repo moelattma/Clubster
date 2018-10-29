@@ -19,5 +19,12 @@ router.get('/organizations', (req, res) => {
 	console.log('just bhe');
 	controller.getUserClubs(req, res);
 });
+router.get('/organizations/:idOfOrganization/members', (req, res) => {
+	controller.getMembers(req, res);
+});
+router.post('/organizations/:idOfOrganization/:idOfMember', (req, res) => {
+	controller.addMember(req, res);
+});
+
 
 module.exports = router;

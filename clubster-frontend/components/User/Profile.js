@@ -11,11 +11,11 @@ export default class Profile extends Component {
                 <View style = {styles.header}>
 
                     <View style = {styles.profilePicWrap}>
-                        <Image style = {styles.profilepic} source ={require('../../images/adnan.png')}/>
+                       <Image style = {styles.profilepic} source ={require('../../images/adnan.png')}/>
                     </View>
                         
-                    <Text style={styles.name}> Adnan Yunus </Text>
-                    <Text style={styles.major}> Major: Undecided </Text>
+                    <Text style={styles.name}> Aimal Khan </Text>
+                    <Text style={styles.major}> Major: Econ </Text>
                 </View>
     
 
@@ -74,11 +74,10 @@ const styles = StyleSheet.create({
         borderWidth: 4,
         //justifyContent: 'center',
     },
-
     name: {
         marginTop: 20,
-        fontSize: 16,
-        color: '#fff',
+        fontSize: 20,
+        color: 'black',
         fontWeight: 'bold',
     },
     major: {

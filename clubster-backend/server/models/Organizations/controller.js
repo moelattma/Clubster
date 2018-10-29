@@ -18,17 +18,53 @@ exports.getUserClubs = (req, res) => {
 
 exports.getAllClubs = (req, res) => {
 	// Code to display all the clubs in our Mongo Collection
-	Organization.find().then((organizations) => {
-		if (!organizations)
+	Organization.find().then((organization) => {
+		if (!organization)
 		{
 			return res.status(400).json({'Error':'No organizations found'});
 		}
 		else{
-			return res.status(201).json({'organizations': organizations});
+			return res.status(201).json({'organization': organization});
 		}
 	});
 
 };
+
+// dummy method for adding members
+exports.addMember= (req, res) => {
+	const{idOfOrganization, idOfMember} = req.params;
+	console.log(Organization);
+	// finds and return organization id of specific club
+	Organization.findOne({_id: idOfOrganization}).then((organization)=>{
+		console.log(organization)
+		if (!organization)
+		{
+			return res.status(400).json({'Error':'No organizations found'});
+		}
+		else{
+			Organization.addMemberToClub(idOfOrganization,idOfMember);
+			return res.status(201).json({'organization': organization});
+		}
+	});
+
+}
+
+exports.getMembers = (req, res) => {
+		// Destruct req body ( pull the values to the assign keys)
+	const{idOfOrganization} = req.params;
+	// finds and return organization id of specific club
+	Organization.findOne({_id: idOfOrganization}).populate('members').then((organization)=>{
+		if (!organization)
+		{
+			return res.status(400).json({'Error':'No organizations found'});
+		}
+		else{
+			return res.status(201).json({'organization': organization});
+		}
+	});
+}
+
+
 
 exports.addOrg = (req, res) => {
 	// Code to add a new organization to the Mongo Collection
@@ -55,7 +91,7 @@ exports.addOrg = (req, res) => {
 
 	 				newOrg.save().then(organization => {
 						admins.forEach(function(admin) {
-							User.clubAdminPushing(admin, organization._id);
+							User.clubAdminPushing(admin, organization);
 						});
 						return res.status(201).json(organization);
 					}); // Push the new user onto the db if successful, else display error
