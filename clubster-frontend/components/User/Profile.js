@@ -11,7 +11,7 @@ export default class Profile extends Component {
                 <View style = {styles.header}>
 
                     <View style = {styles.profilePicWrap}>
-                        <Image style = {styles.profilepic} source ={require('../images/adnan.png')}/>
+                        <Image style = {styles.profilepic} source ={require('../../images/adnan.png')}/>
                     </View>
                         
                     <Text style={styles.name}> Adnan Yunus </Text>
