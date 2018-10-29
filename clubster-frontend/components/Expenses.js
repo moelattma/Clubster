@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, FlatList } from 'react-native';
-import axios from 'axios';
+import { TouchableOpacity, StyleSheet, Text, View, FlatList } from 'react-native'
 
 export default class Expenses extends Component {
     constructor(props) {
         super(props);
+
         this.state = {
             expenses:[]
 

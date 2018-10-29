@@ -1,165 +1,155 @@
 import React, { Component } from 'react';
-import { 
-    TouchableOpacity,  
-  StyleSheet, 
-  Text, 
-  View, 
+import {
+  TouchableOpacity,
+StyleSheet,
+Button,
+Text,
+View,
+Dimensions,
+FlatList,
+TextInput,
+TouchableWithoutFeedback,
+TouchableHighlight
 } from 'react-native';
 import axios from 'axios';
-
+import t from 'tcomb-form-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+const Form = t.form.Form;
 
+
+
+const Organization = t.struct({
+  Name: t.String,
+  Abbreviation: t.String,
+  Purpose: t.String,
+  Description: t.String,
+  terms: t.Boolean
+});
+
+const formatData = (data, columnNums) => {
+  let rowsFull = Math.floor(data.length / columnNums);
+  let lastRowNum = data.length % columnNums;
+  for(let i = 0;i<data.length;i++) {
+    data[i]['key'] = data[i]['_id'];
+  }
+  for(;lastRowNum != columnNums && lastRowNum !== 0;) {
+    data.push({ key: `blank-${lastRowNum}`, empty: true });
+    lastRowNum++;
+  }
+  return data;
+}
+
+const numColumns = 3;
 export default class ClubsPage extends Component {
 
     constructor() { // Initializing state
         super();
         this.state = {
-            arrClubsAdmin: []
+            arrClubsAdmin: [],
+            show:false
         }
     }
 
+    renderItem = ({ item, index }) => {
+      if (item.hasOwnProperty('empty') && item.empty === true) {
+        return <TouchableWithoutFeedback onPress={ () => this.actionOnRow(item)}><View style={[styles.item, styles.itemInvisible]} /></TouchableWithoutFeedback>;
+      }
+      return (
+        <TouchableWithoutFeedback onPress={() => this.actionOnRow(item)}>
+          <View style={styles.item}>
+            <Text style={styles.itemText}>{item.name}</Text>
+          </View>
+        </TouchableWithoutFeedback>
+      );
+    };
+
+    handleSubmit = () => {
+      const value = this._formRef.getValue().Abbreviation;
+      console.log('value: ', value);
+    }
+
+    renderElement(){
+      if(this.state.show == true)
+        return <View style = {{flex:1}}><Form type={Organization} ref={(ref) => this._formRef=ref}/><Button title="Sign Up!" onPress={this.handleSubmit}/></View>;
+      return <View style = {{flex:1}}><FlatList data={formatData(this.state.arrClubsAdmin, numColumns)} renderItem={this.renderItem} numColumns={numColumns}/><TouchableOpacity style={styles.btn} onPress={() => {this.setState({show:true});}}><Text style={styles.plus}>+</Text></TouchableOpacity></View>;
+    }
+
+
+
     componentDidMount() {
         axios.get("http://localhost:3000/api/organizations").then((response) => {
-            this.state.arrClubsAdmin = response.data; // Setting up state variable
+            this.setState({arrClubsAdmin:response.data.user.arrayClubsAdmin}); // Setting up state variable
             console.log(this.state.arrClubsAdmin);
         }).catch((err) => console.log(err));
     };
 
   render() {
     return (
-        // Container for the whole body
-        <View style={styles.body}>
-            <TouchableOpacity style={{alignItems: 'flex-end', marginRight: '1%', marginTop: '0.4%'}} 
-                onPress = {() => this.props.navigation.navigate('ClubSearch')}>
-                <Icon name="ios-search-outline" size={44} color={'rgba(255, 255, 255, 0.9)'}/>
-            </TouchableOpacity>
-
-            {/* Using Flexbox 1 to align box 1 and 2 in same row
-            which takes 2/3 of the main body */}
-            <View style={styles.flexBox1}>      
-                <TouchableOpacity style={styles.button1}>
-                    <Text style={styles.clubName}>
-                        Club 1
-                    </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.button2}>
-                    <Text style={styles.clubName}>
-                        Club2
-                    </Text>
-                </TouchableOpacity>
-            </View>
-
-            {/* Using flexBox2 to align box3 and 4 in second row 
-            which takes 2/3 of the main body */}
-            <View style={styles.flexBox2} >
-                <TouchableOpacity style={styles.button3}>
-                    <Text style={styles.clubName}>
-                        Club3
-                    </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.button4}>
-                    <Text style={styles.clubName}>
-                        Club4
-                    </Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+      // Container for the whole body
+    <View style={styles.container}>
+        {this.renderElement()}
+     </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-    body : {
-        flex: 1,
-        paddingTop: 25,
-        backgroundColor: '#36485f',
-        alignItems: 'stretch',
-    },
-    header: {
-        color : 'white', 
-        fontWeight: 'bold', 
-        fontSize: 35,
-        fontStyle: 'italic',
-        alignSelf: 'center',
-    },
-    flexBox1: {
-        flex: 3,
-        height: 10,
-        alignItems: 'center',
-        backgroundColor: '#6699cc',
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-    },
-    flexBox2: {
-        flex: 3,
-        height: 10,
-        alignItems: 'center',
-        backgroundColor: '#6699cc',
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-    },
-    flexBox3: {
-        flex: 1,
-        borderWidth: 1,
-        height: 10,
-        alignItems: 'center',
-        backgroundColor: '#9fbfdf',
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-    },
-    button1: {
-        height: 150,
-        width: 150,
-        marginLeft: 10,
-        marginTop: 80,
-        marginBottom: 100,
-        alignSelf: 'stretch',
-        justifyContent: 'center',
-        backgroundColor: '#80ffcc',
-    },
-    button2: {
-        height: 150,
-        width: 150,
-        marginLeft: 10,
-        marginTop: 80,
-        marginBottom: 100, 
-        alignSelf: 'stretch',
-        justifyContent: 'center',
-        backgroundColor: '#df80ff',  
-    },
-    button3: {
-        height: 150,
-        width: 150,
-        marginBottom: 20,
-        marginTop: 30,
-        marginLeft: 10,
-        backgroundColor: '#ff8080',
-        alignSelf: 'stretch',
-        justifyContent: 'center',
-        
-    },
-    button4: {
-        height: 150,
-        width: 150,
-        marginBottom: 20,
-        marginTop: 30,
-        marginLeft: 10,
-        alignSelf: 'stretch',
-        justifyContent: 'center',
-        backgroundColor: '#ffff80',
-    },
-
-    clubName:{
-        fontSize: 40,
-        color: 'black',
-        alignSelf: 'center',
-        fontWeight: 'bold',
-    },
-    insideText: {
-        fontSize: 20,
-        alignSelf: 'center',
-        fontWeight: 'bold',
-    },
+  row: {
+  flex: 1,
+  flexDirection: "row"
+},
+button: {
+  backgroundColor: 'lightblue',
+  padding: 12,
+  margin: 16,
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 4,
+  borderColor: 'rgba(0, 0, 0, 0.1)',
+},
+modalContent: {
+  backgroundColor: 'white',
+  padding: 82,
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 4,
+  borderColor: 'rgba(0, 0, 0, 0.1)',
+},
+bottomModal: {
+  justifyContent: 'flex-end',
+  margin: 0,
+},
+container: {
+  flex: 1,
+  marginVertical: 20,
+},
+btn:{
+  position:'absolute',
+  width:50,
+  height:50,
+  backgroundColor:'#03A9F4',
+  borderRadius:30,
+  bottom:0,
+  right:0,
+  alignItems:'center',
+  justifyContent:'center'
+},
+plus: {
+  fontSize: 40,
+  color: 'white'
+},
+item: {
+  backgroundColor: '#4D243D',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flex: 1,
+  margin: 1,
+  height: Dimensions.get('window').width / numColumns,
+},
+itemInvisible: {
+  backgroundColor: 'transparent',
+},
+itemText: {
+  color: '#fff',
+}
 });
