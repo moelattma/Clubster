@@ -1,8 +1,13 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, Image } from 'react-native'; 
+import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native'; 
 
 export default class Profile extends Component {
-
+    constructor() {
+        super();
+        this.state = {
+            show:false
+        }
+    }
     
     render() {
         return (
@@ -17,23 +22,7 @@ export default class Profile extends Component {
                     <Text style={styles.name}> Aimal Khan </Text>
                     <Text style={styles.major}> Major: Econ </Text>
                 </View>
-    
-
-            {/* Profile Bar */}
-            
-                <View style={styles.bar}>
-
-                    <View style={styles.barItem}>
-                        <Text style={styles.barTop}>22</Text>
-                        <Text style={styles.barBottom}>Clubs Joined</Text>
-                    </View>
-
-                    <View style={[styles.barItem, styles.barSeparator]}>
-                        <Text style={styles.barTop}>11</Text>
-                        <Text style={styles.barBottom}>Events Attended</Text>
-                    </View>
-
-                </View>
+                <TouchableOpacity style={styles.btn} onPress={() => { this.setState({ show: true }); }}><Text style={styles.plus}>+</Text></TouchableOpacity>
 
             </View>
             
@@ -101,6 +90,21 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         fontStyle: 'italic'
+    },
+    btn: {
+        position: 'absolute',
+        width: 50,
+        height: 50,
+        backgroundColor: '#03A9F4',
+        borderRadius: 30,
+        bottom: 0,
+        right: 0,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    plus: {
+        fontSize: 40,
+        color: 'white'
     },
     barBottom: {
         color: 'white',
