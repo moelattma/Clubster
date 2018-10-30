@@ -4,8 +4,10 @@ import { ClubsterNavigator } from '../router'
 
 export default class ClubsNavigation extends Component {
   render() {
+    const { home } = this.props.screenProps;
+
     return (
-        <ClubsterNavigator />
+        <ClubsterNavigator screenProps={{ home }} />
     );
   }
 }

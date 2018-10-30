@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-export default class Dashboard extends Component {                 
+export default class Dashboard extends Component {  
   render() {
+    const { screenProps } = this.props;
+    console.log('hello');
+    console.log(    screenProps.organization      );
     return (
       <View style={styles.container}>
         

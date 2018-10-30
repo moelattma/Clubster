@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import {
   TouchableOpacity,
-StyleSheet,
-Button,
-Text,
-View,
-Dimensions,
-FlatList,
-TextInput,
-TouchableWithoutFeedback,
-TouchableHighlight
+  StyleSheet,
+  Button,
+  Text,
+  View,
+  Dimensions,
+  FlatList,
+  TextInput,
+  TouchableWithoutFeedback,
+  TouchableHighlight
 } from 'react-native';
 import axios from 'axios';
 import t from 'tcomb-form-native';
@@ -29,10 +29,10 @@ const Organization = t.struct({
 const formatData = (data, columnNums) => {
   let rowsFull = Math.floor(data.length / columnNums);
   let lastRowNum = data.length % columnNums;
-  for(let i = 0;i<data.length;i++) {
+  for (let i = 0; i < data.length; i++) {
     data[i]['key'] = data[i]['_id'];
   }
-  for(;lastRowNum != columnNums && lastRowNum !== 0;) {
+  for (; lastRowNum != columnNums && lastRowNum !== 0;) {
     data.push({ key: `blank-${lastRowNum}`, empty: true });
     lastRowNum++;
   }
@@ -42,114 +42,115 @@ const formatData = (data, columnNums) => {
 const numColumns = 3;
 export default class ClubsPage extends Component {
 
-    constructor() { // Initializing state
-        super();
-        this.state = {
-            arrClubsAdmin: [],
-            show:false
-        }
+  constructor() { // Initializing state
+    super();
+    this.state = {
+      arrClubsAdmin: [],
+      show: false
     }
+  }
 
-    renderItem = ({ item, index }) => {
-      if (item.hasOwnProperty('empty') && item.empty === true) {
-        return <TouchableWithoutFeedback onPress={ () => this.actionOnRow(item)}><View style={[styles.item, styles.itemInvisible]} /></TouchableWithoutFeedback>;
-      }
-      return (
-        <TouchableWithoutFeedback onPress={() => this.actionOnRow(item)}>
-          <View style={styles.item}>
-            <Text style={styles.itemText}>{item.name}</Text>
-          </View>
-        </TouchableWithoutFeedback>
-      );
-    };
-
-    handleSubmit = () => {
-      const value = this._formRef.getValue().Abbreviation;
-      console.log('value: ', value);
+  renderItem = ({ item, index }) => {
+    if (item.hasOwnProperty('empty') && item.empty === true) {
+      return <TouchableWithoutFeedback onPress={() => this.actionOnRow(item)}><View style={[styles.item, styles.itemInvisible]} /></TouchableWithoutFeedback>;
     }
+    const { screenProps } = this.props;  
+    return (
+      <TouchableWithoutFeedback onPress={() => screenProps.home.navigate('AdminNavigation', { item })}>
+        <View style={styles.item}>
+          <Text style={styles.itemText}>{item.name}</Text>
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  };
 
-    renderElement(){
-      if(this.state.show == true)
-        return <View style = {{flex:1}}><Form type={Organization} ref={(ref) => this._formRef=ref}/><Button title="Sign Up!" onPress={this.handleSubmit}/></View>;
-      return <View style = {{flex:1}}><FlatList data={formatData(this.state.arrClubsAdmin, numColumns)} renderItem={this.renderItem} numColumns={numColumns}/><TouchableOpacity style={styles.btn} onPress={() => {this.setState({show:true});}}><Text style={styles.plus}>+</Text></TouchableOpacity></View>;
-    }
+  handleSubmit = () => {
+    const value = this._formRef.getValue().Abbreviation;
+    console.log('value: ', value);
+  }
+
+  renderElement() {
+    if (this.state.show == true)
+      return <View style={{ flex: 1 }}><Form type={Organization} ref={(ref) => this._formRef = ref} /><Button title="Sign Up!" onPress={this.handleSubmit} /></View>;
+    return <View style={{ flex: 1 }}><FlatList data={formatData(this.state.arrClubsAdmin, numColumns)} renderItem={this.renderItem} numColumns={numColumns} /><TouchableOpacity style={styles.btn} onPress={() => { this.setState({ show: true }); }}><Text style={styles.plus}>+</Text></TouchableOpacity></View>;
+  }
 
 
 
-    componentDidMount() {
-        axios.get("http://localhost:3000/api/organizations").then((response) => {
-            this.setState({arrClubsAdmin:response.data.user.arrayClubsAdmin}); // Setting up state variable
-            console.log(this.state.arrClubsAdmin);
-        }).catch((err) => console.log(err));
-    };
+  componentDidMount() {
+    axios.get("http://localhost:3000/api/organizations").then((response) => {
+      this.setState({ arrClubsAdmin: response.data.user.arrayClubsAdmin }); // Setting up state variable
+      console.log(this.state.arrClubsAdmin);
+    }).catch((err) => console.log(err));
+  };
 
   render() {
     return (
       // Container for the whole body
-    <View style={styles.container}>
+      <View style={styles.container}>
         {this.renderElement()}
-     </View>
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
   row: {
-  flex: 1,
-  flexDirection: "row"
-},
-button: {
-  backgroundColor: 'lightblue',
-  padding: 12,
-  margin: 16,
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: 4,
-  borderColor: 'rgba(0, 0, 0, 0.1)',
-},
-modalContent: {
-  backgroundColor: 'white',
-  padding: 82,
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: 4,
-  borderColor: 'rgba(0, 0, 0, 0.1)',
-},
-bottomModal: {
-  justifyContent: 'flex-end',
-  margin: 0,
-},
-container: {
-  flex: 1,
-  marginVertical: 20,
-},
-btn:{
-  position:'absolute',
-  width:50,
-  height:50,
-  backgroundColor:'#03A9F4',
-  borderRadius:30,
-  bottom:0,
-  right:0,
-  alignItems:'center',
-  justifyContent:'center'
-},
-plus: {
-  fontSize: 40,
-  color: 'white'
-},
-item: {
-  backgroundColor: '#4D243D',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flex: 1,
-  margin: 1,
-  height: Dimensions.get('window').width / numColumns,
-},
-itemInvisible: {
-  backgroundColor: 'transparent',
-},
-itemText: {
-  color: '#fff',
-}
+    flex: 1,
+    flexDirection: "row"
+  },
+  button: {
+    backgroundColor: 'lightblue',
+    padding: 12,
+    margin: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 4,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 82,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 4,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  bottomModal: {
+    justifyContent: 'flex-end',
+    margin: 0,
+  },
+  container: {
+    flex: 1,
+    marginVertical: 20,
+  },
+  btn: {
+    position: 'absolute',
+    width: 50,
+    height: 50,
+    backgroundColor: '#03A9F4',
+    borderRadius: 30,
+    bottom: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  plus: {
+    fontSize: 40,
+    color: 'white'
+  },
+  item: {
+    backgroundColor: '#4D243D',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    margin: 1,
+    height: Dimensions.get('window').width / numColumns,
+  },
+  itemInvisible: {
+    backgroundColor: 'transparent',
+  },
+  itemText: {
+    color: '#fff',
+  }
 });
