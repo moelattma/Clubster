@@ -16,15 +16,15 @@ router.post('/organizations/new', (req, res) => {
 });
 
 router.get('/organizations', (req, res) => {
-	console.log('just bhe');
 	controller.getUserClubs(req, res);
 });
+
 router.get('/organizations/:idOfOrganization/members', (req, res) => {
 	controller.getMembers(req, res);
 });
+
 router.post('/organizations/:idOfOrganization/:idOfMember', (req, res) => {
 	controller.deleteClubMember(req, res);
 });
-
 
 module.exports = router;

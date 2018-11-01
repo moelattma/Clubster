@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { FlatList, TouchableOpacity, View, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
-import { List, ListItem, SearchBar } from 'react-native-elements';
+import { List, ListItem, SearchBar, Header } from 'react-native-elements';
 import _ from 'lodash';
-import Icon from 'react-native-vector-icons/Ionicons'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import axios from 'axios';
 
 export default class SearchClubs extends Component {
@@ -37,22 +37,17 @@ export default class SearchClubs extends Component {
             return org.name.toLowerCase().includes(formatQuery);
         });
 
-        this.setState({ query: text, organizations: data }); 
+        this.setState({ query: text, organizations: data });
     }
 
     renderHeader = () => {
         return (
             <View style={styles.header}>
-                <TouchableOpacity style={{ marginLeft: 10, marginRight: 10 }} onPress={() => this.props.navigation.navigate('ClubPage')} >
-                    <Icon
-                        name="md-arrow-back"
-                        size={38}
-                        color={'rgba(0, 0, 0, 0.9)'}
-                    />
+                <TouchableOpacity style={{ marginLeft: 14, marginRight: 4 }} onPress={() => this.props.navigation.navigate('ClubPage')} >
+                    <MaterialIcons name="arrow-back" size={32} color={'black'} />
                 </TouchableOpacity>
                 <SearchBar
                     containerStyle={{ flex: 1, alignSelf: 'center', backgroundColor: '#ffffff', borderBottomWidth: 0 }}
-                    style={{ flex: 1 }}
                     clearIcon
                     placeholder="Search Clubs"
                     lightTheme
@@ -83,7 +78,7 @@ export default class SearchClubs extends Component {
             title={item.name}
             onPress={() => this.props.navigation.navigate('ClubProfile', { item })}
             subtitle={item.description}
-            containerStyle={{ borderBottomWidth: 0 }}
+            containerStyle={{ borderBottomWidth: 0, height: 80 }}
         />
     )
 
@@ -103,6 +98,7 @@ export default class SearchClubs extends Component {
                     data={this.state.organizations}
                     renderItem={this._renderItem}
                     keyExtractor={organization => organization.name}
+                    ListHeaderComponent={false}
                     ListHeaderComponent={this.renderHeader}
                     ItemSeparatorComponent={this.renderSeparator}
                     ListFooterComponent={this.renderFooter}

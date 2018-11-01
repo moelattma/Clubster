@@ -19,7 +19,7 @@ const Notifications = new Schema({
   idOfOrganization: {
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'organizations',
-    required:false
+    required: false
   },
   idOfReciever: {
     type: Schema.Types.ObjectId,   //Specifiers

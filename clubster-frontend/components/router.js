@@ -26,13 +26,15 @@ import Chat from './User/ClubAdmin/Chat'
 
 export const LoginNavigator = createSwitchNavigator(
     {
-        Login: { screen: Login },
-        SignUp: { screen: SignUp },
-        HomeNavigation: { screen: HomeNavigation },
+        Login: { screen: Login, navigationOptions: { header: null } },
+        SignUp: { screen: SignUp, navigationOptions: { header: null } },
+        HomeNavigation: { screen: HomeNavigation, navigationOptions: { header: null } },
         AdminNavigation: { screen: AdminNavigation }
     },
     {
-        headerMode: 'none'
+        navigationOptions: {
+            headerBackImage: (<MaterialIcons name="arrow-back" size={32} color={'black'} />)
+        }
     }
 );
 
@@ -41,24 +43,24 @@ export const HomeNavigator = createBottomTabNavigator(
         Notifications: {
             screen: Notifications,
             navigationOptions: {
-                tabBarIcon: ({ tintColor }) => ( 
-                    <Ionicons name="ios-notifications" size={42} color={tintColor} /> 
+                tabBarIcon: ({ tintColor }) => (
+                    <Ionicons name="ios-notifications" size={42} color={tintColor} />
                 )
             }
         },
         ClubNavigation: {
             screen: ClubNavigation,
             navigationOptions: {
-                tabBarIcon: ({ tintColor }) => ( 
-                    <MaterialCommunityIcons name="home-assistant" size={48} color={tintColor} /> 
+                tabBarIcon: ({ tintColor }) => (
+                    <MaterialCommunityIcons name="home-assistant" size={48} color={tintColor} />
                 )
             }
         },
         Profile: {
             screen: Profile,
             navigationOptions: {
-                tabBarIcon: ({ tintColor }) => ( 
-                    <Ionicons name="ios-person" size={44} color={tintColor} /> 
+                tabBarIcon: ({ tintColor }) => (
+                    <Ionicons name="ios-person" size={44} color={tintColor} />
                 )
             }
         }
@@ -82,55 +84,57 @@ export const HomeNavigator = createBottomTabNavigator(
 
 export const ClubsterNavigator = createStackNavigator(
     {
-        ClubPage: { screen: ClubPage },
-        ClubSearch: { screen: ClubSearch },
+        ClubPage: { screen: ClubPage, navigationOptions: { header: null } },
+        ClubSearch: { screen: ClubSearch, navigationOptions: { header: null } },
         ClubProfile: { screen: ClubProfile }
     },
     {
         initialRouteName: 'ClubPage',
-        headerMode: 'none',
+        navigationOptions: {
+            headerBackImage: (<MaterialIcons name="arrow-back" size={32} color={'black'} />)
+        }
     }
 );
 
 export const AdminNavigator = createBottomTabNavigator(
     {
-        Dashboard: { 
+        Dashboard: {
             screen: Dashboard,
             navigationOptions: {
-                tabBarIcon: ({ tintColor }) => ( 
-                    <FontAwesome name="home" size={42} color={tintColor} /> 
+                tabBarIcon: ({ tintColor }) => (
+                    <FontAwesome name="home" size={42} color={tintColor} />
                 )
             }
         },
-        ClubEvents: { 
-            screen: ClubEvents, 
-            navigationOptions: { 
-                tabBarIcon: ({ tintColor }) => ( 
-                    <MaterialIcons name="event" size={40} color={tintColor} /> 
+        ClubEvents: {
+            screen: ClubEvents,
+            navigationOptions: {
+                tabBarIcon: ({ tintColor }) => (
+                    <MaterialIcons name="event" size={40} color={tintColor} />
                 )
             }
         },
-        Expenses: { 
-            screen: Expenses, 
-            navigationOptions: { 
-                tabBarIcon: ({ tintColor }) => ( 
-                    <FontAwesome name="money" size={38} color={tintColor} /> 
+        Expenses: {
+            screen: Expenses,
+            navigationOptions: {
+                tabBarIcon: ({ tintColor }) => (
+                    <FontAwesome name="money" size={38} color={tintColor} />
                 )
             }
         },
-        MemberList: { 
+        MemberList: {
             screen: MemberList,
-            navigationOptions: { 
-                tabBarIcon: ({ tintColor }) => ( 
-                    <Ionicons name="ios-people" size={46} color={tintColor} /> 
+            navigationOptions: {
+                tabBarIcon: ({ tintColor }) => (
+                    <Ionicons name="ios-people" size={46} color={tintColor} />
                 )
             }
         },
-        Chat: { 
-            screen: Chat, 
-            navigationOptions: { 
-                tabBarIcon: ({ tintColor }) => ( 
-                    <FontAwesome name="wechat" size={38} color={tintColor} /> 
+        Chat: {
+            screen: Chat,
+            navigationOptions: {
+                tabBarIcon: ({ tintColor }) => (
+                    <FontAwesome name="wechat" size={38} color={tintColor} />
                 )
             }
         }

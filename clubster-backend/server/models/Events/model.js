@@ -1,0 +1,59 @@
+/*
+* Model for Profile.
+* Author: ayunus@ucsc.edu
+* Class: CS115
+*/
+
+//Include libraries
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+/*
+* Creation of User Schema. We specify a const variable with fields: name, email, password, avatar, array of clubs where user is member, and array of clubs where user is admin.
+*/
+const Events = new Schema({
+  organization: {
+    type: Schema.Types.ObjectId,   //Specifiers
+    ref: 'organizations'
+  },
+  name: {
+    type: String,
+    required: true
+  },
+  date: {
+    type: String,
+    required: true
+  },
+  time: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true,
+    minlength: 10,
+    trim: true,
+    unique: true
+  },
+  going: [{
+    type: Schema.Types.ObjectId,   //Specifiers
+    ref: 'users'
+  }], 
+  interested: [{
+    type: Schema.Types.ObjectId,   //Specifiers
+    ref: 'users'
+  }]
+});
+
+Events.statics.addGoingUser = async function(eventID, userID) {
+  await this.findByIdAndUpdate(eventID, { $push: { going: userID } });
+}
+
+Events.statics.addInterestedUser = async function(eventID, userID) {
+  await this.findByIdAndUpdate(eventID, { $push: { interested: userID } });
+}
+
+/*
+* Export so that other js files can use this schema
+*/
+module.exports = mongoose.model('Events', Events);

@@ -8,7 +8,7 @@ export default class ClubProfile extends Component {
 
         return (
             <View style={styles.background}>
-            
+                <Text style={{ marginTop: 14, fontSize: 34, alignSelf: 'center', color: 'black' }}> {organization.name} </Text>
             </View>
         );
     }
@@ -16,6 +16,6 @@ export default class ClubProfile extends Component {
 
 const styles = StyleSheet.create({
     background: {
-        flex: 1,
+        flex: 1
     }
 });

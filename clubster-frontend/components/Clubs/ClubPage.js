@@ -9,8 +9,7 @@ import {
   FlatList,
   TextInput,
   TouchableWithoutFeedback,
-  TouchableHighlight
-} from 'react-native';
+  TouchableHighlight } from 'react-native';
 import axios from 'axios';
 import t from 'tcomb-form-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -88,6 +87,8 @@ export default class ClubsPage extends Component {
     return (
       // Container for the whole body
       <View style={styles.container}>
+        <Button onPress={() => this.props.navigation.navigate('ClubSearch')} title="Search Clubs"/>
+          
         {this.renderElement()}
       </View>
     );

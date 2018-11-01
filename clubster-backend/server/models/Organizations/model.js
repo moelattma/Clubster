@@ -49,7 +49,11 @@ const Organization = new Schema({
   members: [{
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'users'
-  }],
+  }], 
+  events: [{
+    type: Schema.Types.ObjectId,   //Specifiers
+    ref: 'Events'
+  }]
 });
 
 Organization.statics.addMemberToClub = async function(organizationID, memberID) {
@@ -61,6 +65,14 @@ Organization.statics.addAdminToClub = async function(organizationID, adminID) {
 }
 Organization.statics.deleteClubMember = async function(organizationID, memberID) {
   await this.findByIdAndUpdate(organizationID, { $pull: { members: memberID } });
+}
+
+Organization.statics.addEventToClub = async function(organizationID, eventID) {
+  await this.findByIdAndUpdate(organizationID, { $push: { events: eventID } });
+}
+
+Organization.statics.addEventToClub = async function(organizationID, eventID) {
+  await this.findByIdAndUpdate(organizationID, { $push: { events: eventID } });
 }
 
 /*

@@ -3,10 +3,8 @@
 * author: ayunus@ucsc.edu
 */
 
-// Import
 const Organization = require('./model');
 const User = require('../Users/model');
-
 
 exports.getUserClubs = (req, res) => {
 	console.log(req.body._id);
@@ -16,17 +14,15 @@ exports.getUserClubs = (req, res) => {
 	}).catch((err) => console.log(err));
 };
 
+// Display all the clubs in our Mongo Collection
 exports.getAllClubs = (req, res) => {
-	// Code to display all the clubs in our Mongo Collection
 	Organization.find().then((organization) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No organizations found' });
-		}
-		else {
-			return res.status(201).json({ 'organization': organization });
+		} else {
+			return res.status(201).json({ 'organizations': organization });
 		}
 	});
-
 };
 
 // dummy method for adding members
@@ -39,14 +35,13 @@ exports.addMember = (req, res) => {
 		console.log(organization)
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No organizations found' });
-		}
-		else {
+		} else {
 			Organization.addMemberToClub(idOfOrganization, idOfMember);
 			return res.status(201).json({ 'organization': organization });
 		}
 	});
-
 }
+
 exports.deleteClubMember = (req, res) => {
 	const { idOfOrganization, idOfMember } = req.params;
 	console.log(idOfOrganization, idOfMember);
@@ -61,8 +56,8 @@ exports.deleteClubMember = (req, res) => {
 			Organization.deleteClubMember(idOfOrganization, idOfMember);
 			return res.status(201).json({ 'organization': organization });
 		}
-});
-} 
+	});
+}
 
 exports.getMembers = (req, res) => {
 	// Destruct req body ( pull the values to the assign keys)
@@ -115,5 +110,4 @@ exports.addOrg = (req, res) => {
 	else {
 		return res.status(201).json({ 'Error': 'Error' });
 	}
-
 };

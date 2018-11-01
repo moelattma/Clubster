@@ -3,6 +3,7 @@ const express = require('express');
 const loginRoutes = require('./models/Users/routes');
 const organizationRoutes = require('./models/Organizations/routes');
 const profileRoutes = require('./models/Profile/routes');
+const eventRoutes = require('./models/Events/routes');
 const notificationRoutes = require('./models/Notifications/routes');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -29,7 +30,7 @@ app.use(passport.initialize());
 // Passport Config
 require('./utils/passport')(passport);
 
-app.use('/api', [loginRoutes,organizationRoutes, profileRoutes, notificationRoutes]);
+app.use('/api', [loginRoutes,organizationRoutes, profileRoutes, notificationRoutes,eventRoutes]);
 
 const PORT = process.env.PORT || 3000;
 
