@@ -1,4 +1,8 @@
 import React, { Component } from 'react';
+//import { AntDesign } from 'react-native-vector-icons/AntDesign';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+
+
 import {
   TouchableOpacity,
   StyleSheet,
@@ -24,24 +28,31 @@ export default class MemberList extends Component {
   }
   renderItem = ({ item }) => {
     return (
-      <TouchableOpacity style={{ flex: 1, flexDirection: 'row', marginBottom: 3 }}
-        onPress={() => ToastAndroid.show(item.book_title, ToastAndroid.SHORT)}>
-        <Image style={{ width: 80, height: 80, margin: 5 }}
-          source={{ uri: item.avatar }} />
-        <View style={{ flex: 1, justifyContent: 'center', marginLeft: 5 }}>
-          <Text style={{ fontSize: 18, color: 'green', marginBottom: 15 }}>
-            {item.name}
-          </Text>
-          <Text style={{ fontSize: 16, color: 'red' }}>
-            {item.username}
-          </Text>
-        </View>
-        {/* // Delete Button */}
-        <View style={{ flex: 1, justifyContent: 'center'}}>
-          <Text style={styles.plus}>+</Text>
-        </View>
+      <View>
+        <TouchableOpacity style={{ flex: 1, flexDirection: 'row', marginBottom: 3 }}
+          onPress={() => ToastAndroid.show(item.book_title, ToastAndroid.SHORT)}>
+          <Image style={{ width: 80, height: 80, margin: 5 }}
+            source={{ uri: item.avatar }} />
+          <View style={{ flex: 1, justifyContent: 'center', marginLeft: 5 }}>
+            <Text style={{ fontSize: 18, color: 'green', marginBottom: 15 }}>
+              {item.name}
+            </Text>
+            <Text style={{ fontSize: 16, color: 'red' }}>
+              {item.username}
+            </Text>
+          </View>
+        </TouchableOpacity>
 
-      </TouchableOpacity>
+        {/* Delete Button */}
+        <TouchableOpacity style={styles.btn} onPress={() => { this.deleteUser(item._id)}}>
+          <MaterialIcons
+            name="delete-forever"
+            size={35}
+            color={'black'}
+          />
+        </TouchableOpacity>
+
+      </View>
     )
   }
   // item seprator using black color line in between 
@@ -55,8 +66,19 @@ export default class MemberList extends Component {
   }
   componentWillMount() {
     // get request-setup memberArr[]
-    axios.get('http://localhost:3000/api/organizations/5bd150152632506f2c53dde1/members').then((response) => {
+    axios.get('http://localhost:3000/api/organizations/5bd3fac350f9b629004dea0f/members').then((response) => {
       this.setState({ memberArr: response.data.organization.members });
+      console.log(this.state.memberArr);
+    });
+  }
+
+  deleteUser = (idDeleted) => {
+    // post request - we delete user by sending the id of user thats going to be deleted to the backend
+    axios.post(`http://localhost:3000/api/organizations/5bd3fac350f9b629004dea0f/${idDeleted}`).then((response) => {
+      var arr = this.state.memberArr.filter(function(id) {
+        return id !== idDeleted;
+      });
+      this.setState({memberArr: arr});
       console.log(this.state.memberArr);
     });
   }
@@ -74,10 +96,10 @@ export default class MemberList extends Component {
             data={this.state.memberArr}
             renderItem={this.renderItem}
             // the keyExtractor prop to specify which piece of data should be used as key
-            keyExtractor={(item, index) => index}
+            keyExtractor={member => member._id}
 
             //Divider to the FlatList
-            ItemSepratorComponent={this.renderSeparator}
+            ItemSeparatorComponent={this.renderSeparator}
           />
         </View>
     );
@@ -91,5 +113,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingLeft: 60,
     paddingRight: 60
+  },
+  btn: {
+    position: 'absolute',
+    width: 40,
+    height: 40,
+    backgroundColor: '#fff',
+    borderRadius: 30,
+    //borderColor: 'black',
+    bottom: 35,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 });

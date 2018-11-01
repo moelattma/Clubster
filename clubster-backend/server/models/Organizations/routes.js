@@ -23,7 +23,7 @@ router.get('/organizations/:idOfOrganization/members', (req, res) => {
 	controller.getMembers(req, res);
 });
 router.post('/organizations/:idOfOrganization/:idOfMember', (req, res) => {
-	controller.addMember(req, res);
+	controller.deleteClubMember(req, res);
 });
 
 
