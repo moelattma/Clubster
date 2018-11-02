@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, FlatList, List } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, FlatList } from 'react-native';
 import axios from 'axios';
 
 export default class Expenses extends Component {
@@ -7,19 +7,50 @@ export default class Expenses extends Component {
         super(props);
 
         this.state = {
-            expenses: [],
+            expenses: [
+                {
+                    "_id": "1",
+                    "event": "Movie Night",
+                    "amount": "$150"
+                },
+
+                {
+                    "_id": "2",
+                    "event": "Study Slam",
+                    "amount": "$250"
+                },
+
+                {
+                    "_id": "3",
+                    "event": "Knitting Day",
+                    "amount": "$100"
+                },
+
+                {
+                    "_id": "4",
+                    "event": "Thanksgiving",
+                    "amount": "$500"
+                },
+
+                {
+                    "_id": "5",
+                    "event": "Election Day",
+                    "amount": "$140"
+                }
+
+            ],
         }
     }
     _renderItem = ({ item }) => {
         return (
             // <TouchableOpacity style={{  }}
             //     onPress={() => }>
-                <View style={{ flex: 1, justifyContent: 'center', marginLeft: 5 }}>
-                    <Text style={{ fontSize: 18, color: 'green', marginBottom: 15 }}>
-                        {item.eventName}
+                <View style={styles.expense}>
+                    <Text style={{ fontSize: 20, color: 'blue'}}>
+                        {item.event}
                     </Text>
-                    <Text style={{ fontSize: 16, color: 'red' }}>
-                        {item.eventCost}
+                    <Text style={{ fontSize: 20, color: 'blue'}}>
+                        {item.amount}
                     </Text>
                 </View>
 
@@ -30,29 +61,28 @@ export default class Expenses extends Component {
     renderSeparator = () => {
         return (
           <View
-            style={{ height: 1, width: '100%', backgroundColor: 'pink' }}>    
+            style={{ height: 1, width: '100%', backgroundColor: 'black' }}>    
           </View>
         )
       }
 
     componentDidMount() {
-        const { screenProps } = this.props;
-        console.log(screenProps._id);
-        axios.get("http://localhost:3000/api/organizations/${screenProps._id}").then((response) => {
-            this.setState({ expenses: response.data.expenses }); // Setting up state variable
-        }).catch((err) => console.log(err));
+        // const { screenProps } = this.props;
+        // console.log(screenProps._id);
+        // axios.get("http://localhost:3000/api/organizations/${screenProps._id}").then((response) => {
+        //     this.setState({ expenses: response.data.expenses }); // Setting up state variable
+        // }).catch((err) => console.log(err));
     }
 
     render() {
         return (
-            <View>
+            <View style={styles.expensesPage}>
                 
                     <FlatList
                         data={this.state.expenses}
                         renderItem={this._renderItem}
                         keyExtractor={(expense) => expense._id}
-                        
-                        itemSep = {this.renderSeparator}
+                        ItemSeparatorComponent={this.renderSeparator}
                     />
                 
             </View>
@@ -63,27 +93,18 @@ export default class Expenses extends Component {
 
 
 const styles = StyleSheet.create({
-    body: {
+    expense: {
         flex: 1,
-        paddingTop: 25,
-        backgroundColor: '#36485f',
-        alignItems: 'stretch',
-    },
+        flexDirection: 'row',
+        backgroundColor: 'lightgrey',
+        paddingVertical: 15,
+        paddingHorizontal: 5,
+        justifyContent: 'space-between'
+    }, 
 
-    header: {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 35,
-        fontStyle: 'italic',
-        alignSelf: 'center',
-    },
-
-    notification: {
-        flex: 1,
-        backgroundColor: '#36485f'
-    },
-
-    notificationText: {
-        alignSelf: 'center'
+    expensesPage: {
+        marginTop: 30,
+        marginHorizontal: 5,
+        marginBottom: 5
     }
 });

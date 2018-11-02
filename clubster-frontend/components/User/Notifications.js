@@ -1,35 +1,23 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, FlatList, List, ListItem } from 'react-native'
+import { TouchableOpacity, StyleSheet, Text, View, FlatList } from 'react-native'
 import axios from 'axios';
 export default class Notifications extends Component {
     constructor(props) {
         super(props);
         this.state = {
             notifications:[
-                {"type": "You are now a member of ACM!"},
-                {"type": "You are part of this event!"},
-                {"type": "You have a ride!"},
-                {"type": "You are now a member of ACM!"},
-                {"type": "You are part of this event!"},
-                {"type": "You have a ride!"},
-                {"type": "You are now a member of ACM!"},
-                {"type": "You are part of this event!"},
-                {"type": "You have a ride!"},
-                {"type": "You are now a member of ACM!"},
-                {"type": "You are part of this event!"},
-                {"type": "You have a ride!"},
-                {"type": "You are now a member of ACM!"},
-                {"type": "You are part of this event!"},
-                {"type": "You have a ride!"},
-                {"type": "You are now a member of ACM!"},
-                {"type": "You are part of this event!"},
-                {"type": "You have a ride!"},
-                {"type": "You are now a member of ACM!"},
-                {"type": "You are part of this event!"},
-                {"type": "You have a ride!"},
-                {"type": "You are now a member of ACM!"},
-                {"type": "You are part of this event!"},
-                {"type": "You have a ride!"}              
+                {
+                    "_id": "1",
+                    "type": "You are now a member of ACM!"
+                },
+                {
+                    "_id": "2",
+                    "type": "You are part of this event!"
+                },
+                {
+                    "_id": "3",
+                    "type": "You have a ride!"
+                }                         
                 
             ]
         };
@@ -49,7 +37,7 @@ export default class Notifications extends Component {
             // <TouchableOpacity style={{  }}
             //     onPress={() => }>
                 <View style={[styles.notification]}>
-                    <Text style={{ fontSize: 18, color: 'black'}}>
+                    <Text style={{ fontSize: 20, color: 'blue', justifyContent: 'center'}}>
                         {item.type}
                     </Text>
                 </View>
@@ -76,7 +64,7 @@ export default class Notifications extends Component {
               <FlatList 
                 data = {this.state.notifications}
                 renderItem = {this._renderItem}
-                keyExtractor={(type) => type._id}
+                keyExtractor={(item) => item._id}
                 //keyExtractor={this._keyExtractor}
                 ItemSeparatorComponent={this.renderSeparator}
 
