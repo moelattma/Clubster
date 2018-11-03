@@ -5,7 +5,7 @@
 
 const Organization = require('./model');
 const User = require('../Users/model');
-
+const Conversation = require('../Conversations/model');
 exports.getUserClubs = (req, res) => {
 	console.log(req.body._id);
 	User.findOne({ id: req.body._id }).populate('arrayClubsAdmin').then((user) => {
@@ -44,8 +44,7 @@ exports.addMember = (req, res) => {
 
 exports.deleteClubMember = (req, res) => {
 	const { idOfOrganization, idOfMember } = req.params;
-	console.log(idOfOrganization, idOfMember);
-	console.log(Organization);
+
 	// finds and return organization id of specific club
 	Organization.findOne({ _id: idOfOrganization }).then((organization) => {
 		console.log(organization)
@@ -79,9 +78,10 @@ exports.addOrg = (req, res) => {
 	// Code to add a new organization to the Mongo Collection
 
 	// Destruct req body
-	const { name, president, acronym, admins, description } = req.body;
+	const { name, president, acronym, admins, description, purpose } = req.body;
+	console.log(name);
 	// If user supplied these fields
-	if (name && president && acronym && description) {
+	if (name && purpose && acronym && description) {
 		// Check if organization with these key-value pairs already exists
 		Organization.findOne({ name: name })
 			.then((organization) => {
@@ -92,18 +92,27 @@ exports.addOrg = (req, res) => {
 					// Make new organization and save into the Organizations Collection
 					let newOrg = new Organization({
 						name: name,
-						president: president,
+						president: req.user._id,
 						acronym: acronym,
-						admins: admins,
+						admins: [],
+						purpose: purpose,
 						description: description
 					});
-
-					newOrg.save().then(organization => {
-						admins.forEach(function (admin) {
-							User.clubAdminPushing(admin, organization);
+					let chatRoom = new Conversation({
+						idOfClub: newOrg._id
+					});
+					console.log(newOrg);
+					newOrg.save().then((organization) => {
+						console.log(organization);
+						User.clubAdminPushing(req.user._id, organization);
+						Organization.addAdminToClub(organization._id, req.user._id)
+						chatRoom.save().then((chatRoom) => {
+							if(organization && chatRoom) {
+								return res.status(201).json(newOrg);
+							}
 						});
-						return res.status(201).json(organization);
-					}); // Push the new user onto the db if successful, else display error
+				}).catch((err) => {console.log(err); return res.status(400).json({'Error': err})}); // Push the new user onto the db if successful, else display error
+
 				}
 			}).catch(err => console.log(err));
 	}

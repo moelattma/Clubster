@@ -20,7 +20,7 @@ npm manifest:
     "description": "Bakcend of application",
     "main": "index.js",
     "scripts": {
-      "dev": "SET NODE_ENV=development & nodemon index.js"
+      "dev": "NODE_ENV=development & nodemon index.js"
     },
     "repository": {
       "type": "git",
@@ -36,9 +36,13 @@ npm manifest:
       "express": "^4.16.4",
       "gravatar": "^1.6.0",
       "jsonwebtoken": "^8.3.0",
-      "mongoose": "^5.3.3",
+      "mongoose": "^5.3.6",
       "morgan": "^1.9.1",
+      "node-gyp": "^3.8.0",
+      "node-pre-gyp": "^0.11.0",
       "nodemon": "^1.18.4",
+      "passport": "^0.4.0",
+      "passport-jwt": "^4.0.0",
       "validator": "^10.8.0"
     }
   }
@@ -53,8 +57,8 @@ Trace:
   Error: Command failed.
   Exit code: 3221225786
   Command: C:\WINDOWS\system32\cmd.exe
-  Arguments: /d /s /c SET NODE_ENV=development & nodemon index.js
-  Directory: C:\Users\Adnan\Desktop\Clubster\Clubster\clubster-backend
+  Arguments: /d /s /c NODE_ENV=development & nodemon index.js
+  Directory: C:\Users\Adnan\Desktop\CS115\Clubster\clubster-backend
   Output:
   
       at ProcessTermError.MessageError (C:\Users\Adnan\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:186:110)

@@ -1,14 +1,14 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, Dimensions } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, Dimensions, AsyncStorage } from 'react-native';
 import { TextField } from 'react-native-material-textfield';
 import axios from 'axios';
 const { width:WIDTH } = Dimensions.get('window');
 
 export default class Login extends React.Component {
-  state = { 
-    username: '', 
-    password: '' 
-  };                           
+  state = {
+    username: '',
+    password: ''
+  };
 
   handleLogin = () => {
     const { username, password } = this.state;                        //Destructuring
@@ -19,6 +19,10 @@ export default class Login extends React.Component {
       })
       .then(response => {
         if(response.status == 200) {
+          // Set token to ls
+          console.log(response.data.token);
+          AsyncStorage.setItem('jwtToken', response.data.token);
+          axios.defaults.headers.common['Authorization'] = response.data.token;
           this.props.navigation.navigate('HomeNavigation');               //Navigate to Clubs page if successful
       }})
       .catch((err) => {

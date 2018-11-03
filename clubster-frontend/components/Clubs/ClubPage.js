@@ -21,16 +21,12 @@ const Organization = t.struct({
   Name: t.String,
   Abbreviation: t.String,
   Purpose: t.String,
-  Description: t.String,
-  terms: t.Boolean
+  Description: t.String
 });
 
 const formatData = (data, columnNums) => {
   let rowsFull = Math.floor(data.length / columnNums);
   let lastRowNum = data.length % columnNums;
-  for (let i = 0; i < data.length; i++) {
-    data[i]['key'] = data[i]['_id'];
-  }
   for (; lastRowNum != columnNums && lastRowNum !== 0;) {
     data.push({ key: `blank-${lastRowNum}`, empty: true });
     lastRowNum++;
@@ -53,7 +49,7 @@ export default class ClubsPage extends Component {
     if (item.hasOwnProperty('empty') && item.empty === true) {
       return <TouchableWithoutFeedback onPress={() => this.actionOnRow(item)}><View style={[styles.item, styles.itemInvisible]} /></TouchableWithoutFeedback>;
     }
-    const { screenProps } = this.props;  
+    const { screenProps } = this.props;
     return (
       <TouchableWithoutFeedback onPress={() => screenProps.home.navigate('AdminNavigation', { item })}>
         <View style={styles.item}>
@@ -64,14 +60,27 @@ export default class ClubsPage extends Component {
   };
 
   handleSubmit = () => {
-    const value = this._formRef.getValue().Abbreviation;
-    console.log('value: ', value);
+    // Name: t.String,
+    // Abbreviation: t.String,
+    // Purpose: t.String,
+    // Description: t.String
+    const name = this._formRef.getValue().Name;
+    const acronym = this._formRef.getValue().Abbreviation;
+    const purpose = this._formRef.getValue().Purpose;
+    const description = this._formRef.getValue().Description;
+    axios.post('http://localhost:3000/api/organizations/new', {name:name,acronym:acronym,purpose:purpose,description:description}).then((organization)=> {
+      console.log(organization);
+      this.setState({show:false});
+      this.setState({ arrClubsAdmin: this.state.arrClubsAdmin.concat(organization.data)});
+    }).catch((error) => {
+      console.log(error);
+    });
   }
 
   renderElement() {
     if (this.state.show == true)
       return <View style={{ flex: 1 }}><Form type={Organization} ref={(ref) => this._formRef = ref} /><Button title="Sign Up!" onPress={this.handleSubmit} /></View>;
-    return <View style={{ flex: 1 }}><FlatList data={formatData(this.state.arrClubsAdmin, numColumns)} renderItem={this.renderItem} numColumns={numColumns} /><TouchableOpacity style={styles.btn} onPress={() => { this.setState({ show: true }); }}><Text style={styles.plus}>+</Text></TouchableOpacity></View>;
+    return <View style={{ flex: 1 }}><FlatList data={formatData(this.state.arrClubsAdmin, numColumns)} renderItem={this.renderItem} numColumns={numColumns} keyExtractor={(item, index) => item._id}/><TouchableOpacity style={styles.btn} onPress={() => { this.setState({ show: true }); }}><Text style={styles.plus}>+</Text></TouchableOpacity></View>;
   }
 
 
@@ -88,7 +97,7 @@ export default class ClubsPage extends Component {
       // Container for the whole body
       <View style={styles.container}>
         <Button onPress={() => this.props.navigation.navigate('ClubSearch')} title="Search Clubs"/>
-          
+
         {this.renderElement()}
       </View>
     );

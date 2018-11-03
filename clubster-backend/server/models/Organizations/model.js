@@ -35,6 +35,13 @@ const Organization = new Schema({
       trim: true,
       unique:true
   },
+  purpose: {
+    type: String,
+    required: true,
+    minlength: 32,
+    trim: true,
+    unique:true
+  },
   social: {
     facebook: {
       type: String
@@ -49,7 +56,7 @@ const Organization = new Schema({
   members: [{
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'users'
-  }], 
+  }],
   events: [{
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'Events'
