@@ -19,4 +19,4 @@ const Messages = new Schema({
 });
 
 
-module.exports = mongoose.model('Messages', Messages);
+module.exports = mongoose.model('messages', Messages);

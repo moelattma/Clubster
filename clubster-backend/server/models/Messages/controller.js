@@ -8,17 +8,24 @@ exports.insertMessage = (req, res) => {
   let newMessage = new Message({
     text: text,
     createdAt: Date.now(),
-    user: "5bcad6a3345dcf92dc99ec8f"
+    user: req.user._id
   });
-  Conversations.findOne({idOfClub: groupId}).then((conversation) => {
+  Conversations.findOne({idOfClub: groupId}).populate({
+         path    : 'messages',
+         populate: [
+             { path: 'user' }
+         ]
+    }).then((conversation) => {
     if(!conversation) {
       console.log("Here!!");
       return res.status(400).json({'Error':'No messages found'});
     } else {
       console.log(conversation);
       Conversations.addMessage(newMessage, conversation._id);
-      newMessage.save().then((message) => { return res.status(201).json({message:newMessage})}).catch((err) => { return res.status(400).json({error:'err is sending message'})});
-      
+      newMessage.save().then((messageObj) => {
+        Message.findOne({_id: messageObj._id}).populate('user').then((message) => {
+          return res.status(201).json({message:message})}).catch((err) => { return res.status(400).json({error:'err is sending message'})});
+        }).catch(err => { return console.log(err)});
     }
   });
 };

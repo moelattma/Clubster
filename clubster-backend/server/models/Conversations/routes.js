@@ -2,7 +2,7 @@ const router = require('express').Router();
 const controller = require('./controller');
 const passport = require('passport');
 
-router.get('/conversations/:groupId', (req, res) => {
+router.get('/conversations/:groupId', passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.findMessages(req, res);
 });
 

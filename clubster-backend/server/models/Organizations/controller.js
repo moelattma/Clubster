@@ -7,8 +7,8 @@ const Organization = require('./model');
 const User = require('../Users/model');
 const Conversation = require('../Conversations/model');
 exports.getUserClubs = (req, res) => {
-	console.log(req.body._id);
-	User.findOne({ id: req.body._id }).populate('arrayClubsAdmin').then((user) => {
+	console.log(req.user._id);
+	User.findOne({ _id: req.user._id }).populate('arrayClubsAdmin').then((user) => {
 		console.log(req.body._id);
 		return res.status(201).json({ 'user': user });	//populates array that user is admin of
 	}).catch((err) => console.log(err));
