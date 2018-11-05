@@ -101,9 +101,7 @@ exports.addOrg = (req, res) => {
 					let chatRoom = new Conversation({
 						idOfClub: newOrg._id
 					});
-					console.log(newOrg);
 					newOrg.save().then((organization) => {
-						console.log(organization);
 						User.clubAdminPushing(req.user._id, organization);
 						Organization.addAdminToClub(organization._id, req.user._id)
 						chatRoom.save().then((chatRoom) => {

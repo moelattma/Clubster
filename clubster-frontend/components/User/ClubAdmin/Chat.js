@@ -11,11 +11,11 @@ export default class Chat extends Component {
   componentWillMount() {
     const { screenProps } = this.props;
     console.log(screenProps);
-    axios.get(`http://localhost:3000/api/conversations/${screenProps.organization._id}`).then((response) => {
+    axios.get(`http://localhost:3000/api/conversations/${screenProps._id}`).then((response) => {
       console.log(response);
-      this.setState({messages: response.data.conversation.messages});
-      this.setState({userId: response.data.userId})
-    });
+      this.setState({ messages: response.data.conversation.messages });
+      this.setState({ userId: response.data.userId })
+    }).catch((err) => console.log(err));
     // this.setState({
     //   messages: [
     //     {
@@ -37,13 +37,13 @@ export default class Chat extends Component {
     console.log(screenProps);
     var text = messages[messages.length - 1].text;
     axios.post(`http://localhost:3000/api/messages/${screenProps.organization._id}`, {
-      text:text
+      text: text
     }).then((message) => {
       console.log(message.data.message);
       this.setState(previousState => ({
         messages: GiftedChat.append(previousState.messages, message.data.message)
       }))
-    })
+    }).catch((err) => console.log(err));
   }
 
   render() {

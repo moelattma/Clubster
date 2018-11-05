@@ -1,4 +1,5 @@
 import React from 'react'
+import { View } from 'react-native'
 import { createStackNavigator, createBottomTabNavigator, createSwitchNavigator } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -24,7 +25,7 @@ import Expenses from './User/ClubAdmin/Expenses'
 import MemberList from './User/ClubAdmin/MembersList'
 import Chat from './User/ClubAdmin/Chat'
 
-export const LoginNavigator = createSwitchNavigator(
+export const LoginNavigator = createStackNavigator(
     {
         Login: { screen: Login, navigationOptions: { header: null } },
         SignUp: { screen: SignUp, navigationOptions: { header: null } },
@@ -33,7 +34,10 @@ export const LoginNavigator = createSwitchNavigator(
     },
     {
         navigationOptions: {
-            headerBackImage: (<MaterialIcons name="arrow-back" size={32} color={'black'} />)
+            headerBackImage: (<MaterialIcons name="arrow-back" size={32} color={'black'} />),
+            headerStyle: {
+                backgroundColor: '#E2E3E5'
+            },
         }
     }
 );
@@ -111,7 +115,7 @@ export const AdminNavigator = createBottomTabNavigator(
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
                     <MaterialIcons name="event" size={40} color={tintColor} />
-                )
+                ),
             }
         },
         Expenses: {

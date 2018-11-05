@@ -60,10 +60,6 @@ export default class ClubsPage extends Component {
   };
 
   handleSubmit = () => {
-    // Name: t.String,
-    // Abbreviation: t.String,
-    // Purpose: t.String,
-    // Description: t.String
     const name = this._formRef.getValue().Name;
     const acronym = this._formRef.getValue().Abbreviation;
     const purpose = this._formRef.getValue().Purpose;
@@ -78,12 +74,22 @@ export default class ClubsPage extends Component {
   }
 
   renderElement() {
-    if (this.state.show == true)
-      return <View style={{ flex: 1 }}><Form type={Organization} ref={(ref) => this._formRef = ref} /><Button title="Sign Up!" onPress={this.handleSubmit} /></View>;
-    return <View style={{ flex: 1 }}><FlatList data={formatData(this.state.arrClubsAdmin, numColumns)} renderItem={this.renderItem} numColumns={numColumns} keyExtractor={(item, index) => item._id}/><TouchableOpacity style={styles.btn} onPress={() => { this.setState({ show: true }); }}><Text style={styles.plus}>+</Text></TouchableOpacity></View>;
+    if (this.state.show == true) {
+      return (
+        <View style={{ flex: 1 }}>
+          <Form type={Organization} ref={(ref) => this._formRef = ref} />
+          <Button title="Sign Up!" onPress={this.handleSubmit} />
+        </View>);
+    }
+    return (
+      <View style={{ flex: 1 }}>
+        <FlatList data={formatData(this.state.arrClubsAdmin, numColumns)} renderItem={this.renderItem} numColumns={numColumns} keyExtractor={(admin) => admin} />
+        <TouchableOpacity style={styles.btn} onPress={() => { this.setState({ show: true }); }}>
+          <Text style={styles.plus}>+</Text>
+        </TouchableOpacity>
+      </View>
+    );
   }
-
-
 
   componentDidMount() {
     axios.get("http://localhost:3000/api/organizations").then((response) => {
@@ -107,7 +113,7 @@ export default class ClubsPage extends Component {
 const styles = StyleSheet.create({
   row: {
     flex: 1,
-    flexDirection: "row"
+    flexDirection: 'row'
   },
   button: {
     backgroundColor: 'lightblue',

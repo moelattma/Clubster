@@ -1,8 +1,8 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, Dimensions, AsyncStorage } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, Dimensions, KeyboardAvoidingView, Keyboard, AsyncStorage } from 'react-native';
 import { TextField } from 'react-native-material-textfield';
 import axios from 'axios';
-const { width:WIDTH } = Dimensions.get('window');
+const { width: WIDTH } = Dimensions.get('window');
 
 export default class Login extends React.Component {
   state = {
@@ -12,7 +12,7 @@ export default class Login extends React.Component {
 
   handleLogin = () => {
     const { username, password } = this.state;                        //Destructuring
-    if(username && password) {
+    if (username && password) {
       axios.post('http://localhost:3000/api/login', {               //POST with payload
         username,
         password
@@ -33,36 +33,40 @@ export default class Login extends React.Component {
     }
   }
 
+  handleKeyboard = () => {
+
+  }
+
   render() {
     return (
-      <View style={styles.container}>
-        <TextField                                                  //TextInputs with onChangeText built in
-          inputContainerStyle={styles.textContainer}
-          label="Username"
-          baseColor="rgba(255, 255, 255, 0.75)"
-          textColor="rgba(255, 255, 255, 1)"
-          onChangeText={username => this.setState({ username })}
-          returnKeyType='next'
-        />
+      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled onTouchStart={() => Keyboard.dismiss()} >
+          <TextField                                                 
+            inputContainerStyle={styles.textContainer}
+            label="Username"
+            baseColor="rgba(255, 255, 255, 0.75)"
+            textColor="rgba(255, 255, 255, 1)"
+            onChangeText={username => this.setState({ username })}
+            returnKeyType='next'
+          />
 
-        <TextField
-          inputContainerStyle={styles.textContainer}
-          label="Password"
-          baseColor="rgba(255, 255, 255, 0.75)"
-          textColor="rgba(255, 255, 255, 1)"
-          onChangeText={password => this.setState({ password })}
-          secureTextEntry={true}
-          returnKeyType='none'
-        />
+          <TextField
+            inputContainerStyle={styles.textContainer}
+            label="Password"
+            baseColor="rgba(255, 255, 255, 0.75)"
+            textColor="rgba(255, 255, 255, 1)"
+            onChangeText={password => this.setState({ password })}
+            secureTextEntry={true}
+            returnKeyType='none'
+          />
 
-        <TouchableOpacity style={styles.login} onPress = {this.handleLogin.bind(this)}>
-          <Text style={styles.loginText}> Log In </Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.login} onPress={this.handleLogin.bind(this)}>
+            <Text style={styles.loginText}> Log In </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.signup} onPress = {() => this.props.navigation.navigate('SignUp')} >
-          <Text style={styles.signupText}> Sign Up </Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity onPress={() => this.props.navigation.navigate('SignUp')} >
+            <Text style={styles.signupText}> Sign Up </Text>
+          </TouchableOpacity>
+      </KeyboardAvoidingView>
     );
   }
 }
@@ -85,21 +89,21 @@ const styles = StyleSheet.create({
   login: {
     alignSelf: 'center',
     backgroundColor: '#59cbbd',
-    height: 40,
+    height: 60,
     width: WIDTH / 2,
     marginTop: 15,
-    marginBottom: 2
+    justifyContent: 'center',
+    marginBottom: 6
   },
   loginText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 20,
-    textAlign: 'center',
-    marginTop: 5
+    fontSize: 28,
+    textAlign: 'center'
   },
   signupText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 20,
     textAlign: 'center',
     marginTop: 5
   }

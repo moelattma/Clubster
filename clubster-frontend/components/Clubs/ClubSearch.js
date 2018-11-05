@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { FlatList, TouchableOpacity, View, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
-import { List, ListItem, SearchBar, Header } from 'react-native-elements';
+import { List, ListItem, SearchBar } from 'react-native-elements';
 import _ from 'lodash';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import axios from 'axios';
@@ -23,9 +23,9 @@ export default class SearchClubs extends Component {
     }
 
     getOrganizations() {
+        this.setState({ loading: true });
         axios.get('http://localhost:3000/api/organizations/all')
             .then((response) => {
-                this.setState({ loading: true });
                 this.setState({ organizations: response.data.organizations, allOrganizations: response.data.organizations });
                 this.setState({ loading: false });
             });

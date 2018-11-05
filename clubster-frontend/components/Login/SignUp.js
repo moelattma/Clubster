@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, KeyboardAvoidingView, Keyboard } from 'react-native';
 import { TextField } from 'react-native-material-textfield'
 import axios from 'axios';
 
@@ -21,8 +21,8 @@ export default class SignUp extends Component {
       name
     }).then(response => {
       console.log(response.status);
-      if (response.status == 200) {
-        this.props.navigator.pop();                           //Pop off signup once done
+      if (response.status == 201) {
+        this.props.navigation.navigate('Login');                         
       }
     }).catch(err => console.log('Could not sign up', err));
   };
@@ -36,9 +36,9 @@ export default class SignUp extends Component {
         errors['email'] = 'Must be a UCSC email'
       if (name == null || !name.includes(' '))
         errors['name'] = 'Please enter your first and last name'
-      if (username == null || username.length < 6)
-        errors['username'] = 'Username is too short'
-      if (password == null || password.length < 8)
+      if (username == null || username.length < 5)
+        errors['username'] = 'Username is too short, must be greater than 5'
+      if (password == null || password.length < 6)
         errors['password'] = 'Password is too short'
       if (password == null || confirmPassword == null || password != confirmPassword)
         errors['confirmPassword'] = 'Passwords do not match'
@@ -52,7 +52,7 @@ export default class SignUp extends Component {
     let { errors = {} } = this.state;
 
     return (
-      <View style={styles.regForm}>
+      <KeyboardAvoidingView style={styles.regForm} behavior="padding" enabled onTouchStart={() => Keyboard.dismiss()} >
         <View>
           <Text style={styles.header}>
             Register for Clubster
@@ -66,7 +66,8 @@ export default class SignUp extends Component {
           textColor="rgba(255, 255, 255, 1)"
           onChangeText={email => this.setState({ email })}
           returnKeyType='next'
-          error={errors.email} />
+          error={errors.email}
+        />
 
         <TextField
           inputContainerStyle={styles.inputContainer}
@@ -111,7 +112,11 @@ export default class SignUp extends Component {
             Sign Up
           </Text>
         </TouchableOpacity>
-      </View>
+
+        <TouchableOpacity style={ styles.login} onPress={() => this.props.navigation.navigate('Login')} >
+          <Text style={{ color: '#fff', fontSize: 18 }}> Already have an account? </Text>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
     );
   }
 }
@@ -149,5 +154,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 25
+  },
+  login: {
+    position: 'absolute', 
+    bottom: 5, 
+    alignContent: 'center', 
+    alignSelf: 'center'
   }
 });

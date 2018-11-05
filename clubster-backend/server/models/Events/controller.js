@@ -10,38 +10,36 @@ const Organization = require('../Organizations/model');
 exports.getEvents = (req, res) => {
 	const { organizationID } = req.params;
 
-	Organization.findOne({ _id: organizationID }).populate('events').then((organization) => {
+	Organization.findByIdAndUpdate(organizationID).populate('events').then((organization) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No events found' });
 		} else {
 			return res.status(201).json({ 'events': organization.events });
-		}	
-	});
+		}
+	}).catch((err) => console.log(err));
 };
 
 exports.addEvent = (req, res) => {
 	const { organizationID } = req.params;
-	const { name, date, time, description } = req.body;
+	const { name, date, description } = req.body;
 
-	Organization.findOne({ _id: organizationID }).then((organization) => {
+	Organization.findByIdAndUpdate(organizationID).then((organization) => {
+		console.log(organization);
 		if (!organization) {
-			console.log("gay");
-			return res.status(400).json({ 'Error': 'No events found' });
+			return res.status(400).json({ 'Error': 'No such organization exists' });
 		} else {
-			let newEvent = new Events({
+			let clubEvent = new Events({
 				organization: organizationID,
 				name: name,
 				date: date,
-				time: time,
 				description: description
 			});
-			newEvent.save().then((event) => {
-				Organization.addEventToClub(organizationID, newEvent._id);
-				return res.status(201).json({ 'event': event });
+			clubEvent.save().then((event) => {
+				Organization.addEventToClub(organizationID, event._id);
+				return res.status(201).json({ 'event': clubEvent });
 			}).catch((err) => {
 				return res.status(400).json({ 'Error': err });
 			});
-			
 		}
 	})
 }

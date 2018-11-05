@@ -78,10 +78,6 @@ Organization.statics.addEventToClub = async function(organizationID, eventID) {
   await this.findByIdAndUpdate(organizationID, { $push: { events: eventID } });
 }
 
-Organization.statics.addEventToClub = async function(organizationID, eventID) {
-  await this.findByIdAndUpdate(organizationID, { $push: { events: eventID } });
-}
-
 /*
 * Export so that other js files can use this schema
 */
