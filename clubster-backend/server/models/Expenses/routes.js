@@ -4,6 +4,7 @@ const passport = require('passport');
 
 
 router.get('/:organizationId/expenses', (req, res) => {
+	console.log('hi!!!');
 	controller.grabExpenses(req, res);
 });
 

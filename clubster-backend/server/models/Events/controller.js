@@ -6,7 +6,7 @@
 // Import
 const Events = require('./model');
 const Organization = require('../Organizations/model');
-
+const Expenses = require('../Expenses/model');
 exports.getEvents = (req, res) => {
 	const { organizationID } = req.params;
 
@@ -21,7 +21,7 @@ exports.getEvents = (req, res) => {
 
 exports.addEvent = (req, res) => {
 	const { organizationID } = req.params;
-	const { name, date, description } = req.body;
+	const { name, date, description, expense } = req.body;
 
 	Organization.findByIdAndUpdate(organizationID).then((organization) => {
 		console.log(organization);
@@ -34,12 +34,23 @@ exports.addEvent = (req, res) => {
 				date: date,
 				description: description
 			});
-			clubEvent.save().then((event) => {
-				Organization.addEventToClub(organizationID, event._id);
-				return res.status(201).json({ 'event': clubEvent });
-			}).catch((err) => {
+			let expenses = new Expenses({
+				idOfClub:organizationID,
+				amount: expense
+			});
+			expenses.save().then((expense) => {
+					if(expense) {
+						clubEvent.save().then((event) => {
+							Organization.addEventToClub(organizationID, event._id);
+							return res.status(201).json({ 'event': clubEvent });
+						}).catch((err) => {
+							return res.status(400).json({ 'Error': err });
+						});
+					}
+				}).catch((err) => {
 				return res.status(400).json({ 'Error': err });
 			});
+
 		}
 	})
 }

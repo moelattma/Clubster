@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View, Text, Dimensions, Button, FlatList, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import axios from 'axios';
 import t from 'tcomb-form-native';
-
+import tx from 'tcomb-additional-types';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
@@ -16,6 +16,7 @@ const Event = t.struct({
   name: t.String,
   description: t.String,
   date: t.String,
+  expense: tx.Number.Decimal
 });
 
 export default class ClubEvents extends Component {
@@ -24,7 +25,7 @@ export default class ClubEvents extends Component {
 
     this.state = {
       clubEvents: [],
-      showCreateEvent: false, 
+      showCreateEvent: false,
       loading: false
     }
   }
@@ -48,7 +49,8 @@ export default class ClubEvents extends Component {
     const name = this._formRef.getValue().name;
     const date = this._formRef.getValue().date;
     const description = this._formRef.getValue().description;
-    axios.post(`http://localhost:3000/api/events/${_id}/new`, { name, date, description }).then((event) => {
+    const expense = this._formRef.getValue().expense;
+    axios.post(`http://localhost:3000/api/events/${_id}/new`, { name, date, description,expense }).then((event) => {
       this.setState({ clubEvents: this.state.clubEvents.concat(event.data) });
     }).catch((error) => {
       console.log(error);
@@ -91,7 +93,7 @@ export default class ClubEvents extends Component {
 
   render() {
     return (
-      <View style={{ flex: 1 }}> 
+      <View style={{ flex: 1 }}>
         {this.renderView()}
       </View>
     );
