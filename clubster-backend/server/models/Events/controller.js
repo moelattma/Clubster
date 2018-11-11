@@ -24,7 +24,6 @@ exports.addEvent = (req, res) => {
 	const { name, date, description, expense } = req.body;
 
 	Organization.findByIdAndUpdate(organizationID).then((organization) => {
-		console.log(organization);
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No such organization exists' });
 		} else {

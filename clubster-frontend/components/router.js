@@ -1,5 +1,4 @@
 import React from 'react'
-import { View } from 'react-native'
 import { createStackNavigator, createBottomTabNavigator, createSwitchNavigator } from 'react-navigation';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -8,16 +7,18 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 import Login from './Login/Login';
 import SignUp from './Login/SignUp';
+import ClubsterNavigation from './User/ClubsterNavigation'
+
 import HomeNavigation from './Login/HomeNavigation';
+import AdminNavigation from './User/ClubAdmin/AdminNavigation'
 
 import Notifications from './User/Notifications'
-import ClubNavigation from "./Clubs/ClubNavigation"
+import ClubsNavigation from "./Clubs/ClubsNavigation"
 import Profile from './User/Profile'
 
 import ClubPage from './Clubs/ClubPage'
 import ClubSearch from './Clubs/ClubSearch'
 import ClubProfile from './Clubs/ClubProfile'
-import AdminNavigation from './User/ClubAdmin/AdminNavigation'
 
 import Dashboard from './User/ClubAdmin/Dashboard'
 import ClubEvents from './User/ClubAdmin/ClubEvents'
@@ -25,22 +26,25 @@ import Expenses from './User/ClubAdmin/Expenses'
 import MemberList from './User/ClubAdmin/MembersList'
 import Chat from './User/ClubAdmin/Chat'
 
-export const LoginNavigator = createStackNavigator(
+export const LoginNavigator = createSwitchNavigator(
     {
-        Login: { screen: Login, navigationOptions: { header: null } },
-        SignUp: { screen: SignUp, navigationOptions: { header: null } },
+        Login: { screen: Login },
+        SignUp: { screen: SignUp },
+        ClubsterNavigation: { screen: ClubsterNavigation }
+    }
+);
+
+export const ClubsterNavigator = createStackNavigator(
+    {
         HomeNavigation: { screen: HomeNavigation, navigationOptions: { header: null } },
         AdminNavigation: { screen: AdminNavigation }
     },
     {
         navigationOptions: {
-            headerBackImage: (<MaterialIcons name="arrow-back" size={32} color={'black'} />),
-            headerStyle: {
-                backgroundColor: '#E2E3E5'
-            },
+            headerBackImage: (<MaterialIcons name="arrow-back" size={32} color={'black'} />)
         }
     }
-);
+)
 
 export const HomeNavigator = createBottomTabNavigator(
     {
@@ -52,8 +56,8 @@ export const HomeNavigator = createBottomTabNavigator(
                 )
             }
         },
-        ClubNavigation: {
-            screen: ClubNavigation,
+        ClubsNavigation: {
+            screen: ClubsNavigation,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
                     <MaterialCommunityIcons name="home-assistant" size={48} color={tintColor} />
@@ -73,7 +77,7 @@ export const HomeNavigator = createBottomTabNavigator(
     {
         animationEnabled: true,
         swipeEnabled: true,
-        initialRouteName: "ClubNavigation",
+        initialRouteName: "ClubsNavigation",
         backBehavior: 'initialRoute',
         tabBarOptions: {
             activeBackgroundColor: '#E2E3E5',
@@ -86,16 +90,16 @@ export const HomeNavigator = createBottomTabNavigator(
     }
 );
 
-export const ClubsterNavigator = createStackNavigator(
+export const ClubsNavigator = createStackNavigator(
     {
-        ClubPage: { screen: ClubPage, navigationOptions: { header: null } },
+        ClubPage: { screen: ClubPage },
         ClubSearch: { screen: ClubSearch, navigationOptions: { header: null } },
         ClubProfile: { screen: ClubProfile }
     },
     {
         initialRouteName: 'ClubPage',
         navigationOptions: {
-            headerBackImage: (<MaterialIcons name="arrow-back" size={32} color={'black'} />)
+            headerBackImage: (<MaterialIcons name="arrow-back" size={32} color={'black'} />),
         }
     }
 );
@@ -156,4 +160,4 @@ export const AdminNavigator = createBottomTabNavigator(
             showIcon: true
         }
     }
-)
+);

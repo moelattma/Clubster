@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { View, Text, Dimensions, Button, FlatList, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import axios from 'axios';
 import t from 'tcomb-form-native';
-import tx from 'tcomb-additional-types';
+
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { createStackNavigator } from 'react-navigation';
 
-// const Form = t.form.Form;
 const Form = t.form.Form;
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const EVENT_WIDTH = WIDTH * 9 / 10;
@@ -16,17 +16,57 @@ const Event = t.struct({
   name: t.String,
   description: t.String,
   date: t.String,
-  expense: tx.Number.Decimal
 });
 
 export default class ClubEvents extends Component {
+  componentWillMount() {
+    this._navListenerFocus = this.props.navigation.addListener('willFocus', () => {
+      this.props.screenProps.adminNavigation.setParams({ hideHeader: true });
+    });
+    this._navListenerBlur = this.props.navigation.addListener('willBlur', () => {
+      this.props.screenProps.adminNavigation.setParams({ hideHeader: false });
+    });
+  }
+
+  componentWillUnmount() {
+    this._navListenerFocus.remove();
+    this._navListenerBlur.remove();
+  }
+
+  render() {
+    const { _id, clubsterNavigation, adminNavigation } = this.props.screenProps;
+    return (
+      <ClubEventNavigator screenProps={{ _id, clubsterNavigation, adminNavigation }} />
+    );
+  }
+}
+
+class ShowEvents extends Component {
   constructor() {
     super();
 
     this.state = {
       clubEvents: [],
-      showCreateEvent: false,
       loading: false
+    }
+  }
+
+  static navigationOptions = ({ navigation, screenProps }) => {
+    return {
+      headerLeft: (
+        <View style={{ marginLeft: 13 }}>
+          <MaterialIcons
+            name="arrow-back" size={32} color={'black'}
+            onPress={() => screenProps.adminNavigation.navigate('HomeNavigation')} />
+        </View>
+      ),
+      headerRight: (
+        <View style={{ marginRight: 6 }}>
+          <FontAwesome
+            name="plus" size={32} color={'black'}
+            onPress={() => navigation.navigate('CreateClubEvent')} />
+        </View>
+      )
     }
   }
 
@@ -44,21 +84,7 @@ export default class ClubEvents extends Component {
     this.setState({ loading: false })
   }
 
-  createEvent = () => {
-    const { _id } = this.props.screenProps;
-    const name = this._formRef.getValue().name;
-    const date = this._formRef.getValue().date;
-    const description = this._formRef.getValue().description;
-    const expense = this._formRef.getValue().expense;
-    axios.post(`http://localhost:3000/api/events/${_id}/new`, { name, date, description,expense }).then((event) => {
-      this.setState({ clubEvents: this.state.clubEvents.concat(event.data) });
-    }).catch((error) => {
-      console.log(error);
-    });
-  }
-
   _renderItem = ({ item }) => {
-    console.log(item);
     return (
       <TouchableWithoutFeedback >
         <View style={styles.eventContainer} >
@@ -68,20 +94,11 @@ export default class ClubEvents extends Component {
     );
   }
 
-  renderView = () => {
-    if (this.state.showCreateEvent) {
-      return (
-        <View style={{ flex: 1 }}>
-          <Form type={Event} ref={(ref) => this._formRef = ref} />
-          <Button title="Create an Event!" onPress={() => {this.createEvent(); this.setState({ showCreateEvent: false })}} />
-        </View>
-      );
-    }
+  render() {
     return (
-      <View >
-        <Button title="Make a new event" onPress={() => {this.setState({ showCreateEvent: true })}} />
+      <View style={{ flex: 1 }} >
         <FlatList
-          data={this.state.clubEvents}
+          data={this.state.clubEvents.reverse()}
           renderItem={this._renderItem}
           keyExtractor={clubEvent => clubEvent._id}
           refreshing={this.state.loading}
@@ -90,11 +107,27 @@ export default class ClubEvents extends Component {
       </View>
     );
   }
+}
+
+class CreateClubEvent extends Component {
+  createEvent = () => {
+    const { _id } = this.props.screenProps;
+    const name = this._formRef.getValue().name;
+    const date = this._formRef.getValue().date;
+    const description = this._formRef.getValue().description;
+    axios.post(`http://localhost:3000/api/events/${_id}/new`, { name, date, description }).then((event) => {
+      this.setState({ clubEvents: this.state.clubEvents.concat(event.data) });
+    }).catch((error) => {
+      console.log(error);
+    });
+    this.props.navigation.navigate('ShowEvents');
+  }
 
   render() {
     return (
       <View style={{ flex: 1 }}>
-        {this.renderView()}
+        <Form type={Event} ref={(ref) => this._formRef = ref} />
+        <Button title="Create this Event!" onPress={() => this.createEvent()} />
       </View>
     );
   }
@@ -120,17 +153,14 @@ const styles = StyleSheet.create({
   }
 });
 
-/*
-  renderHeader = () => {
-    return (
-      <View style={styles.header}>
-        <TouchableOpacity style={{ marginLeft: 14, marginRight: 4 }} onPress={() => this.props.navigation.navigate('ClubPage')} >
-          <MaterialIcons name="arrow-back" size={32} color={'black'} />
-        </TouchableOpacity>
-        <TouchableOpacity style={{ position: 'absolute', right: 5, justifyContent: 'center' }} >
-          <FontAwesome name="plus" size={32} color={'black'} />
-        </TouchableOpacity>
-      </View>
-    );
+const ClubEventNavigator = createStackNavigator(
+  {
+    ShowEvents: { screen: ShowEvents },
+    CreateClubEvent: { screen: CreateClubEvent }
+  },
+  {
+    navigationOptions: {
+      headerBackImage: (<MaterialIcons name="arrow-back" size={32} color={'black'} />),
+    }
   }
-*/
+)

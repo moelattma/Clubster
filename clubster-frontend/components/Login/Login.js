@@ -1,5 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, Dimensions, KeyboardAvoidingView, Keyboard, AsyncStorage } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, Dimensions, Keyboard, AsyncStorage } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { TextField } from 'react-native-material-textfield';
 import axios from 'axios';
 const { width: WIDTH } = Dimensions.get('window');
@@ -17,56 +18,54 @@ export default class Login extends React.Component {
         username,
         password
       })
-      .then(response => {
-        if(response.status == 200) {
-          // Set token to ls
-          console.log(response.data.token);
-          AsyncStorage.setItem('jwtToken', response.data.token);
-          axios.defaults.headers.common['Authorization'] = response.data.token;
-          this.props.navigation.navigate('HomeNavigation');               //Navigate to Clubs page if successful
-      }})
-      .catch((err) => {
-        console.log('Not a valid account: ', err);                                           //Err
-      });
+        .then(response => {
+          if (response.status == 200) {
+            // Set token to ls
+            console.log(response.data.token);
+            AsyncStorage.setItem('jwtToken', response.data.token);
+            axios.defaults.headers.common['Authorization'] = response.data.token;
+            this.props.navigation.navigate('ClubsterNavigation');               //Navigate to Clubs page if successful
+          }
+        })
+        .catch((err) => {
+          console.log('Not a valid account: ', err);                                           //Err
+        });
     } else {
       console.log('error');                                         //errors printing
     }
   }
 
-  handleKeyboard = () => {
-
-  }
-
   render() {
     return (
-      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled onTouchStart={() => Keyboard.dismiss()} >
-          <TextField                                                 
-            inputContainerStyle={styles.textContainer}
-            label="Username"
-            baseColor="rgba(255, 255, 255, 0.75)"
-            textColor="rgba(255, 255, 255, 1)"
-            onChangeText={username => this.setState({ username })}
-            returnKeyType='next'
-          />
+      <KeyboardAwareScrollView contentContainerStyle={styles.container} scrollEnabled={true} enableOnAndroid={true} 
+      alwaysBounceVertical={true} extraScrollHeight={40} keyboardShouldPersistTaps="handled" >
+        <TextField
+          inputContainerStyle={styles.textContainer}
+          label="Username"
+          baseColor="rgba(255, 255, 255, 0.75)"
+          textColor="rgba(255, 255, 255, 1)"
+          onChangeText={username => this.setState({ username })}
+          returnKeyType='next'
+        />
 
-          <TextField
-            inputContainerStyle={styles.textContainer}
-            label="Password"
-            baseColor="rgba(255, 255, 255, 0.75)"
-            textColor="rgba(255, 255, 255, 1)"
-            onChangeText={password => this.setState({ password })}
-            secureTextEntry={true}
-            returnKeyType='none'
-          />
+        <TextField
+          inputContainerStyle={styles.textContainer}
+          label="Password"
+          baseColor="rgba(255, 255, 255, 0.75)"
+          textColor="rgba(255, 255, 255, 1)"
+          onChangeText={password => this.setState({ password })}
+          secureTextEntry={true}
+          returnKeyType='none'
+        />
 
-          <TouchableOpacity style={styles.login} onPress={this.handleLogin.bind(this)}>
-            <Text style={styles.loginText}> Log In </Text>
-          </TouchableOpacity>
+        <TouchableOpacity style={styles.login} onPress={this.handleLogin.bind(this)}>
+          <Text style={styles.loginText}> Log In </Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => this.props.navigation.navigate('SignUp')} >
-            <Text style={styles.signupText}> Sign Up </Text>
-          </TouchableOpacity>
-      </KeyboardAvoidingView>
+        <TouchableOpacity onPress={() => this.props.navigation.navigate('SignUp')} >
+          <Text style={styles.signupText}> Sign Up </Text>
+        </TouchableOpacity>
+      </KeyboardAwareScrollView>
     );
   }
 }

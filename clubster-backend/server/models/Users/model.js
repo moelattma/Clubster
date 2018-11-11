@@ -15,23 +15,22 @@ const User = new Schema({
   username: {
     type: String,   //Specifiers
     required: true,
-    minlength: 5
+    minlength: 6
   },
   name: {
     type: String,
-    required: true,
-    minlength: 4
+    required: true
   },
   email: {
     type: String,
     required: true,
-    minlength: 5,
     trim: true,
-    unique:true
+    unique: true
   },
   password: {
     type: String,
-    required: true
+    required: true,
+    minlength: 8
   },
   avatar: {
     type: String

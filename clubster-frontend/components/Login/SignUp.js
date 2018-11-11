@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, KeyboardAvoidingView, Keyboard } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { TextField } from 'react-native-material-textfield'
 import axios from 'axios';
+
+const { height: HEIGHT } = Dimensions.get('window');
 
 export default class SignUp extends Component {
   state = {                                     //state initilaization
@@ -22,7 +25,7 @@ export default class SignUp extends Component {
     }).then(response => {
       console.log(response.status);
       if (response.status == 201) {
-        this.props.navigation.navigate('Login');                         
+        this.props.navigation.navigate('Login');
       }
     }).catch(err => console.log('Could not sign up', err));
   };
@@ -34,12 +37,12 @@ export default class SignUp extends Component {
 
       if (email == null || !email.includes('@ucsc.edu'))
         errors['email'] = 'Must be a UCSC email'
-      if (name == null || !name.includes(' '))
-        errors['name'] = 'Please enter your first and last name'
-      if (username == null || username.length < 5)
-        errors['username'] = 'Username is too short, must be greater than 5'
-      if (password == null || password.length < 6)
-        errors['password'] = 'Password is too short'
+      if (name == null)
+        errors['name'] = 'Please enter your full name'
+      if (username == null || username.length < 6)
+        errors['username'] = 'Username must be at least 6 letters'
+      if (password == null || password.length < 8)
+        errors['password'] = 'Password must be at least 8 letters'
       if (password == null || confirmPassword == null || password != confirmPassword)
         errors['confirmPassword'] = 'Passwords do not match'
       this.setState({ errors });
@@ -52,12 +55,11 @@ export default class SignUp extends Component {
     let { errors = {} } = this.state;
 
     return (
-      <KeyboardAvoidingView style={styles.regForm} behavior="padding" enabled onTouchStart={() => Keyboard.dismiss()} >
-        <View>
-          <Text style={styles.header}>
-            Register for Clubster
-          </Text>
-        </View>
+      <KeyboardAwareScrollView contentContainerStyle={styles.regForm} scrollEnabled={true} ref={ref => this._scrollView = ref}
+        enableOnAndroid={true} alwaysBounceVertical={true} extraScrollHeight={40} keyboardShouldPersistTaps="handled" >
+        <Text style={styles.header}>
+          Register for Clubster
+        </Text>
 
         <TextField                                            // TextInputs with onChangeText
           inputContainerStyle={styles.inputContainer}
@@ -65,6 +67,7 @@ export default class SignUp extends Component {
           baseColor="rgba(255, 255, 255, 0.75)"
           textColor="rgba(255, 255, 255, 1)"
           onChangeText={email => this.setState({ email })}
+          keyboardType="email-address"
           returnKeyType='next'
           error={errors.email}
         />
@@ -104,6 +107,7 @@ export default class SignUp extends Component {
           textColor="rgba(255, 255, 255, 1)"
           onChangeText={confirmPassword => this.setState({ confirmPassword })}
           returnKeyType='none'
+          onFocus={() => this._scrollView.scrollToEnd({ animated: true })}
           secureTextEntry={true}
           error={errors.confirmPassword} />
 
@@ -113,10 +117,10 @@ export default class SignUp extends Component {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={ styles.login} onPress={() => this.props.navigation.navigate('Login')} >
+        <TouchableOpacity style={styles.login} onPress={() => this.props.navigation.navigate('Login')} >
           <Text style={{ color: '#fff', fontSize: 18 }}> Already have an account? </Text>
         </TouchableOpacity>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     );
   }
 }
@@ -156,9 +160,9 @@ const styles = StyleSheet.create({
     fontSize: 25
   },
   login: {
-    position: 'absolute', 
-    bottom: 5, 
-    alignContent: 'center', 
+    position: 'absolute',
+    bottom: 5,
+    alignContent: 'center',
     alignSelf: 'center'
   }
 });

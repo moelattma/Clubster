@@ -1,22 +1,11 @@
 import React, { Component } from 'react';
-import {
-  TouchableOpacity,
-  StyleSheet,
-  Button,
-  Text,
-  View,
-  Dimensions,
-  FlatList,
-  TextInput,
-  TouchableWithoutFeedback,
-  TouchableHighlight } from 'react-native';
+import { TouchableOpacity,StyleSheet, Button, Text, View, Dimensions, FlatList, TouchableWithoutFeedback } from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
 import axios from 'axios';
 import t from 'tcomb-form-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+
 const Form = t.form.Form;
-
-
-
 const Organization = t.struct({
   Name: t.String,
   Abbreviation: t.String,
@@ -44,6 +33,16 @@ export default class ClubsPage extends Component {
       show: false
     }
   }
+
+  static navigationOptions = ({ navigation }) => {
+    return {
+      headerRight: (
+        <View style={{ marginRight: 6 }}>
+        <FontAwesome name="search" onPress={() => navigation.navigate('ClubSearch')} size={28} />
+        </View>
+      ),
+    };
+  };
 
   renderItem = ({ item, index }) => {
     if (item.hasOwnProperty('empty') && item.empty === true) {
@@ -102,8 +101,6 @@ export default class ClubsPage extends Component {
     return (
       // Container for the whole body
       <View style={styles.container}>
-        <Button onPress={() => this.props.navigation.navigate('ClubSearch')} title="Search Clubs"/>
-
         {this.renderElement()}
       </View>
     );
@@ -170,3 +167,4 @@ const styles = StyleSheet.create({
     color: '#fff',
   }
 });
+

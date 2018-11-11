@@ -43,7 +43,7 @@ export default class SearchClubs extends Component {
     renderHeader = () => {
         return (
             <View style={styles.header}>
-                <TouchableOpacity style={{ marginLeft: 14, marginRight: 4 }} onPress={() => this.props.navigation.navigate('ClubPage')} >
+                <TouchableOpacity style={{ marginLeft: 14, marginRight: 4, marginTop: 3 }} onPress={() => this.props.navigation.navigate('ClubPage')} >
                     <MaterialIcons name="arrow-back" size={32} color={'black'} />
                 </TouchableOpacity>
                 <SearchBar

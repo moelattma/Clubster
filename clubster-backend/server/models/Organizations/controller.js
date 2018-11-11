@@ -16,11 +16,11 @@ exports.getUserClubs = (req, res) => {
 
 // Display all the clubs in our Mongo Collection
 exports.getAllClubs = (req, res) => {
-	Organization.find().then((organization) => {
-		if (!organization) {
+	Organization.find().then((organizations) => {
+		if (!organizations) {
 			return res.status(400).json({ 'Error': 'No organizations found' });
 		} else {
-			return res.status(201).json({ 'organizations': organization });
+			return res.status(201).json({ 'organizations': organizations });
 		}
 	});
 };
@@ -72,27 +72,24 @@ exports.getMembers = (req, res) => {
 	});
 }
 
-
-
 exports.addOrg = (req, res) => {
 	// Code to add a new organization to the Mongo Collection
 
 	// Destruct req body
-	const { name, president, acronym, admins, description, purpose } = req.body;
-	console.log(name);
-	// If user supplied these fields
-	if (name && purpose && acronym && description) {
+	const { name, acronym, purpose, description } = req.body;
+	User.findByIdAndUpdate(req.user._id).then((user) => {
+		const president = user.name;
+
 		// Check if organization with these key-value pairs already exists
-		Organization.findOne({ name: name })
-			.then((organization) => {
+		if (name && acronym && purpose && description) {
+			Organization.findOne({ name: name }).then((organization) => {
 				if (organization) {
 					return res.status(400).json({ 'Error': 'Organization already exists' });
-				}
-				else {
+				} else {
 					// Make new organization and save into the Organizations Collection
 					let newOrg = new Organization({
 						name: name,
-						president: req.user._id,
+						president: president,
 						acronym: acronym,
 						admins: [],
 						purpose: purpose,
@@ -105,16 +102,17 @@ exports.addOrg = (req, res) => {
 						User.clubAdminPushing(req.user._id, organization);
 						Organization.addAdminToClub(organization._id, req.user._id)
 						chatRoom.save().then((chatRoom) => {
-							if(organization && chatRoom) {
+							if (organization && chatRoom) {
 								return res.status(201).json(newOrg);
 							}
 						});
-				}).catch((err) => {console.log(err); return res.status(400).json({'Error': err})}); // Push the new user onto the db if successful, else display error
+					}).catch((err) => { console.log(err); return res.status(400).json({ 'Error': err }) }); // Push the new user onto the db if successful, else display error
 
 				}
 			}).catch(err => console.log(err));
-	}
-	else {
-		return res.status(201).json({ 'Error': 'Error' });
-	}
+		}
+		else {
+			return res.status(201).json({ 'Error': 'Error' });
+		}
+	});
 };

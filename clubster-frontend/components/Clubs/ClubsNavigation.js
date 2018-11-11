@@ -1,13 +1,13 @@
 import React,{ Component } from 'react';
 
-import { ClubsterNavigator } from '../router'
+import { ClubsNavigator } from '../router'
 
 export default class ClubsNavigation extends Component {
   render() {
     const { home } = this.props.screenProps;
 
     return (
-        <ClubsterNavigator screenProps={{ home }} />
+        <ClubsNavigator screenProps={{ home }} />
     );
   }
 }
