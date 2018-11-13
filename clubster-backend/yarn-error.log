@@ -20,7 +20,7 @@ npm manifest:
     "description": "Bakcend of application",
     "main": "index.js",
     "scripts": {
-      "dev": "NODE_ENV=development & nodemon index.js"
+      "dev": "adb reverse tcp:3000 tcp:3000 && NODE_ENV=development & nodemon index.js"
     },
     "repository": {
       "type": "git",
@@ -57,8 +57,8 @@ Trace:
   Error: Command failed.
   Exit code: 3221225786
   Command: C:\WINDOWS\system32\cmd.exe
-  Arguments: /d /s /c NODE_ENV=development & nodemon index.js
-  Directory: C:\Users\Adnan\Desktop\CS115\Clubster\clubster-backend
+  Arguments: /d /s /c adb reverse tcp:3000 tcp:3000 && NODE_ENV=development & nodemon index.js
+  Directory: C:\Users\Adnan\Desktop\115\Clubster\clubster-backend
   Output:
   
       at ProcessTermError.MessageError (C:\Users\Adnan\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:186:110)

@@ -1,32 +1,116 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native'; 
-
+import { View, StyleSheet, Text, Image, TouchableOpacity, Button } from 'react-native';
+import { ImagePicker, Permissions, Constants } from 'expo';
+import axios from 'axios';
+import converter from 'base64-arraybuffer';
 export default class Profile extends Component {
     constructor() {
         super();
         this.state = {
-            show:false
+            show:false,
+            result: null,
+            img:null
         }
     }
-    
+
+    askPermissionsAsync = async () => {
+      await Permissions.askAsync(Permissions.CAMERA);
+      await Permissions.askAsync(Permissions.CAMERA_ROLL);
+      // you would probably do something to verify that permissions
+      // are actually granted, but I'm skipping that for brevity
+    };
+
+    useLibraryHandler = async () => {
+      await this.askPermissionsAsync();
+      let result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        base64: false,
+      });
+
+      const data = new FormData();
+      data.append('name', 'avatar');
+      data.append('fileData', {
+        uri : result.uri,
+        type: 'multipart/form-data',
+        name: "image1.jpg"
+      });
+      const config = {
+        method: 'POST',
+        headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data',
+        },
+        body: data,
+      };
+      fetch("http://localhost:3000/" + "api/img_data", config)
+      .then((checkStatusAndGetJSONResponse)=>{
+      console.log(checkStatusAndGetJSONResponse);
+      }).catch((err)=>{console.log(err)});
+      this.setState({ result });
+  };
+
+    arrayBufferToBase64(buffer) {
+        var binary = '';
+        var bytes = [].slice.call(new Uint8Array(buffer));
+        bytes.forEach((b) => binary += String.fromCharCode(b));
+        return window.btoa(binary);
+    };
+
+    useCameraHandler = async () => {
+      await this.askPermissionsAsync();
+      let result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        base64: false,
+      });
+      this.setState({ result });
+    };
+
+    onSubmit = () => {
+      axios.post(`http://localhost:3000/api/img_data`).then((response) => {
+        console.log(response); // Setting up state variable
+      }).catch((err) => console.log(err));
+    }
+
+    componentDidMount() {
+      fetch('http://localhost:3000/api/img_data')
+      .then((res) => res.json())
+      .then((data) => {
+        // console.log(img)
+        var base64Flag = 'data:image/jpeg;base64,';
+        var imageStr = converter.encode(data.img.data.data);
+        this.setState({
+            img: base64Flag + imageStr
+        });
+      });
+    }
+
     render() {
+       const {img} = this.state;
+       console.log(img);
         return (
-           
+
             <View style={styles.background}>
                 <View style = {styles.header}>
 
                     <View style = {styles.profilePicWrap}>
-                       <Image style = {styles.profilepic} source ={require('../../images/adnan.png')}/>
+                    <Image style = {styles.profilepic} source={{uri: this.state.img}}/>
                     </View>
-                        
+
                     <Text style={styles.name}> Aimal Khan </Text>
                     <Text style={styles.major}> Major: Econ </Text>
                 </View>
-                <TouchableOpacity style={styles.btn} onPress={() => { this.setState({ show: true }); }}><Text style={styles.plus}>+</Text></TouchableOpacity>
+                <Button
+                  title="launchImageLibraryAsync"
+                  onPress={this.useLibraryHandler}
+                />
+                <Text style={styles.paragraph}>
+                {JSON.stringify(this.state.result)}
+                </Text>
+                </View>
 
-            </View>
-            
-        ); 
+        );
     }
 }
 
