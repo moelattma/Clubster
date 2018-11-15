@@ -9,7 +9,12 @@ export default class Profile extends Component {
         this.state = {
             show:false,
             result: null,
-            img:null
+            img:null,
+            major: '',
+            hobbies: '',
+            Facebook: '',
+            Instagram: '',
+            LinkedIn: '',
         }
     }
 
@@ -19,6 +24,17 @@ export default class Profile extends Component {
       // you would probably do something to verify that permissions
       // are actually granted, but I'm skipping that for brevity
     };
+
+    _showModal = () => this.setState({ show: true })
+    _hideModal = () => this.setState({ show: false })
+    
+    submitProfile(){
+        axios.post('http://localhost:3000/api/profile', {
+            major: this.state.major, hobbies: this.state.hobbies, 
+            facebook: this.state.facebook, Instagram: this.state.Instagram,
+            LinkedIn: this.state.LinkedIn
+        })
+    }
 
     useLibraryHandler = async () => {
       await this.askPermissionsAsync();
@@ -87,55 +103,126 @@ export default class Profile extends Component {
     }
 
     render() {
-       const {img} = this.state;
-       console.log(img);
         return (
 
-            <View style={styles.background}>
-                <View style = {styles.header}>
-
-                    <View style = {styles.profilePicWrap}>
-                    <Image style = {styles.profilepic} source={{uri: this.state.img}}/>
-                    </View>
-
-                    <Text style={styles.name}> Aimal Khan </Text>
-                    <Text style={styles.major}> Major: Econ </Text>
+            <View style={{flex:1}}>
+                <View style={styles.tContainer}>
+                    
                 </View>
-                <Button
-                  title="launchImageLibraryAsync"
-                  onPress={this.useLibraryHandler}
-                />
-                <Text style={styles.paragraph}>
-                {JSON.stringify(this.state.result)}
-                </Text>
+                <View style={styles.profilePic}>
+                    <Image style={styles.profilePicWrap} source={require('../../images/adnan.png')} />
+                    
                 </View>
+                <Text style={styles.name}> Aimal Khan </Text>
+                <Text style={styles.major}> major:{this.state.major}</Text>
+                <Text style={styles.major}> Hobbies:{this.state.hobbies}</Text>
+                <Text style={styles.major}> Facebook:{this.state.facebook}</Text>
+                <Text style={styles.major}> Instagram:{this.state.Instagram}</Text>
+                <Text style={styles.major}> LinkedIn:{this.state.LinkedIn}</Text>
+
+
+
+
+                {/* MODAL  */}
+                <View style={{ flex: 1 }}>
+                    <TouchableOpacity style={styles.editButton} onPress={this._showModal} >
+                        <MaterialCommunityIcons
+                            name="account-edit"
+                            size={35}
+                            color={'black'}
+                        />
+                        {/* <Text style={styles.plus}>+</Text> */}
+                    </TouchableOpacity>
+
+                    <Modal isVisible={this.state.show}>
+                        <View style={styles.modalView}>
+                            <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+                                Edit Profile 
+                            </Text>
+                            <TextInput placeholder = "Major" onChangeText={(major) => this.setState({major})}value={this.state.major}/>
+
+                            <TextInput placeholder = "Hobbies(seperated by ,)" onChangeText={(hobbies) => this.setState({hobbies})}value={this.state.hobbies}/>
+                            <TextInput placeholder = "Facebook" onChangeText={(Facebook) => this.setState({Facebook})}value={this.state.Facebook}/>
+                            <TextInput placeholder = "Instagram" onChangeText={(Instagram) => this.setState({Instagram})}value={this.state.Instagram}/>
+                            <TextInput placeholder = "LinkedIn" onChangeText={(LinkedIn) => this.setState({LinkedIn})}value={this.state.LinkedIn}/>
+
+                            <TouchableOpacity onPress={() => {this.submitProfile()}}>
+                                <Text style={styles.SubmitBtn}> Save </Text>
+                            </TouchableOpacity>
+
+                            
+                            <TouchableOpacity onPress={() => {this.setState({show: false})}}>
+                                <Text style={styles.closeText}> Cancel</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Modal>
+                </View>
+
+            </View>
 
         );
     }
 }
 
 const styles = StyleSheet.create({
-    background : {
+    background: {
         flex: 1,
-       // width: undefined,
-      //  height: undefined,
-      //  alignSelf: 'stretch',
+        height:200,
+        backgroundColor: 'lightgreen'
     },
-
+    tContainer:{
+        flex:1,
+        backgroundColor: '#3399ff', 
+        paddingTop: 100,   
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    modalView: {
+        backgroundColor: "#fff",
+        height: 300,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    closeText: {
+        backgroundColor: '#ff6666',
+        color: '#fff',
+        fontWeight: 'bold',
+       // margin: 20,
+        padding: 5
+    },
+    SubmitBtn: {
+        backgroundColor: 'skyblue',
+        color: '#fff',
+        fontWeight: 'bold',
+       margin: 5,
+        padding: 5
+    },
     header: {
-        flex: 1,
+       // flex: 1,
+        backgroundColor: 'lightgreen',
+        marginBottom: 1000,
+    },
+    profilePic: {
+        // flex: 1,
+        flexGrow:1,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 150,
-        backgroundColor: 'skyblue',
+        position: 'absolute',
+        top: -40,
+        
+        // backgroundColor: '#03A9F4',
 
-      },
+    },
     profilePicWrap: {
         width: 180,
         height: 180,
         borderRadius: 100,
+        zIndex: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
         borderColor: 'rgba(0,0,0, 0.4)',
         borderWidth: 16,
+        position: 'absolute',
     },
 
     profilepic: {
@@ -166,7 +253,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         flexDirection: 'row'
     },
-    barSeparator:{
+    barSeparator: {
         borderRightWidth: 4,
     },
     barTop: {
@@ -175,17 +262,17 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontStyle: 'italic'
     },
-    btn: {
-        position: 'absolute',
-        width: 50,
-        height: 50,
-        backgroundColor: '#03A9F4',
-        borderRadius: 30,
-        bottom: 0,
-        right: 0,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
+    // btn: {
+    //     position: 'absolute',
+    //     width: 50,
+    //     height: 50,
+    //     backgroundColor: '#3399ff',
+    //     borderRadius: 30,
+    //     bottom: 0,
+    //     right: 0,
+    //     alignItems: 'center',
+    //     justifyContent: 'center'
+    // },
     plus: {
         fontSize: 40,
         color: 'white'
@@ -200,6 +287,10 @@ const styles = StyleSheet.create({
         padding: 18,
         alignItems: 'center'
     },
+    editButton: {
+       position: 'absolute',
+        right: 0
+    }
 
 
 });

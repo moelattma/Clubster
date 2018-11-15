@@ -7,29 +7,27 @@
 const Profile = require('./model');
 
 exports.profileSubmission = (req, res) => {
-    const {major, social, hobbies } = req.body; // destructure, pull value and assign it
-    let email = req.user;
-    console.log(email);
+    const {major, hobbies, Facebook, Instagram, LinkedIn} = req.body; // destructure, pull value and assign it
+
     // making new profile object
     const newProfile = {
         user: req.user._id,
         major: major,
         hobbies: hobbies.toString().split(','),
         social: {
-            youtube: social.youtube,
-            facebook: social.facebook,
-            linkedin: social.linkedin,
-            instagram: social.instagram,
+            facebook: Facebook,
+            linkedin: LinkedIn,
+            instagram: Instagram,
         }
     };
 
-    Profile.findOne({email: email}).then((profile)=>{
+    Profile.findOne({user: req.user._id}).then((profile)=>{
         if(profile){
             Profile.findOneAndUpdate(
                 {user: req.user._id},
-                {$set: newProfile},
+                {$set: newProfile},    // overwrites the previous profile with new one
                 {new: true}
-            ).then((profile) => res.json(profile))
+            ).then((profile) => res.json(profile))    // if sccueedd the return the profile 
         }else{
             new Profile(newProfile).save().then((profile) => res.json(profile));
         }
