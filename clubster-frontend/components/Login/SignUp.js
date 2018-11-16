@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   regForm: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#36485f',
+    backgroundColor: '#03A9F4',
     paddingLeft: 60,
     paddingRight: 60
   },
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     paddingBottom: 10,
     marginBottom: 20,
-    borderBottomColor: '#199187',
+    borderBottomColor: 'black',
     borderBottomWidth: 1,
     fontWeight: 'bold',
     textAlign: 'center'

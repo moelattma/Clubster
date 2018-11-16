@@ -39,6 +39,9 @@ export default class Login extends React.Component {
     return (
       <KeyboardAwareScrollView contentContainerStyle={styles.container} scrollEnabled={true} enableOnAndroid={true} 
       alwaysBounceVertical={true} extraScrollHeight={40} keyboardShouldPersistTaps="handled" >
+        
+        <Text style={styles.logoName}>Clubster</Text>
+
         <TextField
           inputContainerStyle={styles.textContainer}
           label="Username"
@@ -74,7 +77,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#36485f',
+    backgroundColor: '#03A9F4',
     paddingLeft: 60,
     paddingRight: 60
   },
@@ -105,5 +108,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     marginTop: 5
+  },
+  logoName: {
+    fontSize: 60,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    justifyContent: 'center',
+    color: '#fff',
+    marginLeft: 40
   }
 });

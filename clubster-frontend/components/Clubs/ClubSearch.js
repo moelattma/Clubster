@@ -47,7 +47,7 @@ export default class SearchClubs extends Component {
                     <MaterialIcons name="arrow-back" size={32} color={'black'} />
                 </TouchableOpacity>
                 <SearchBar
-                    containerStyle={{ flex: 1, alignSelf: 'center', backgroundColor: '#ffffff', borderBottomWidth: 0 }}
+                    containerStyle={{ flex: 1, alignSelf: 'center', backgroundColor: '#03A9F4', borderBottomWidth: 0 }}
                     clearIcon
                     placeholder="Search Clubs"
                     lightTheme
@@ -115,6 +115,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderBottomWidth: 1,
-        borderBottomColor: '#D6D6D6'
+        borderBottomColor: '#D6D6D6',
+        backgroundColor: '#03A9F4'
     }
 });
