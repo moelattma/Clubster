@@ -21,10 +21,10 @@ const Notifications = new Schema({
     ref: 'organizations',
     required: false
   },
-  idOfReciever: {
+  idOfReceivers: [{
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'users'
-  },
+  }],
   type: {
     type: String,
     required: true

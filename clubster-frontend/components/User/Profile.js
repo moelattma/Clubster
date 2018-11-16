@@ -3,6 +3,7 @@ import { View, StyleSheet, Text, Image, TouchableOpacity, Button } from 'react-n
 import { ImagePicker, Permissions, Constants } from 'expo';
 import axios from 'axios';
 import converter from 'base64-arraybuffer';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 export default class Profile extends Component {
     constructor() {
         super();

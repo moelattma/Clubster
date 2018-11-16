@@ -33,14 +33,14 @@ const Organization = new Schema({
       required: true,
       minlength: 32,
       trim: true,
-      unique:true
+      unique: true
   },
   purpose: {
     type: String,
     required: true,
     minlength: 32,
     trim: true,
-    unique:true
+    unique: true
   },
   social: {
     facebook: {
@@ -81,4 +81,4 @@ Organization.statics.addEventToClub = async function(organizationID, eventID) {
 /*
 * Export so that other js files can use this schema
 */
-module.exports = mongoose.model('Organization', Organization);
+module.exports = mongoose.model('organizations', Organization);

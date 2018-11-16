@@ -6,32 +6,30 @@
 */
 
 //Import Node.js libraries.
-const Notifications = require('./model');              //import Notification Schema
+const Notification = require('./model');              //import Notification Schema
 const Organizations = require('../Organizations/model')
 const User = require('../Users/model')
 
-exports.grabNotifications = (req, res) => {
-  //gets all notifications based on the userid
-  Notifications.find({idOfReciever: req.body._id}).then((notifications) => {
-		if (!notifications)
-		{
-			return res.status(400).json({'Error':'No notifications found'});
-		}
+const TYPES = ["ORG_JOIN",];
 
-		else{
-			return res.status(201).json({'notifications': notifications});
+exports.grabNotifications = (req, res) => {
+	//gets all notifications based on the userid
+	Notification.find({ idOfReceivers: { $in: [req.user._id] } }).populate('idOfSender').populate('idOfOrganization').then((notifications) => {
+		if (!notifications) {
+			return res.status(400).json({ 'Error': 'No notifications found' });
+		} else {
+			return res.status(201).json({ 'notifications': notifications });
 		}
 	});
 };
 
 exports.addMember = (req, res) => {
-	const {idOfMember, idOfOrganization} = req.params;
+	const { idOfMember, idOfOrganization } = req.params;
 
 	// add idOfMember to Org's array
-	Organizations.findOne({id: idOfOrganization}).then((organization) => {
-		if (!organizations)
-		{
-			return res.status(400).json({'Error':'No organization found'});
+	Organizations.findOne({ id: idOfOrganization }).then((organization) => {
+		if (!organizations) {
+			return res.status(400).json({ 'Error': 'No organization found' });
 		}
 
 		else {
@@ -42,13 +40,12 @@ exports.addMember = (req, res) => {
 };
 
 exports.addAdmin = (req, res) => {
-	const {idOfAdmin, idOfOrganization} = req.params;
+	const { idOfAdmin, idOfOrganization } = req.params;
 
 	// add idOfMember to Org's array
-	Organizations.findOne({id: idOfOrganization}).then((organization) => {
-		if (!organizations)
-		{
-			return res.status(400).json({'Error':'No organization found'});
+	Organizations.findOne({ id: idOfOrganization }).then((organization) => {
+		if (!organizations) {
+			return res.status(400).json({ 'Error': 'No organization found' });
 		}
 
 		else {
@@ -58,17 +55,48 @@ exports.addAdmin = (req, res) => {
 	});
 };
 
-exports.addNotification = (req, res) => {
-	console.log(req.user);
-	let notification = new Notifications({
-		idOfSender: req.user._id,
-		idOfReciever: req.user._id,
-		type: "You are now a member of ACM!"
+exports.newNotification = (req, res) => {
+	const { type, organization } = req.body;
+	const senderID = req.user._id;
+
+	let notification = ({
+		idOfSender: senderID,
+		idOfOrganization: organization._id,
+		idOfReceivers: [],
+		type: type
 	});
 
-	notification.save().then((notification) => {
-		return res.status(201).json({'notification': notification});
-	}).catch((err) => {
-		return res.status(401).json({'error': err});
-	});
-};
+	switch (type) {
+		case "ORG_JOIN":
+			notification.idOfReceivers = organization.admins;
+			new Notification(notification).save().then((newNote) => {
+				return res.status(201).json(newNote);
+			});
+			break;
+
+	}
+}
+
+// newJoinNotification = (senderID, organization) => {
+// 	console.log('senderid is ', senderID);
+// 	console.log('org admins are ', organization.admins);
+// 	let notification = new Notification({
+// 		idOfSender: senderID,
+// 		idOfReceivers: organization.admins
+// 	});
+// }
+
+// exports.addNotification = (req, res) => {
+// 	console.log(req.user);
+// 	let notification = new Notifications({
+// 		idOfSender: req.user._id,
+// 		idOfReciever: req.user._id,
+// 		type: "You are now a member of ACM!"
+// 	});
+
+// 	notification.save().then((notification) => {
+// 		return res.status(201).json({'notification': notification});
+// 	}).catch((err) => {
+// 		return res.status(401).json({'error': err});
+// 	});
+// };
