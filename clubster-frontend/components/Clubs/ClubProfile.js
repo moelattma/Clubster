@@ -26,9 +26,11 @@ export default class ClubProfile extends Component {
         };
     };
 
-    handleJoin = () => {
-        axios.post()
-    }
+    handleJoin = (organization) => {
+        axios.post("http://localhost:3000/api/notifications/new", { type: "ORG_JOIN", organization })
+        .then()
+        .catch((err) => console.log('couldnt find it', err));
+    };
 
     render() {
         const { navigation } = this.props;
@@ -42,7 +44,7 @@ export default class ClubProfile extends Component {
                 <Text style={{ textAlign: 'center', marginLeft: WIDTH / 10, marginRight: WIDTH / 10, marginTop: 20 }}> 
                     Description: {organization.description} 
                 </Text>
-                <TouchableOpacity onPress={this.handleJoin} style={styles.joinButton} >
+                <TouchableOpacity onPress={() => this.handleJoin(organization)} style={styles.joinButton} >
                     <Text style={{ fontSize: 24, fontWeight: '500', color: 'white', textAlign: 'center', textAlignVertical: 'center' }}> Join! </Text>
                 </TouchableOpacity>
             </View>

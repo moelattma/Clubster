@@ -41,7 +41,7 @@ const User = new Schema({
   },
   arrayClubsAdmin: [{
     type: Schema.Types.ObjectId,
-    ref: 'Organization',
+    ref: 'organizations',
     required: false
   }]
 });

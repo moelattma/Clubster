@@ -4,8 +4,6 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { TextField } from 'react-native-material-textfield'
 import axios from 'axios';
 
-const { height: HEIGHT } = Dimensions.get('window');
-
 export default class SignUp extends Component {
   state = {                                     //state initilaization
     email: '',
@@ -24,7 +22,7 @@ export default class SignUp extends Component {
       name
     }).then(response => {
       console.log(response.status);
-      if (response.status == 201) {
+      if (response.status == 200 || response.status == 201) {
         this.props.navigation.navigate('Login');
       }
     }).catch(err => console.log('Could not sign up', err));
@@ -46,7 +44,7 @@ export default class SignUp extends Component {
       if (password == null || confirmPassword == null || password != confirmPassword)
         errors['confirmPassword'] = 'Passwords do not match'
       this.setState({ errors });
-      if (Object.keys(errors).length == 0)
+      if (Object.keys(errors).length == 0) 
         this.submitData();
     }
   }
