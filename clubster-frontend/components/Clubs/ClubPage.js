@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     color: 'white'
   },
   item: {
-    backgroundColor: '#4D243D',
+    backgroundColor: '#009900',
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
@@ -165,6 +165,8 @@ const styles = StyleSheet.create({
   },
   itemText: {
     color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 20
   }
 });
 

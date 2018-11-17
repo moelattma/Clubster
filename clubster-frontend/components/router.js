@@ -52,7 +52,7 @@ export const HomeNavigator = createBottomTabNavigator(
             screen: Notifications,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <Ionicons name="ios-notifications" size={42} color={tintColor} />
+                    <Ionicons name="ios-notifications-outline" size={42} color={tintColor} />
                 )
             }
         },
@@ -60,7 +60,7 @@ export const HomeNavigator = createBottomTabNavigator(
             screen: ClubsNavigation,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <MaterialCommunityIcons name="home-assistant" size={48} color={tintColor} />
+                    <MaterialCommunityIcons name="home-outline" size={48} color={tintColor} />
                 )
             }
         },
@@ -68,7 +68,7 @@ export const HomeNavigator = createBottomTabNavigator(
             screen: Profile,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <Ionicons name="ios-person" size={44} color={tintColor} />
+                    <Ionicons name="logo-tux" size={44} color={tintColor} />
                 )
             }
         }
@@ -80,8 +80,8 @@ export const HomeNavigator = createBottomTabNavigator(
         initialRouteName: "ClubsNavigation",
         backBehavior: 'initialRoute',
         tabBarOptions: {
-            activeBackgroundColor: '#E2E3E5',
-            inactiveBackgroundColor: '#E2E3E5',
+            activeBackgroundColor: 'skyblue',
+            inactiveBackgroundColor: 'skyblue',
             inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
             activeTintColor: '#1F629F',
             showLabel: false,
