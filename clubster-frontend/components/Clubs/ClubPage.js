@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TouchableOpacity,StyleSheet, Button, Text, View, Dimensions, FlatList, TouchableWithoutFeedback } from 'react-native';
+import { TouchableOpacity, StyleSheet, Button, Text, View, Dimensions, FlatList, TouchableWithoutFeedback } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import axios from 'axios';
@@ -38,7 +38,7 @@ export default class ClubsPage extends Component {
     return {
       headerRight: (
         <View style={{ marginRight: 6 }}>
-        <FontAwesome name="search" onPress={() => navigation.navigate('ClubSearch')} size={28} />
+          <FontAwesome name="search" onPress={() => navigation.navigate('ClubSearch')} size={28} />
         </View>
       ),
     };
@@ -63,10 +63,10 @@ export default class ClubsPage extends Component {
     const acronym = this._formRef.getValue().Abbreviation;
     const purpose = this._formRef.getValue().Purpose;
     const description = this._formRef.getValue().Description;
-    axios.post('http://localhost:3000/api/organizations/new', {name:name,acronym:acronym,purpose:purpose,description:description}).then((organization)=> {
+    axios.post('http://localhost:3000/api/organizations/new', { name: name, acronym: acronym, purpose: purpose, description: description }).then((organization) => {
       console.log(organization);
-      this.setState({show:false});
-      this.setState({ arrClubsAdmin: this.state.arrClubsAdmin.concat(organization.data)});
+      this.setState({ show: false });
+      this.setState({ arrClubsAdmin: this.state.arrClubsAdmin.concat(organization.data) });
     }).catch((error) => {
       console.log(error);
     });

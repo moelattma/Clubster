@@ -27,4 +27,8 @@ router.post('/organizations/:idOfOrganization/:idOfMember', (req, res) => {
 	controller.deleteClubMember(req, res);
 });
 
+router.post('/organizations/isMember', passport.authenticate('jwt', {session:false}), (req, res) => {
+	controller.isMember(req, res);
+});
+
 module.exports = router;

@@ -28,8 +28,6 @@ exports.getAllClubs = (req, res) => {
 // dummy method for adding members
 exports.addMember = (req, res) => {
 	const { idOfOrganization, idOfMember } = req.params;
-	console.log(idOfOrganization, idOfMember);
-	console.log(Organization);
 	// finds and return organization id of specific club
 	Organization.findOne({ _id: idOfOrganization }).then((organization) => {
 		console.log(organization)
@@ -42,6 +40,18 @@ exports.addMember = (req, res) => {
 	});
 }
 
+exports.isMember = (req, res) => {
+	const { orgID } = req.body;
+	const userID = req.user._id;
+
+	Organization.findByIdAndUpdate(orgID).then((organization) => {
+		if(!organization)
+			return res.status(400).json({ 'Error': 'No organization found' })
+		const isMember = organization.members.indexOf(userID) != -1 || organization.admins.indexOf(userID) != -1;
+		return res.status(201).json({ 'isMember': isMember });
+	});
+}
+
 exports.deleteClubMember = (req, res) => {
 	const { idOfOrganization, idOfMember } = req.params;
 
@@ -50,8 +60,7 @@ exports.deleteClubMember = (req, res) => {
 		console.log(organization)
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No organizations found' });
-		}
-		else {
+		} else {
 			Organization.deleteClubMember(idOfOrganization, idOfMember);
 			return res.status(201).json({ 'organization': organization });
 		}
@@ -65,8 +74,7 @@ exports.getMembers = (req, res) => {
 	Organization.findOne({ _id: idOfOrganization }).populate('members').then((organization) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No organizations found' });
-		}
-		else {
+		} else {
 			return res.status(201).json({ 'organization': organization });
 		}
 	});
@@ -100,14 +108,14 @@ exports.addOrg = (req, res) => {
 					});
 					newOrg.save().then((organization) => {
 						User.clubAdminPushing(req.user._id, organization);
-						Organization.addAdminToClub(organization._id, req.user._id)
+						Organization.addAdminToClub(organization._id, req.user._id);
+						Organization.addMemberToClub(organization._id, req.user._id);
 						chatRoom.save().then((chatRoom) => {
 							if (organization && chatRoom) {
 								return res.status(201).json(newOrg);
 							}
 						});
 					}).catch((err) => { console.log(err); return res.status(400).json({ 'Error': err }) }); // Push the new user onto the db if successful, else display error
-
 				}
 			}).catch(err => console.log(err));
 		}

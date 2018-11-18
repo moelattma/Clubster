@@ -57,7 +57,6 @@ exports.findUser = (req, res) => {
   const { username, password } = req.body;
   User.findOne({ username: username }).then((user) => {
     if (!user) {
-
       return res.status(400).json({ 'Error': 'User does not exist' });
     } else {
       bcrypt.compare(password, user.password).then(same => {
