@@ -35,6 +35,10 @@ const Organization = new Schema({
       trim: true,
       unique: true
   },
+  imageId: {
+    type: Schema.Types.ObjectId,
+    ref: 'images'
+  },
   purpose: {
     type: String,
     required: true,

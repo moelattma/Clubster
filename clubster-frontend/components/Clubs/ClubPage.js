@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, StyleSheet, Button, Text, View, Dimensions, FlatList, TouchableWithoutFeedback } from 'react-native';
+import { ScrollView, AsyncStorage, TouchableOpacity, Image,StyleSheet, Button, Text, View, Dimensions, FlatList, TouchableWithoutFeedback } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
+import ClubsUI from './ClubsUI';
 import axios from 'axios';
 import t from 'tcomb-form-native';
+import { ImagePicker, Permissions, Constants } from 'expo';
+import converter from 'base64-arraybuffer';
 
 const Form = t.form.Form;
 const Organization = t.struct({
@@ -13,26 +15,72 @@ const Organization = t.struct({
   Description: t.String
 });
 
-const formatData = (data, columnNums) => {
-  let rowsFull = Math.floor(data.length / columnNums);
-  let lastRowNum = data.length % columnNums;
-  for (; lastRowNum != columnNums && lastRowNum !== 0;) {
-    data.push({ key: `blank-${lastRowNum}`, empty: true });
-    lastRowNum++;
-  }
-  return data;
-}
+const window = Dimensions.get('window');
+const imageWidth = (window.width/3)+30;
+const imageHeight = window.width/3;
 
-const numColumns = 3;
 export default class ClubsPage extends Component {
 
   constructor() { // Initializing state
     super();
     this.state = {
       arrClubsAdmin: [],
-      show: false
+      show: false,
+      img:'https://facebook.github.io/react/logo-og.png'
     }
+    console.log('Adnan ', this.props);
   }
+
+  askPermissionsAsync = async () => {
+    await Permissions.askAsync(Permissions.CAMERA);
+    await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    // you would probably do something to verify that permissions
+    // are actually granted, but I'm skipping that for brevity
+  };
+
+  useLibraryHandler = async () => {
+    await this.askPermissionsAsync();
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      base64: false,
+    });
+    const token = await AsyncStorage.getItem('jwtToken');
+    const data = new FormData();
+    data.append('name', this._formRef.getValue().Name);
+    data.append('acronym', this._formRef.getValue().Abbreviation);
+    data.append('purpose', this._formRef.getValue().Purpose);
+    data.append('description', this._formRef.getValue().Description);
+    data.append('fileData', {
+      uri : result.uri,
+      type: 'multipart/form-data',
+      name: "image1.jpg"
+    });
+    axios.post('http://localhost:3000/api/organizations/new', data).then((response) => {
+      console.log(response);
+      var arrAdmin = this.state.arrClubsAdmin
+      arrAdmin.push({
+        president: response.data.organization.president,
+        admins: response.data.organization.admins,
+        name: response.data.organization.name,
+        acronym: response.data.organization.acronym,
+        description: response.data.organization.description,
+        imageUrl: 'data:image/jpeg;base64,' + converter.encode(response.data.organization.imageId.img.data.data),
+        purpose: response.data.organization.purpose,
+        members: response.data.organization.members,
+        events: response.data.organization.events
+      });
+      this.setState({arrClubsAdmin: arrAdmin});
+      this.setState({show:false});
+    });
+  };
+
+  arrayBufferToBase64(buffer) {
+      var binary = '';
+      var bytes = [].slice.call(new Uint8Array(buffer));
+      bytes.forEach((b) => binary += String.fromCharCode(b));
+      return window.btoa(binary);
+  };
 
   static navigationOptions = ({ navigation }) => {
     return {
@@ -50,7 +98,7 @@ export default class ClubsPage extends Component {
     }
     const { screenProps } = this.props;
     return (
-      <TouchableWithoutFeedback onPress={() => screenProps.home.navigate('AdminNavigation', { item })}>
+      <TouchableWithoutFeedback>
         <View style={styles.item}>
           <Text style={styles.itemText}>{item.name}</Text>
         </View>
@@ -72,17 +120,60 @@ export default class ClubsPage extends Component {
     });
   }
 
+
+
+  componentDidMount() {
+    var arr = [];
+    axios.get("http://localhost:3000/api/organizations").then((response) => {
+      for(var i = 0;i<response.data.user.arrayClubsAdmin.length;i++) {
+        arr.push({
+          president: response.data.user.arrayClubsAdmin[i].president,
+          admins: response.data.user.arrayClubsAdmin[i].admins,
+          name: response.data.user.arrayClubsAdmin[i].name,
+          acronym: response.data.user.arrayClubsAdmin[i].acronym,
+          description: response.data.user.arrayClubsAdmin[i].description,
+          imageUrl: 'data:image/jpeg;base64,' + converter.encode(response.data.user.arrayClubsAdmin[i].imageId.img.data.data),
+          purpose: response.data.user.arrayClubsAdmin[i].purpose,
+          members: response.data.user.arrayClubsAdmin[i].members,
+          events: response.data.user.arrayClubsAdmin[i].events
+        });
+      }
+      this.setState({ arrClubsAdmin: arr }); // Setting up state variable
+      console.log(this.state.arrClubsAdmin);
+    }).catch((err) => console.log(err));
+  };
+
   renderElement() {
     if (this.state.show == true) {
       return (
-        <View style={{ flex: 1 }}>
+        <View>
           <Form type={Organization} ref={(ref) => this._formRef = ref} />
-          <Button title="Sign Up!" onPress={this.handleSubmit} />
-        </View>);
+          <Button title="Sign Up!" onPress={this.useLibraryHandler} />
+        </View>
+      );
     }
     return (
-      <View style={{ flex: 1 }}>
-        <FlatList data={formatData(this.state.arrClubsAdmin, numColumns)} renderItem={this.renderItem} numColumns={numColumns} keyExtractor={(admin) => admin} />
+      <View style = {{flex:1}}>
+      <ScrollView contentContainerStyle = {styles.root}>
+          {this.state.arrClubsAdmin.map((item, i) => (
+            <TouchableOpacity key={i} onPress={() => this.props.home.navigate('AdminNavigation', { item })}>
+            <View style={styles.meetupCard} >
+              <View style={styles.meetupCardTopContainer}>
+              <Image style={styles.imageHeight} source={{uri: item.imageUrl }} />
+              </View>
+
+              <View style={styles.meetupCardBottomContainer}>
+                <Text style={styles.meetupCardMetaName}>
+
+                </Text>
+                <Text style={styles.meetupCardMetaDate}>
+                  Mar 2m 6:00pm
+                </Text>
+              </View>
+            </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
         <TouchableOpacity style={styles.btn} onPress={() => { this.setState({ show: true }); }}>
           <Text style={styles.plus}>+</Text>
         </TouchableOpacity>
@@ -90,17 +181,10 @@ export default class ClubsPage extends Component {
     );
   }
 
-  componentDidMount() {
-    axios.get("http://localhost:3000/api/organizations").then((response) => {
-      this.setState({ arrClubsAdmin: response.data.user.arrayClubsAdmin }); // Setting up state variable
-      console.log(this.state.arrClubsAdmin);
-    }).catch((err) => console.log(err));
-  };
-
   render() {
+    console.log('HEEEEEE!!!!!!!!!!!!!!! ', this.state.arrClubsAdmin);
     return (
-      // Container for the whole body
-      <View style={styles.container}>
+      <View style = {{flex:1}}>
         {this.renderElement()}
       </View>
     );
@@ -157,8 +241,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
-    margin: 1,
-    height: Dimensions.get('window').width / numColumns,
+    margin: 1
   },
   itemInvisible: {
     backgroundColor: 'transparent',
@@ -167,6 +250,56 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 20
+  },
+  root: {
+    flexDirection: 'row',
+    flexWrap: 'wrap'
+  },
+  titleContainer: {
+    flex: 0.1,
+    paddingHorizontal: '2.5%',
+    paddingVertical: '2.5%',
+  },
+  title: {
+    color: '#fff',
+    fontSize: 25,
+  },
+  contentContainer: {
+    flex: 1,
+  },
+  imageHeight: {
+    width: window.width/2,
+    alignItems: 'center',
+    height: imageHeight,
+    borderColor: '#d6d7da'
+  },
+  meetupCard: {
+    width: window.width/2,
+    alignItems: 'center',
+    height: imageHeight+5,
+    marginTop: 10,
+    borderColor: '#d6d7da'
+  },
+  meetupCardTopContainer: {
+    flex: 1,
+    position: 'absolute',
+  },
+  meetupCardTitle: {
+    position: 'relative',
+    color: '#0000ff'
+  },
+  meetupCardBottomContainer: {
+    flex: 0.4,
+    width: window.width/2 - 1,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    paddingHorizontal: '2.5%',
+
+  },
+  meetupCardMetaName: {
+    fontSize: 15
+  },
+  meetupCardMetaDate: {
+    fontSize: 13
   }
 });
-

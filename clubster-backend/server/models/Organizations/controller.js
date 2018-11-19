@@ -6,9 +6,12 @@
 const Organization = require('./model');
 const User = require('../Users/model');
 const Conversation = require('../Conversations/model');
+const Img = require('../Images/model');
+const fs = require('fs');
+
 exports.getUserClubs = (req, res) => {
 	console.log(req.user._id);
-	User.findOne({ _id: req.user._id }).populate('arrayClubsAdmin').then((user) => {
+	User.findOne({ _id: req.user._id }).populate({path : 'arrayClubsAdmin', populate : {path : 'imageId'}}).then((user) => {
 		console.log(req.body._id);
 		return res.status(201).json({ 'user': user });	//populates array that user is admin of
 	}).catch((err) => console.log(err));
@@ -94,33 +97,54 @@ exports.addOrg = (req, res) => {
 				if (organization) {
 					return res.status(400).json({ 'Error': 'Organization already exists' });
 				} else {
-					// Make new organization and save into the Organizations Collection
-					let newOrg = new Organization({
-						name: name,
-						president: president,
-						acronym: acronym,
-						admins: [],
-						purpose: purpose,
-						description: description
-					});
-					let chatRoom = new Conversation({
-						idOfClub: newOrg._id
-					});
-					newOrg.save().then((organization) => {
-						User.clubAdminPushing(req.user._id, organization);
-						Organization.addAdminToClub(organization._id, req.user._id);
-						Organization.addMemberToClub(organization._id, req.user._id);
-						chatRoom.save().then((chatRoom) => {
-							if (organization && chatRoom) {
-								return res.status(201).json(newOrg);
-							}
+
+					var new_img = new Img;
+					var id;
+			    console.log(req.file);
+			    new_img.img.data = fs.readFileSync(req.file.path)
+			    new_img.img.contentType = 'image/jpeg';
+			    new_img.save().then((image) => {
+						console.log('jj', image._id);
+						// Make new organization and save into the Organizations Collection
+						let newOrg = new Organization({
+							name: name,
+							president: president,
+							acronym: acronym,
+							admins: [],
+							purpose: purpose,
+							description: description,
+							imageId: image._id
 						});
-					}).catch((err) => { console.log(err); return res.status(400).json({ 'Error': err }) }); // Push the new user onto the db if successful, else display error
+						let chatRoom = new Conversation({
+							idOfClub: newOrg._id
+						});
+
+						newOrg.save().then((organization) => {
+							console.log('hee ', organization);
+							User.clubAdminPushing(req.user._id, organization);
+							Organization.addAdminToClub(organization._id, req.user._id);
+							Organization.addMemberToClub(organization._id, req.user._id);
+							chatRoom.save().then((chatRoom) => {
+								if (organization && chatRoom) {
+									Organization.findOne({ _id: organization._id }).populate('imageId').then((newOrganization) => {
+										if (!newOrganization) {
+											return res.status(400).json({ 'Error': 'No organizations found' });
+										} else {
+											return res.status(201).json({ 'organization': newOrganization });
+										}
+									});
+								}
+							});
+						}).catch((err) => { console.log(err); return res.status(400).json({ 'Error': err }) });
+					}).catch((err) => {
+						console.log(err);
+					});
+					 // Push the new user onto the db if successful, else display error
 				}
 			}).catch(err => console.log(err));
 		}
 		else {
-			return res.status(201).json({ 'Error': 'Error' });
+			return res.status(400).json({ 'Error': 'Error' });
 		}
 	});
 };

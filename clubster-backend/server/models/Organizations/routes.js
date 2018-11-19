@@ -6,12 +6,15 @@
 const router = require('express').Router();
 const controller = require('./controller');
 const passport = require('passport');
+const multer = require('multer');
+var upload = multer({ dest: 'uploads/' });
 
 router.get('/organizations/all', passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.getAllClubs(req, res);
 });
 
-router.post('/organizations/new', passport.authenticate('jwt', {session:false}), (req, res) => {
+router.post('/organizations/new', upload.single('fileData'), passport.authenticate('jwt', {session:false}), (req, res) => {
+	console.log('hi');
 	controller.addOrg(req, res);
 });
 

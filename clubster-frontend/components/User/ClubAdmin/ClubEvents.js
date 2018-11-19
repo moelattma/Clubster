@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import { View, Text, Dimensions, Button, FlatList, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import axios from 'axios';
 import t from 'tcomb-form-native';
-
+import EventsUI from '../../Clubs/EventsUI';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { createStackNavigator } from 'react-navigation';
+import tx from 'tcomb-additional-types';
 
 const Form = t.form.Form;
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
@@ -16,6 +17,7 @@ const Event = t.struct({
   name: t.String,
   description: t.String,
   date: t.String,
+  expense: tx.Number.Decimal
 });
 
 export default class ClubEvents extends Component {
@@ -96,27 +98,25 @@ class ShowEvents extends Component {
 
   render() {
     return (
-      <View style={{ flex: 1 }} >
-        <FlatList
-          data={this.state.clubEvents.reverse()}
-          renderItem={this._renderItem}
-          keyExtractor={clubEvent => clubEvent._id}
-          refreshing={this.state.loading}
-          onRefresh={() => this.getClubEvents()}
-        />
-      </View>
+      <EventsUI events = {this.state.clubEvents} />
     );
   }
 }
 
 class CreateClubEvent extends Component {
+
   createEvent = () => {
+    var clubEventsNew = [];
     const { _id } = this.props.screenProps;
     const name = this._formRef.getValue().name;
     const date = this._formRef.getValue().date;
     const description = this._formRef.getValue().description;
-    axios.post(`http://localhost:3000/api/events/${_id}/new`, { name, date, description }).then((event) => {
-      this.setState({ clubEvents: this.state.clubEvents.concat(event.data) });
+    const expense = this._formRef.getValue().expense;
+    axios.post(`http://localhost:3000/api/events/${_id}/new`, { name, date, description,expense }).then((event) => {
+      clubEventsNew = this.state.clubEvents.push(event.data);
+      this.setState({
+        clubEvents: clubEventsNew
+      });
     }).catch((error) => {
       console.log(error);
     });

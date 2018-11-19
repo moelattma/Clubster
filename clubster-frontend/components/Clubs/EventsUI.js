@@ -2,16 +2,14 @@ import React from 'react';
 import { View, Text, ScrollView, StyleSheet, Image, TouchableWithoutFeedback } from 'react-native';
 
 const EventsUI = ({events}) => (
-    
-    <View style={styles.screen}> 
-        <Text style={styles.header}>Events</Text> 
-        
+
+    <View style={styles.screen}>
         <View>
-            <ScrollView>
+            <ScrollView vertical>
                 {events.map((event, i) => (
 
                     <View key={i} style={styles.eventCard}>
-                    
+
                         <View style={styles.content}>
                             <View style={styles.eventDetails}>
                                 <Text style={styles.eventName}>
@@ -19,7 +17,7 @@ const EventsUI = ({events}) => (
                                 </Text>
                                 <Text>{event.date}</Text>
                                 <Text>{event.time}</Text>
-                                
+
                             </View>
 
                             <View style={styles.eventImage}>
@@ -31,14 +29,14 @@ const EventsUI = ({events}) => (
                             <Text>{event.description}</Text>
                         </View>
                     </View>
-                    
+
                 ))}
 
             </ScrollView>
         </View>
     </View>
-    
-    
+
+
 );
 
 const styles = StyleSheet.create({
@@ -48,8 +46,6 @@ const styles = StyleSheet.create({
     },
 
     screen:{
-        paddingTop: 27,
-        paddingBottom: 75,
         paddingHorizontal: 5
     },
     eventCard: {
@@ -58,7 +54,7 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         paddingHorizontal: 5,
         marginVertical: 2.5
-        
+
     },
 
     header: {
@@ -81,6 +77,3 @@ const styles = StyleSheet.create({
 });
 
 export default EventsUI;
-
-
-

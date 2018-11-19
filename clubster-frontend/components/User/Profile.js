@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity, Button } from 'react-native';
+import { Modal,View, StyleSheet, Text, Image, TouchableOpacity, Button, TextInput } from 'react-native';
 import { ImagePicker, Permissions, Constants } from 'expo';
 import axios from 'axios';
 import converter from 'base64-arraybuffer';
@@ -27,12 +27,16 @@ export default class Profile extends Component {
       // are actually granted, but I'm skipping that for brevity
     };
 
+    hide = () => {
+      return;
+    }
+
     _showModal = () => this.setState({ show: true })
     _hideModal = () => this.setState({ show: false })
-    
+
     submitProfile(){
         axios.post('http://localhost:3000/api/profile', {
-            major: this.state.major, hobbies: this.state.hobbies, 
+            major: this.state.major, hobbies: this.state.hobbies,
             facebook: this.state.facebook, Instagram: this.state.Instagram,
             LinkedIn: this.state.LinkedIn
         })
@@ -109,11 +113,11 @@ export default class Profile extends Component {
 
             <View style={{flex:1}}>
                 <View style={styles.tContainer}>
-                    
+
                 </View>
                 <View style={styles.profilePic}>
                     <Image style={styles.profilePicWrap} source={require('../../images/adnan.png')} />
-                    
+
                 </View>
                 <Text style={styles.name}> Aimal Khan </Text>
                 <Text style={styles.major}> major:{this.state.major}</Text>
@@ -133,28 +137,27 @@ export default class Profile extends Component {
                             size={35}
                             color={'black'}
                         />
-                        {/* <Text style={styles.plus}>+</Text> */}
                     </TouchableOpacity>
 
-                    <Modal isVisible={this.state.show}>
+                    <Modal isVisible={this.state.show} onRequestClose = {this.hide}>
                         <View style={styles.modalView}>
                             <Text style={{fontSize: 20, fontWeight: 'bold'}}>
-                                Edit Profile 
+                                Edit Profile
                             </Text>
-                            <TextInput placeholder = "Major" onChangeText={(major) => this.setState({major})}value={this.state.major}/>
+                            <TextInput placeholder = "Major" onChangeText={(major) => this.setState({major})} value={this.state.major}/>
 
-                            <TextInput placeholder = "Hobbies(seperated by ,)" onChangeText={(hobbies) => this.setState({hobbies})}value={this.state.hobbies}/>
-                            <TextInput placeholder = "Facebook" onChangeText={(Facebook) => this.setState({Facebook})}value={this.state.Facebook}/>
-                            <TextInput placeholder = "Instagram" onChangeText={(Instagram) => this.setState({Instagram})}value={this.state.Instagram}/>
-                            <TextInput placeholder = "LinkedIn" onChangeText={(LinkedIn) => this.setState({LinkedIn})}value={this.state.LinkedIn}/>
+                            <TextInput placeholder = "Hobbies(seperated by ,)" onChangeText={(hobbies) => this.setState({hobbies})} value={this.state.hobbies}/>
+                            <TextInput placeholder = "Facebook" onChangeText={(Facebook) => this.setState({Facebook})} value={this.state.Facebook}/>
+                            <TextInput placeholder = "Instagram" onChangeText={(Instagram) => this.setState({Instagram})} value={this.state.Instagram}/>
+                            <TextInput placeholder = "LinkedIn" onChangeText={(LinkedIn) => this.setState({LinkedIn})} value={this.state.LinkedIn}/>
 
                             <TouchableOpacity onPress={() => {this.submitProfile()}}>
-                                <Text style={styles.SubmitBtn}> Save </Text>
+                                <Text style={styles.SubmitBtn}>Save</Text>
                             </TouchableOpacity>
 
-                            
+
                             <TouchableOpacity onPress={() => {this.setState({show: false})}}>
-                                <Text style={styles.closeText}> Cancel</Text>
+                                <Text style={styles.closeText}>Cancel</Text>
                             </TouchableOpacity>
                         </View>
                     </Modal>
@@ -174,8 +177,8 @@ const styles = StyleSheet.create({
     },
     tContainer:{
         flex:1,
-        backgroundColor: '#3399ff', 
-        paddingTop: 100,   
+        backgroundColor: '#3399ff',
+        paddingTop: 100,
         alignItems: 'center',
         justifyContent: 'center'
     },
@@ -211,7 +214,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         position: 'absolute',
         top: -40,
-        
+
         // backgroundColor: '#03A9F4',
 
     },
