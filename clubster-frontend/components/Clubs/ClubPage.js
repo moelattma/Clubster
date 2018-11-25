@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { ScrollView, AsyncStorage, TouchableOpacity, Image,StyleSheet, Button, Text, View, Dimensions, FlatList, TouchableWithoutFeedback } from 'react-native';
+import { ScrollView, AsyncStorage, TouchableOpacity, Image, StyleSheet, Button, Text, View, Dimensions, FlatList, TouchableWithoutFeedback } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import ClubsUI from './ClubsUI';
 import axios from 'axios';
 import t from 'tcomb-form-native';
 import { ImagePicker, Permissions, Constants } from 'expo';
 import converter from 'base64-arraybuffer';
+import { update } from 'tcomb';
 
 const Form = t.form.Form;
 const Organization = t.struct({
@@ -16,19 +17,18 @@ const Organization = t.struct({
 });
 
 const window = Dimensions.get('window');
-const imageWidth = (window.width/3)+30;
-const imageHeight = window.width/3;
+const imageWidth = (window.width / 3) + 30;
+const imageHeight = window.width / 3;
 
 export default class ClubsPage extends Component {
 
   constructor() { // Initializing state
     super();
     this.state = {
-      arrClubsAdmin: [],
+      clubs: [],
       show: false,
-      img:'https://facebook.github.io/react/logo-og.png'
+      img: 'https://facebook.github.io/react/logo-og.png'
     }
-    console.log('Adnan ', this.props);
   }
 
   askPermissionsAsync = async () => {
@@ -52,34 +52,35 @@ export default class ClubsPage extends Component {
     data.append('purpose', this._formRef.getValue().Purpose);
     data.append('description', this._formRef.getValue().Description);
     data.append('fileData', {
-      uri : result.uri,
+      uri: result.uri,
       type: 'multipart/form-data',
       name: "image1.jpg"
     });
     axios.post('http://localhost:3000/api/organizations/new', data).then((response) => {
       console.log(response);
-      var arrAdmin = this.state.arrClubsAdmin
-      arrAdmin.push({
-        president: response.data.organization.president,
-        admins: response.data.organization.admins,
-        name: response.data.organization.name,
-        acronym: response.data.organization.acronym,
-        description: response.data.organization.description,
-        imageUrl: 'data:image/jpeg;base64,' + converter.encode(response.data.organization.imageId.img.data.data),
-        purpose: response.data.organization.purpose,
-        members: response.data.organization.members,
-        events: response.data.organization.events
+      var updatedClubs = this.state.clubs;
+      const org = response.data.organization;
+      updatedClubs.push({
+        president: org.president,
+        admins: org.admins,
+        name: org.name,
+        acronym: org.acronym,
+        description: org.description,
+        imageUrl: 'data:image/jpeg;base64,' + converter.encode(org.imageId.img.data.data),
+        purpose: org.purpose,
+        members: org.members,
+        events: org.events
       });
-      this.setState({arrClubsAdmin: arrAdmin});
-      this.setState({show:false});
+      this.setState({ clubs: updatedClubs });
+      this.setState({ show: false });
     });
   };
 
   arrayBufferToBase64(buffer) {
-      var binary = '';
-      var bytes = [].slice.call(new Uint8Array(buffer));
-      bytes.forEach((b) => binary += String.fromCharCode(b));
-      return window.btoa(binary);
+    var binary = '';
+    var bytes = [].slice.call(new Uint8Array(buffer));
+    bytes.forEach((b) => binary += String.fromCharCode(b));
+    return window.btoa(binary);
   };
 
   static navigationOptions = ({ navigation }) => {
@@ -98,7 +99,7 @@ export default class ClubsPage extends Component {
     }
     const { screenProps } = this.props;
     return (
-      <TouchableWithoutFeedback>
+      <TouchableWithoutFeedback onPress={() => { screenProps.home.navigate('AdminNavigation') }}>
         <View style={styles.item}>
           <Text style={styles.itemText}>{item.name}</Text>
         </View>
@@ -114,34 +115,37 @@ export default class ClubsPage extends Component {
     axios.post('http://localhost:3000/api/organizations/new', { name: name, acronym: acronym, purpose: purpose, description: description }).then((organization) => {
       console.log(organization);
       this.setState({ show: false });
-      this.setState({ arrClubsAdmin: this.state.arrClubsAdmin.concat(organization.data) });
+      this.setState({ clubs: this.state.clubs.concat(organization.data) });
     }).catch((error) => {
       console.log(error);
     });
   }
 
-
-
   componentDidMount() {
-    var arr = [];
+    var getClubs = [];
     axios.get("http://localhost:3000/api/organizations").then((response) => {
-      for(var i = 0;i<response.data.user.arrayClubsAdmin.length;i++) {
-        arr.push({
-          president: response.data.user.arrayClubsAdmin[i].president,
-          admins: response.data.user.arrayClubsAdmin[i].admins,
-          name: response.data.user.arrayClubsAdmin[i].name,
-          acronym: response.data.user.arrayClubsAdmin[i].acronym,
-          description: response.data.user.arrayClubsAdmin[i].description,
-          imageUrl: 'data:image/jpeg;base64,' + converter.encode(response.data.user.arrayClubsAdmin[i].imageId.img.data.data),
-          purpose: response.data.user.arrayClubsAdmin[i].purpose,
-          members: response.data.user.arrayClubsAdmin[i].members,
-          events: response.data.user.arrayClubsAdmin[i].events
-        });
-      }
-      this.setState({ arrClubsAdmin: arr }); // Setting up state variable
-      console.log(this.state.arrClubsAdmin);
+      const { user } = response.data;
+      arr = user.arrayClubsAdmin;
+
+      for(var i = 0; i < user.arrayClubsAdmin.length; i++) {
+        const club = user.arrayClubsAdmin[i];
+        arr[i].imageUrl = 'data:image/jpeg;base64,' + converter.encode(club.imageId.img.data.data);
+        arr[i].isAdmin = true;
+      };
+
+      for(var i = 0; i < user.arrayClubsMember.length; i++) {
+        const club = user.arrayClubsMember[i];
+        club.imageUrl = 'data:image/jpeg;base64,' + converter.encode(club.imageId.img.data.data);
+        club.isAdmin = false;
+        arr.push(club);
+      };
+      this.setState({ clubs: arr }); // Setting up state variable
     }).catch((err) => console.log(err));
   };
+
+  navigateUser = (item) => {
+    this.props.screenProps.home.navigate('AdminMemNavigation', { item, isAdmin: item.isAdmin });
+  }
 
   renderElement() {
     if (this.state.show == true) {
@@ -153,24 +157,21 @@ export default class ClubsPage extends Component {
       );
     }
     return (
-      <View style = {{flex:1}}>
-      <ScrollView contentContainerStyle = {styles.root}>
-          {this.state.arrClubsAdmin.map((item, i) => (
-            <TouchableOpacity key={i} onPress={() => this.props.home.navigate('AdminNavigation', { item })}>
-            <View style={styles.meetupCard} >
-              <View style={styles.meetupCardTopContainer}>
-              <Image style={styles.imageHeight} source={{uri: item.imageUrl }} />
-              </View>
+      <View style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={styles.root}>
+          {this.state.clubs.map((item, i) => (
+            <TouchableOpacity key={i} onPress={() => this.navigateUser(item)} >
+              <View style={styles.meetupCard} >
+                <View style={styles.meetupCardTopContainer}>
+                  <Image style={styles.imageHeight} source={{ uri: item.imageUrl }} />
+                </View>
 
-              <View style={styles.meetupCardBottomContainer}>
-                <Text style={styles.meetupCardMetaName}>
-
-                </Text>
-                <Text style={styles.meetupCardMetaDate}>
-                  Mar 2m 6:00pm
-                </Text>
+                <View style={styles.meetupCardBottomContainer}>
+                  <Text style={styles.meetupCardMetaName}>
+                    {item.name}
+                  </Text>
+                </View>
               </View>
-            </View>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -182,9 +183,8 @@ export default class ClubsPage extends Component {
   }
 
   render() {
-    console.log('HEEEEEE!!!!!!!!!!!!!!! ', this.state.arrClubsAdmin);
     return (
-      <View style = {{flex:1}}>
+      <View style={{ flex: 1 }}>
         {this.renderElement()}
       </View>
     );
@@ -268,15 +268,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   imageHeight: {
-    width: window.width/2,
+    width: window.width / 2,
     alignItems: 'center',
     height: imageHeight,
     borderColor: '#d6d7da'
   },
   meetupCard: {
-    width: window.width/2,
+    width: window.width / 2,
     alignItems: 'center',
-    height: imageHeight+5,
+    height: imageHeight + 5,
     marginTop: 10,
     borderColor: '#d6d7da'
   },
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   },
   meetupCardBottomContainer: {
     flex: 0.4,
-    width: window.width/2 - 1,
+    width: window.width / 2 - 1,
     backgroundColor: '#fff',
     justifyContent: 'center',
     paddingHorizontal: '2.5%',

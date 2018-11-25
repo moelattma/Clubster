@@ -46,6 +46,7 @@ export default class Login extends React.Component {
           inputContainerStyle={styles.textContainer}
           label="Username"
           baseColor="rgba(255, 255, 255, 0.75)"
+          tintColor='#59cbbd'
           textColor="rgba(255, 255, 255, 1)"
           onChangeText={username => this.setState({ username })}
           returnKeyType='next'
@@ -55,6 +56,7 @@ export default class Login extends React.Component {
           inputContainerStyle={styles.textContainer}
           label="Password"
           baseColor="rgba(255, 255, 255, 0.75)"
+          tintColor='#59cbbd'
           textColor="rgba(255, 255, 255, 1)"
           onChangeText={password => this.setState({ password })}
           secureTextEntry={true}

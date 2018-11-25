@@ -14,7 +14,6 @@ router.get('/organizations/all', passport.authenticate('jwt', {session:false}), 
 });
 
 router.post('/organizations/new', upload.single('fileData'), passport.authenticate('jwt', {session:false}), (req, res) => {
-	console.log('hi');
 	controller.addOrg(req, res);
 });
 
@@ -22,11 +21,11 @@ router.get('/organizations', passport.authenticate('jwt', {session:false}), (req
 	controller.getUserClubs(req, res);
 });
 
-router.get('/organizations/:idOfOrganization/members', (req, res) => {
+router.get('/organizations/:orgID/members', (req, res) => {
 	controller.getMembers(req, res);
 });
 
-router.post('/organizations/:idOfOrganization/:idOfMember', (req, res) => {
+router.post('/organizations/:orgID/:idOfMember', (req, res) => {
 	controller.deleteClubMember(req, res);
 });
 

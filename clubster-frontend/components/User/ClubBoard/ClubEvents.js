@@ -23,10 +23,10 @@ const Event = t.struct({
 export default class ClubEvents extends Component {
   componentWillMount() {
     this._navListenerFocus = this.props.navigation.addListener('willFocus', () => {
-      this.props.screenProps.adminNavigation.setParams({ hideHeader: true });
+      this.props.screenProps.clubBoardNav.setParams({ hideHeader: true });
     });
     this._navListenerBlur = this.props.navigation.addListener('willBlur', () => {
-      this.props.screenProps.adminNavigation.setParams({ hideHeader: false });
+      this.props.screenProps.clubBoardNav.setParams({ hideHeader: false });
     });
   }
 
@@ -36,9 +36,9 @@ export default class ClubEvents extends Component {
   }
 
   render() {
-    const { _id, clubsterNavigation, adminNavigation } = this.props.screenProps;
+    const { _id, clubsterNavigation, clubBoardNav, isAdmin } = this.props.screenProps;
     return (
-      <ClubEventNavigator screenProps={{ _id, clubsterNavigation, adminNavigation }} />
+      <ClubEventNavigator screenProps={{ _id, clubsterNavigation, clubBoardNav, isAdmin }} />
     );
   }
 }
@@ -54,21 +54,22 @@ class ShowEvents extends Component {
   }
 
   static navigationOptions = ({ navigation, screenProps }) => {
+    rightHeader = (
+      <View style={{ marginRight: 6 }}>
+        <FontAwesome
+          name="plus" size={32} color={'black'}
+          onPress={() => navigation.navigate('CreateClubEvent')} />
+      </View>);
+
     return {
       headerLeft: (
         <View style={{ marginLeft: 13 }}>
           <MaterialIcons
             name="arrow-back" size={32} color={'black'}
-            onPress={() => screenProps.adminNavigation.navigate('HomeNavigation')} />
+            onPress={() => screenProps.clubBoardNav.navigate('HomeNavigation')} />
         </View>
       ),
-      headerRight: (
-        <View style={{ marginRight: 6 }}>
-          <FontAwesome
-            name="plus" size={32} color={'black'}
-            onPress={() => navigation.navigate('CreateClubEvent')} />
-        </View>
-      )
+      headerRight: (screenProps.isAdmin ? rightHeader : null)
     }
   }
 
@@ -114,9 +115,7 @@ class CreateClubEvent extends Component {
     const expense = this._formRef.getValue().expense;
     axios.post(`http://localhost:3000/api/events/${_id}/new`, { name, date, description,expense }).then((event) => {
       clubEventsNew = this.state.clubEvents.push(event.data);
-      this.setState({
-        clubEvents: clubEventsNew
-      });
+      this.setState({ clubEvents: clubEventsNew });
     }).catch((error) => {
       console.log(error);
     });

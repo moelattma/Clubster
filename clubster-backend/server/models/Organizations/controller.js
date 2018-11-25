@@ -11,9 +11,9 @@ const fs = require('fs');
 
 exports.getUserClubs = (req, res) => {
 	console.log(req.user._id);
-	User.findOne({ _id: req.user._id }).populate({path : 'arrayClubsAdmin', populate : {path : 'imageId'}}).then((user) => {
-		console.log(req.body._id);
-		return res.status(201).json({ 'user': user });	//populates array that user is admin of
+	User.findOne({ _id: req.user._id }).populate({ path: 'arrayClubsAdmin', populate: { path: 'imageId' } })
+		.populate({ path: 'arrayClubsMember', populate: { path: 'imageId' } }).then((user) => {
+			return res.status(201).json({ 'user': user });	//populates array that user is admin of
 	}).catch((err) => console.log(err));
 };
 
@@ -28,27 +28,12 @@ exports.getAllClubs = (req, res) => {
 	});
 };
 
-// dummy method for adding members
-exports.addMember = (req, res) => {
-	const { idOfOrganization, idOfMember } = req.params;
-	// finds and return organization id of specific club
-	Organization.findOne({ _id: idOfOrganization }).then((organization) => {
-		console.log(organization)
-		if (!organization) {
-			return res.status(400).json({ 'Error': 'No organizations found' });
-		} else {
-			Organization.addMemberToClub(idOfOrganization, idOfMember);
-			return res.status(201).json({ 'organization': organization });
-		}
-	});
-}
-
 exports.isMember = (req, res) => {
 	const { orgID } = req.body;
 	const userID = req.user._id;
 
 	Organization.findByIdAndUpdate(orgID).then((organization) => {
-		if(!organization)
+		if (!organization)
 			return res.status(400).json({ 'Error': 'No organization found' })
 		const isMember = organization.members.indexOf(userID) != -1 || organization.admins.indexOf(userID) != -1;
 		return res.status(201).json({ 'isMember': isMember });
@@ -56,15 +41,16 @@ exports.isMember = (req, res) => {
 }
 
 exports.deleteClubMember = (req, res) => {
-	const { idOfOrganization, idOfMember } = req.params;
+	const { orgID, memberID } = req.params;
 
 	// finds and return organization id of specific club
-	Organization.findOne({ _id: idOfOrganization }).then((organization) => {
+	Organization.findByIdAndUpdate(orgID).then((organization) => {
 		console.log(organization)
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No organizations found' });
 		} else {
-			Organization.deleteClubMember(idOfOrganization, idOfMember);
+			Organization.deleteClubMember(orgID, memberID);
+			User.removeClubMember(orgID, memberID);
 			return res.status(201).json({ 'organization': organization });
 		}
 	});
@@ -72,13 +58,14 @@ exports.deleteClubMember = (req, res) => {
 
 exports.getMembers = (req, res) => {
 	// Destruct req body ( pull the values to the assign keys)
-	const { idOfOrganization } = req.params;
+	const { orgID } = req.params;
+
 	// finds and return organization id of specific club
-	Organization.findOne({ _id: idOfOrganization }).populate('members').then((organization) => {
+	Organization.findByIdAndUpdate(orgID).populate('members').then((organization) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No organizations found' });
 		} else {
-			return res.status(201).json({ 'organization': organization });
+			return res.status(201).json({ 'members': organization.members, 'adminCount': organization.admins.length });
 		}
 	});
 }
@@ -97,14 +84,11 @@ exports.addOrg = (req, res) => {
 				if (organization) {
 					return res.status(400).json({ 'Error': 'Organization already exists' });
 				} else {
-
 					var new_img = new Img;
-					var id;
-			    console.log(req.file);
-			    new_img.img.data = fs.readFileSync(req.file.path)
-			    new_img.img.contentType = 'image/jpeg';
-			    new_img.save().then((image) => {
-						console.log('jj', image._id);
+					console.log(req.file);
+					new_img.img.data = fs.readFileSync(req.file.path)
+					new_img.img.contentType = 'image/jpeg';
+					new_img.save().then((image) => {
 						// Make new organization and save into the Organizations Collection
 						let newOrg = new Organization({
 							name: name,
@@ -121,9 +105,8 @@ exports.addOrg = (req, res) => {
 
 						newOrg.save().then((organization) => {
 							console.log('hee ', organization);
-							User.clubAdminPushing(req.user._id, organization);
+							User.clubAdminPushing(organization._id, user._id);
 							Organization.addAdminToClub(organization._id, req.user._id);
-							Organization.addMemberToClub(organization._id, req.user._id);
 							chatRoom.save().then((chatRoom) => {
 								if (organization && chatRoom) {
 									Organization.findOne({ _id: organization._id }).populate('imageId').then((newOrganization) => {
@@ -139,7 +122,7 @@ exports.addOrg = (req, res) => {
 					}).catch((err) => {
 						console.log(err);
 					});
-					 // Push the new user onto the db if successful, else display error
+					// Push the new user onto the db if successful, else display error
 				}
 			}).catch(err => console.log(err));
 		}

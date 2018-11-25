@@ -35,10 +35,11 @@ const User = new Schema({
   avatar: {
     type: String
   },
-  arrayClubsMember: {
-    type: Array,
+  arrayClubsMember: [{
+    type: Schema.Types.ObjectId,
+    ref: 'organizations',
     required: false
-  },
+  }],
   arrayClubsAdmin: [{
     type: Schema.Types.ObjectId,
     ref: 'organizations',
@@ -46,12 +47,18 @@ const User = new Schema({
   }]
 });
 
-User.statics.clubMemberPushing = async function(member, organization) {
-  await this.findByIdAndUpdate(member, { $push: { arrayClubsMember: organization._id } });
+User.statics.clubMemberPushing = async function(organizationID, memberID) {
+  await this.findByIdAndUpdate(memberID, { $push: { arrayClubsMember: organizationID } });
 }
 
-User.statics.clubAdminPushing = async function(admin, organization) {
-  await this.findByIdAndUpdate(admin, { $push: { arrayClubsAdmin: organization._id } });
+User.statics.clubAdminPushing = async function(organizationID, adminID) {
+  await this.findByIdAndUpdate(adminID, { $push: { arrayClubsAdmin: organizationID } });
+  await this.findByIdAndUpdate(adminID, { $push: { arrayClubsMember: organizationID } });
+}
+
+User.statics.leaveClub = async function(organizationID, memberID) {
+  await this.findByIdAndUpdate(organizationID, { $pull: { arrayClubsAdmin: memberID } });
+  await this.findByIdAndUpdate(organizationID, { $pull: { arrayClubsMember: memberID } });
 }
 /*
 * Export so that other js files can use this schema

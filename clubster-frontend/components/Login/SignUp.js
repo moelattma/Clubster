@@ -4,6 +4,8 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { TextField } from 'react-native-material-textfield'
 import axios from 'axios';
 
+const { height: HEIGHT } = Dimensions.get('window');
+
 export default class SignUp extends Component {
   state = {                                     //state initilaization
     email: '',
@@ -44,7 +46,7 @@ export default class SignUp extends Component {
       if (password == null || confirmPassword == null || password != confirmPassword)
         errors['confirmPassword'] = 'Passwords do not match'
       this.setState({ errors });
-      if (Object.keys(errors).length == 0) 
+      if (Object.keys(errors).length == 0)
         this.submitData();
     }
   }
@@ -53,16 +55,17 @@ export default class SignUp extends Component {
     let { errors = {} } = this.state;
 
     return (
-      <KeyboardAwareScrollView contentContainerStyle={styles.regForm} scrollEnabled={true} ref={ref => this._scrollView = ref}
-        enableOnAndroid={true} alwaysBounceVertical={true} extraScrollHeight={40} keyboardShouldPersistTaps="handled" >
+      <KeyboardAwareScrollView contentContainerStyle={styles.regForm} scrollEnabled={true} enableOnAndroid={true} 
+        enableAutomaticScroll={true} alwaysBounceVertical={true} keyboardShouldPersistTaps="handled" extraScrollHeight={80}>
         <Text style={styles.header}>
           Register for Clubster
         </Text>
 
-        <TextField                                            // TextInputs with onChangeText
+        <TextField
           inputContainerStyle={styles.inputContainer}
           label="Email"
           baseColor="rgba(255, 255, 255, 0.75)"
+          tintColor='#59cbbd'
           textColor="rgba(255, 255, 255, 1)"
           onChangeText={email => this.setState({ email })}
           keyboardType="email-address"
@@ -74,6 +77,7 @@ export default class SignUp extends Component {
           inputContainerStyle={styles.inputContainer}
           label="Username"
           baseColor="rgba(255, 255, 255, 0.75)"
+          tintColor='#59cbbd'
           textColor="rgba(255, 255, 255, 1)"
           onChangeText={username => this.setState({ username })}
           returnKeyType='next'
@@ -83,6 +87,7 @@ export default class SignUp extends Component {
           inputContainerStyle={styles.inputContainer}
           label="Name"
           baseColor="rgba(255, 255, 255, 0.75)"
+          tintColor='#59cbbd'
           textColor="rgba(255, 255, 255, 1)"
           onChangeText={name => this.setState({ name })}
           returnKeyType='next'
@@ -92,6 +97,7 @@ export default class SignUp extends Component {
           inputContainerStyle={styles.inputContainer}
           label="Password"
           baseColor="rgba(255, 255, 255, 0.75)"
+          tintColor='#59cbbd'
           textColor="rgba(255, 255, 255, 1)"
           onChangeText={password => this.setState({ password })}
           returnKeyType='next'
@@ -102,21 +108,22 @@ export default class SignUp extends Component {
           inputContainerStyle={styles.inputContainer}
           label="Confirm password"
           baseColor="rgba(255, 255, 255, 0.75)"
+          tintColor='#59cbbd'
           textColor="rgba(255, 255, 255, 1)"
           onChangeText={confirmPassword => this.setState({ confirmPassword })}
-          returnKeyType='none'
-          onFocus={() => this._scrollView.scrollToEnd({ animated: true })}
+          returnKeyType='go'
           secureTextEntry={true}
           error={errors.confirmPassword} />
 
+
         <TouchableOpacity style={styles.button} onPress={this.validateInput} >
-          <Text style={styles.btntext}>
+          <Text style={styles.btntext} >
             Sign Up
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.login} onPress={() => this.props.navigation.navigate('Login')} >
-          <Text style={{ color: '#fff', fontSize: 18 }}> Already have an account? </Text>
+          <Text style={{ color: '#fff', fontSize: 18 }} > Already have an account? </Text>
         </TouchableOpacity>
       </KeyboardAwareScrollView>
     );
@@ -136,7 +143,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     paddingBottom: 10,
     marginBottom: 20,
-    borderBottomColor: 'black',
+    borderBottomColor: '#59cbbd',
     borderBottomWidth: 1,
     fontWeight: 'bold',
     textAlign: 'center'

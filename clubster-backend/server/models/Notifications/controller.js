@@ -28,22 +28,25 @@ exports.grabNotifications = (req, res) => {
 };
 
 exports.joinOrganization = (req, res) => {
-	const { _id, joinerID, orgID, joinType } = req.body;
+	const { _id, joinerID, orgID, joinType, accepted } = req.body;
 
-	// add idOfMember to Org's array
-	Organization.findByIdAndUpdate(orgID).then((organization) => {
-		if (!organization) {
-			return res.status(400).json({ 'Error': 'No such organization found' });
-		} else {
-			if (joinType == ORG_JOIN_MEM) {
-				Organization.addMemberToClub(orgID, joinerID);
-				User.clubMemberPushing(joinerID, orgID);
-			} else if (joinType == ORG_JOIN_ADMIN) {
-				Organization.addAdminToClub(orgID, joinerID);
-				User.clubAdminPushing(joinerID, orgID);
+	if (accepted) { // add idOfMember to Org's array
+		Organization.findByIdAndUpdate(orgID).then((organization) => {
+			console.log('organization id is! ', orgID);
+			console.log('joiner id is! ', joinerID);
+			if (!organization) {
+				return res.status(400).json({ 'Error': 'No such organization found' });
+			} else {
+				if (joinType == ORG_JOIN_MEM) {
+					Organization.addMemberToClub(orgID, joinerID);
+					User.clubMemberPushing(orgID, joinerID);
+				} else if (joinType == ORG_JOIN_ADMIN) {
+					Organization.addAdminToClub(orgID, joinerID);
+					User.clubAdminPushing(orgID, joinerID);
+				}
 			}
-		}
-	});
+		});
+	}
 
 	Notification.findByIdAndUpdate(_id).then((notification) => {
 		if (!notification) {
@@ -52,7 +55,7 @@ exports.joinOrganization = (req, res) => {
 			notification.isActive = false;
 			notification.save();
 		}
-	})
+	});
 };
 
 exports.newNotification = (req, res) => {

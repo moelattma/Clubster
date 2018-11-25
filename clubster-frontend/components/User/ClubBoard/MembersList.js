@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-//import { AntDesign } from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
 
@@ -23,9 +22,11 @@ export default class MemberList extends Component {
     super();
     this.state = {
       memberArr: [],
+      adminCount: 1,
       isLoading: false
     };
   }
+
   renderItem = ({ item }) => {
     return (
       <View>
@@ -44,7 +45,7 @@ export default class MemberList extends Component {
         </TouchableOpacity>
 
         {/* Delete Button */}
-        <TouchableOpacity style={styles.btn} onPress={() => { this.deleteUser(item._id)}}>
+        <TouchableOpacity style={styles.btn} onPress={() => { this.deleteUser(item._id) }}>
           <MaterialIcons
             name="delete-forever"
             size={35}
@@ -55,26 +56,31 @@ export default class MemberList extends Component {
       </View>
     )
   }
+
   // item seprator using black color line in between 
   renderSeparator = () => {
     return (
       <View
         style={{ height: 1, width: '100%', backgroundColor: 'black' }}>
-
       </View>
     )
   }
+
   componentWillMount() {
+    const orgID = this.props.screenProps._id;
     // get request-setup memberArr[]
-    axios.get('http://localhost:3000/api/organizations/5bd3fac350f9b629004dea0f/members').then((response) => {
-      this.setState({ memberArr: response.data.organization.members });
+    axios.get(`http://localhost:3000/api/organizations/${orgID}/members`).then((response) => {
+      const { members, adminCount } = response.data;
+      this.setState({ memberArr: members, adminCount: adminCount });
       console.log(this.state.memberArr);
     });
   }
 
   deleteUser = (idDeleted) => {
+    const orgID = this.props.screenProps._id;
+
     // post request - we delete user by sending the id of user thats going to be deleted to the backend
-    axios.post(`http://localhost:3000/api/organizations/5bd3fac350f9b629004dea0f/${idDeleted}`).then((response) => {
+    axios.post(`http://localhost:3000/api/organizations/${orgID}/${idDeleted}`).then((response) => {
       var arr = this.state.memberArr.filter(function(id) {
         return id !== idDeleted;
       });

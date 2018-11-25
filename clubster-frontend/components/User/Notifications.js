@@ -56,22 +56,35 @@ export default class Notifications extends Component {
     handleAccept = (item) => {
         const joinType = (item.message.includes("admin") ? "ORG_JOIN_ADMIN" : "ORG_JOIN_MEMBER");
         axios.post('http://localhost:3000/api/notifications/joinOrganization',
-            { _id: item._id, orgID: item.idOfOrganization._id, joinerID: item.idOfSender, joinType }).then((res) => {
+            { _id: item._id, orgID: item.idOfOrganization._id, joinerID: item.idOfSender, joinType, accepted: true })
+            .then((res) => {
                 if (res.status == 201)
                     item.isActive = false;
             }).catch((err) => console.log(err));
+
         const acceptType = (joinType == "ORG_JOIN_ADMIN" ? ACCEPT_ADMIN : ACCEPT_MEM);
-        axios.post('http://localhost:3000/api/notifications/new', { type: acceptType, organization: item.idOfOrganization, receiverID: item.idOfSender }).then((res) => {
-            if(res.status == 201) 
-                this._getNotifications();
-        });
+        axios.post('http://localhost:3000/api/notifications/new',
+            { type: acceptType, organization: item.idOfOrganization, receiverID: item.idOfSender })
+            .then((res) => {
+                if (res.status == 201)
+                    this._getNotifications();
+            });
     }
 
     handleReject = (item) => {
-        axios.post('http://localhost:3000/api/notifications/new', { type: REJECT_JOIN, organization: item.idOfOrganization, receiverID: item.idOfSender }).then((res) => {
-            if(res.status == 201) 
-                this._getNotifications();
-        });
+        axios.post('http://localhost:3000/api/notifications/joinOrganization',
+            { _id: item._id, orgID: item.idOfOrganization._id, joinerID: item.idOfSender, joinType, accepted: false })
+            .then((res) => {
+                if (res.status == 201)
+                    item.isActive = false;
+            }).catch((err) => console.log(err));
+
+        axios.post('http://localhost:3000/api/notifications/new',
+            { type: REJECT_JOIN, organization: item.idOfOrganization, receiverID: item.idOfSender })
+            .then((res) => {
+                if (res.status == 201)
+                    this._getNotifications();
+            });
     }
 
     // separates one list item from the other with a line

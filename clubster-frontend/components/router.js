@@ -3,28 +3,28 @@ import { createStackNavigator, createBottomTabNavigator, createSwitchNavigator }
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import Login from './Login/Login';
 import SignUp from './Login/SignUp';
-import ClubsterNavigation from './User/ClubsterNavigation'
+import ClubsterNavigation from './User/ClubsterNavigation';
 
 import HomeNavigation from './Login/HomeNavigation';
-import AdminNavigation from './User/ClubAdmin/AdminNavigation'
+import AdminMemNavigation from './User/ClubBoard/AdminMemNavigation';
 
-import Notifications from './User/Notifications'
-import ClubsNavigation from "./Clubs/ClubsNavigation"
-import Profile from './User/Profile'
+import Notifications from './User/Notifications';
+import ClubsNavigation from './Clubs/ClubsNavigation';
+import Profile from './User/Profile';
 
-import ClubPage from './Clubs/ClubPage'
-import ClubSearch from './Clubs/ClubSearch'
-import ClubProfile from './Clubs/ClubProfile'
+import ClubPage from './Clubs/ClubPage';
+import ClubSearch from './Clubs/ClubSearch';
+import ClubProfile from './Clubs/ClubProfile';
 
-import Dashboard from './User/ClubAdmin/Dashboard'
-import ClubEvents from './User/ClubAdmin/ClubEvents'
-import Expenses from './User/ClubAdmin/Expenses'
-import MemberList from './User/ClubAdmin/MembersList'
-import Chat from './User/ClubAdmin/Chat'
+import Dashboard from './User/ClubBoard/Dashboard';
+import ClubEvents from './User/ClubBoard/ClubEvents';
+import Expenses from './User/ClubBoard/Expenses';
+import MemberList from './User/ClubBoard/MembersList';
+import Chat from './User/ClubBoard/Chat';
 
 export const LoginNavigator = createSwitchNavigator(
     {
@@ -37,7 +37,7 @@ export const LoginNavigator = createSwitchNavigator(
 export const ClubsterNavigator = createStackNavigator(
     {
         HomeNavigation: { screen: HomeNavigation, navigationOptions: { header: null } },
-        AdminNavigation: { screen: AdminNavigation }
+        AdminMemNavigation: { screen: AdminMemNavigation }
     },
     {
         navigationOptions: {
@@ -161,3 +161,37 @@ export const AdminNavigator = createBottomTabNavigator(
         }
     }
 );
+
+export const MemberNavigator = createBottomTabNavigator(
+    {
+        ClubEvents: {
+            screen: ClubEvents,
+            navigationOptions: {
+                tabBarIcon: ({ tintColor }) => (
+                    <MaterialIcons name="event" size={40} color={tintColor} />
+                ),
+            }
+        },
+        MemberList: {
+            screen: MemberList,
+            navigationOptions: {
+                tabBarIcon: ({ tintColor }) => (
+                    <Ionicons name="ios-people" size={46} color={tintColor} />
+                )
+            }
+        }
+    },
+    {
+        initialRouteName: 'ClubEvents',
+        animationEnabled: true,
+        swipeEnabled: true,
+        tabBarOptions: {
+            activeBackgroundColor: '#E2E3E5',
+            inactiveBackgroundColor: '#E2E3E5',
+            inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
+            activeTintColor: '#1F629F',
+            showLabel: false,
+            showIcon: true
+        }
+    }
+)
