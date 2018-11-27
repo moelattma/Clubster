@@ -21,6 +21,14 @@ const Profile = new Schema({
     required: true,
     minlength: 4
   },
+  description: {
+    type: String,
+    required: true
+  },
+  image: {
+    type: Schema.Types.ObjectId,
+    ref: 'images'
+  },
   hobbies:
     {
       type: [String],

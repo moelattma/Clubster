@@ -36,7 +36,7 @@ export default class Chat extends Component {
     const { screenProps } = this.props;
     console.log(screenProps);
     var text = messages[messages.length - 1].text;
-    axios.post(`http://localhost:3000/api/messages/${screenProps.organization._id}`, {
+    axios.post(`http://localhost:3000/api/messages/${screenProps._id}`, {
       text: text
     }).then((message) => {
       console.log(message.data.message);

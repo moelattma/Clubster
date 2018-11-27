@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { Modal,View, StyleSheet, Text, Image, TouchableOpacity, Button, TextInput } from 'react-native';
+import { AsyncStorage, View, ScrollView, StyleSheet, Text, Image, TouchableOpacity, Button, TextInput, Linking } from 'react-native';
 import { ImagePicker, Permissions, Constants } from 'expo';
 import axios from 'axios';
+import Modal from "react-native-modal";
 import converter from 'base64-arraybuffer';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { SocialIcon } from 'react-native-elements'
 
 export default class Profile extends Component {
     constructor() {
@@ -11,20 +13,21 @@ export default class Profile extends Component {
         this.state = {
             show:false,
             result: null,
-            img:null,
+            img:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC',
             major: '',
             hobbies: '',
             Facebook: '',
             Instagram: '',
+            currentPosition: '',
             LinkedIn: '',
+            description: '',
+            errors: {}
         }
     }
 
     askPermissionsAsync = async () => {
       await Permissions.askAsync(Permissions.CAMERA);
       await Permissions.askAsync(Permissions.CAMERA_ROLL);
-      // you would probably do something to verify that permissions
-      // are actually granted, but I'm skipping that for brevity
     };
 
     hide = () => {
@@ -37,10 +40,20 @@ export default class Profile extends Component {
     submitProfile(){
         axios.post('http://localhost:3000/api/profile', {
             major: this.state.major, hobbies: this.state.hobbies,
-            facebook: this.state.facebook, Instagram: this.state.Instagram,
-            LinkedIn: this.state.LinkedIn
+            facebook: this.state.facebook, instagram: this.state.instagram,
+            linkedIn: this.state.linkedIn, description: this.state.description
+        }).then((response) => {
+          if(response.status == 201 || response.status == 200) {
+              this.setState({ show: false });
+          }
         })
+
     }
+
+    changePicture = () => {
+      this.useLibraryHandler();
+    }
+
 
     useLibraryHandler = async () => {
       await this.askPermissionsAsync();
@@ -49,28 +62,19 @@ export default class Profile extends Component {
         aspect: [4, 3],
         base64: false,
       });
-
+      const token = await AsyncStorage.getItem('jwtToken');
       const data = new FormData();
-      data.append('name', 'avatar');
       data.append('fileData', {
-        uri : result.uri,
+        uri: result.uri,
         type: 'multipart/form-data',
         name: "image1.jpg"
       });
-      const config = {
-        method: 'POST',
-        headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'multipart/form-data',
-        },
-        body: data,
-      };
-      fetch("http://localhost:3000/" + "api/img_data", config)
-      .then((checkStatusAndGetJSONResponse)=>{
-      console.log(checkStatusAndGetJSONResponse);
-      }).catch((err)=>{console.log(err)});
-      this.setState({ result });
-  };
+      axios.post('http://localhost:3000/api/profilePhoto', data).then((response) => {
+        this.setState({img: 'data:image/jpeg;base64,' + converter.encode(response.data.profile.image.img.data.data)})
+      });
+    };
+
+
 
     arrayBufferToBase64(buffer) {
         var binary = '';
@@ -89,48 +93,92 @@ export default class Profile extends Component {
       this.setState({ result });
     };
 
-    onSubmit = () => {
-      axios.post(`http://localhost:3000/api/img_data`).then((response) => {
-        console.log(response); // Setting up state variable
-      }).catch((err) => console.log(err));
-    }
-
-    componentDidMount() {
-      fetch('http://localhost:3000/api/img_data')
-      .then((res) => res.json())
-      .then((data) => {
-        // console.log(img)
-        var base64Flag = 'data:image/jpeg;base64,';
-        var imageStr = converter.encode(data.img.data.data);
-        this.setState({
-            img: base64Flag + imageStr
-        });
+    componentWillMount() {
+      axios.get('http://localhost:3000/api/profile').then((response) => {
+        console.log('yoooooooooooooooooooo ', response.data.major);
+        if(response.data.image) {
+          this.setState({img: 'data:image/jpeg;base64,' + converter.encode(response.data.profile.image.img.data.data)});
+        }
+        if(response.data.social) {
+          this.setState({
+            major: response.data.major,
+             hobbies: response.data.hobbies.join(','),
+             description: response.data.description,
+             Facebook: response.data.social.facebook,
+             linkedIn: response.data.social.linkedin,
+             instagram: response.data.social.instagram,
+          });
+        } else {
+          this.setState({
+            major: response.data.major,
+             hobbies: response.data.hobbies.join(','),
+             description: response.data.description,
+          });
+        }
       });
     }
 
+    link = (url) => {
+      if(url == ''|| url == null) {
+        return;
+      } else if(url.indexOf('http') > -1) {
+          url = url.replace('http', 'https');
+      }
+      if(url.indexOf('https') == -1) {
+          url = "https://" + url;
+      }
+      console.log('Yooo look ', url);
+      Linking.openURL(url);
+    }
+
+
+    renderElement = (d, i) => (
+      <View
+        key = {d}
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          borderWidth: 1,
+          borderColor: "#898989",
+          backgroundColor: "white",
+          borderRadius: 12,
+          margin: 3,
+          height: 24
+        }}
+      >
+        <Text style={{marginHorizontal: 8, fontSize: 16, color:"#898989"}}>
+         {d}
+        </Text>
+      </View>
+  )
+
+
     render() {
+        console.log('HIIIII', this.state);
         return (
 
-            <View style={{flex:1}}>
-                <View style={styles.tContainer}>
-
+            <View>
+                <View style = {{height:200, backgroundColor: '#0006b1'}}></View>
+                <TouchableOpacity style = {styles.avatar} onPress= {() => this.changePicture()}><Image style={styles.imageAvatar} source={{uri: this.state.img}}/></TouchableOpacity>
+                <Text style = {{flexDirection: 'row',alignSelf:'center', marginTop: 70,fontSize: 20,color: 'black',fontWeight: 'bold'}}> Aimal Khan </Text>
+                <Text style={{flexDirection: 'row',alignSelf:'center',fontSize: 20,color: 'black',fontWeight: 'bold'}}> {this.state.major}</Text>
+                <View style = {{flexDirection: 'row',justifyContent: 'center'}}>
+                  <SocialIcon type='facebook' onPress = {() => this.link(this.state.Facebook)} />
+                  <SocialIcon type='instagram' onPress = {() => this.link(this.state.instagram)} />
+                  <SocialIcon type='linkedin' onPress = {() => this.link(this.state.linkedIn)} />
                 </View>
-                <View style={styles.profilePic}>
-                    <Image style={styles.profilePicWrap} source={require('../../images/adnan.png')} />
-
+                <View style = {{height: 30}}>
                 </View>
-                <Text style={styles.name}> Aimal Khan </Text>
-                <Text style={styles.major}> major:{this.state.major}</Text>
-                <Text style={styles.major}> Hobbies:{this.state.hobbies}</Text>
-                <Text style={styles.major}> Facebook:{this.state.facebook}</Text>
-                <Text style={styles.major}> Instagram:{this.state.Instagram}</Text>
-                <Text style={styles.major}> LinkedIn:{this.state.LinkedIn}</Text>
 
-
-
+                <View style =  {{flexDirection: 'column', alignSelf:'center', marginTop:100}}>
+                  <ScrollView horizontal={true} containerStyle={{flexDirection: "column",flexWrap: "wrap",alignItems: "flex-start"}}>
+                    {this.state.hobbies.split(',').map(d => this.renderElement(d))}
+                  </ScrollView>
+                </View>
 
                 {/* MODAL  */}
                 <View style={{ flex: 1 }}>
+
                     <TouchableOpacity style={styles.editButton} onPress={this._showModal} >
                         <MaterialCommunityIcons
                             name="account-edit"
@@ -138,18 +186,18 @@ export default class Profile extends Component {
                             color={'black'}
                         />
                     </TouchableOpacity>
-
                     <Modal isVisible={this.state.show} onRequestClose = {this.hide}>
                         <View style={styles.modalView}>
                             <Text style={{fontSize: 20, fontWeight: 'bold'}}>
                                 Edit Profile
                             </Text>
-                            <TextInput placeholder = "Major" onChangeText={(major) => this.setState({major})} value={this.state.major}/>
-
-                            <TextInput placeholder = "Hobbies(seperated by ,)" onChangeText={(hobbies) => this.setState({hobbies})} value={this.state.hobbies}/>
-                            <TextInput placeholder = "Facebook" onChangeText={(Facebook) => this.setState({Facebook})} value={this.state.Facebook}/>
-                            <TextInput placeholder = "Instagram" onChangeText={(Instagram) => this.setState({Instagram})} value={this.state.Instagram}/>
-                            <TextInput placeholder = "LinkedIn" onChangeText={(LinkedIn) => this.setState({LinkedIn})} value={this.state.LinkedIn}/>
+                            <TextInput style={{alignSelf: 'stretch', padding: 3}} placeholder = "Major" onChangeText={(major) => this.setState({major})} value={this.state.major}/>
+                            <TextInput style={{alignSelf: 'stretch', padding: 3}} placeholder = "Hobbies(seperated by ,)" onChangeText={(hobbies) => this.setState({hobbies})} value={this.state.hobbies}/>
+                            <TextInput style={{alignSelf: 'stretch', padding: 3}} placeholder = "Current Position" onChangeText={(currentPosition) => this.setState({currentPosition})} value={this.state.currentPosition}/>
+                            <TextInput style={{alignSelf: 'stretch', padding: 3}} placeholder = "Facebook" onChangeText={(facebook) => this.setState({facebook})} value={this.state.facebook}/>
+                            <TextInput style={{alignSelf: 'stretch', padding: 3}} placeholder = "Instagram" onChangeText={(instagram) => this.setState({instagram})} value={this.state.instagram}/>
+                            <TextInput style={{alignSelf: 'stretch', padding: 3}} placeholder = "LinkedIn" onChangeText={(linkedIn) => this.setState({linkedIn})} value={this.state.linkedIn}/>
+                            <TextInput multiline = {true} numberOfLines = {6} style={{width: 350}} placeholder = "Decribe yourself!" onChangeText={(description) => this.setState({description})} value={this.state.description}/>
 
                             <TouchableOpacity onPress={() => {this.submitProfile()}}>
                                 <Text style={styles.SubmitBtn}>Save</Text>
@@ -162,6 +210,13 @@ export default class Profile extends Component {
                         </View>
                     </Modal>
                 </View>
+                <TouchableOpacity style={styles.editButton} onPress={this._showModal} >
+                    <MaterialCommunityIcons
+                        name="account-edit"
+                        size={35}
+                        color={'black'}
+                    />
+                </TouchableOpacity>
 
             </View>
 
@@ -170,6 +225,31 @@ export default class Profile extends Component {
 }
 
 const styles = StyleSheet.create({
+  header:{
+    backgroundColor: "#00BFFF",
+    height:200,
+  },
+  avatar: {
+    width: 130,
+    height: 130,
+    borderRadius: 63,
+    borderWidth: 4,
+    borderColor: "white",
+    marginBottom:10,
+    alignSelf:'center',
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop:130
+  },
+  imageAvatar: {
+    width: 130,
+    height: 130,
+    borderColor: "white",
+    borderRadius: 63,
+    alignSelf:'center',
+    position: 'relative'
+  },
     background: {
         flex: 1,
         height:200,
@@ -184,7 +264,7 @@ const styles = StyleSheet.create({
     },
     modalView: {
         backgroundColor: "#fff",
-        height: 300,
+        height: 500,
         justifyContent: 'center',
         alignItems: 'center'
     },
@@ -293,8 +373,9 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     editButton: {
-       position: 'absolute',
-        right: 0
+      position: 'absolute',
+      top: 600,
+      right: 0
     }
 
 

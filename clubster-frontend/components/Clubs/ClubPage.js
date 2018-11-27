@@ -57,7 +57,6 @@ export default class ClubsPage extends Component {
       name: "image1.jpg"
     });
     axios.post('http://localhost:3000/api/organizations/new', data).then((response) => {
-      console.log(response);
       var updatedClubs = this.state.clubs;
       const org = response.data.organization;
       updatedClubs.push({
