@@ -10,6 +10,7 @@ const Notification = require('./model');              //import Notification Sche
 const Organization = require('../Organizations/model')
 const User = require('../Users/model')
 
+const CLUBSTER_WELCOME = "CLUBSTER_WELCOME";
 const ORG_JOIN_ADMIN = "ORG_JOIN_ADMIN";
 const ORG_JOIN_MEM = "ORG_JOIN_MEMBER";
 const ACCEPT_ADMIN = "ACCEPT_ADMIN";
@@ -64,7 +65,7 @@ exports.newNotification = (req, res) => {
 
 	let notification = ({
 		idOfSender: senderID,
-		idOfOrganization: organization._id,
+		idOfOrganization: null,
 		idOfReceivers: [],
 		type: type,
 		isActive: false,
@@ -72,8 +73,14 @@ exports.newNotification = (req, res) => {
 	});
 
 	switch (type) {
+		case CLUBSTER_WELCOME:
+			notification.idOfReceivers = [senderID];
+			notification.message = `Welcome to Clubster!`
+			break;
+
 		case ORG_JOIN_ADMIN:
 		case ORG_JOIN_MEM:
+			notification.idOfOrganization = organization._id;
 			notification.idOfReceivers = organization.admins;
 			notification.message = `${req.user.name} wants to join ${organization.name} as ` + ((type == ORG_JOIN_ADMIN) ? `an admin` : `a member`);
 			notification.isActive = true;
@@ -81,13 +88,15 @@ exports.newNotification = (req, res) => {
 
 		case ACCEPT_ADMIN:
 		case ACCEPT_MEM:
+			notification.idOfOrganization = organization._id;
 			notification.idOfReceivers = [receiverID];
 			notification.message = `You have been accepted to ${organization.name} as ` + ((type == ACCEPT_ADMIN) ? `an admin` : `a member`);
 			break;
 
 		case REJECT_JOIN:
+			notification.idOfOrganization = organization._id;
 			notification.idOfReceivers = [receiverID];
-			notification.message = `You have been rejected from ${organization.name}`;
+			notification.message = `You have been rejected from ${organization.name} :(`;
 			break;
 	}
 

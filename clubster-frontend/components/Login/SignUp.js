@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, Dimensions, TextInput } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { TextField } from 'react-native-material-textfield'
 import axios from 'axios';
 
-const { height: HEIGHT } = Dimensions.get('window');
+const CLUBSTER_WELCOME = "CLUBSTER_WELCOME";
 
 export default class SignUp extends Component {
   state = {                                     //state initilaization
@@ -26,6 +26,7 @@ export default class SignUp extends Component {
       console.log(response.status);
       if (response.status == 200 || response.status == 201) {
         this.props.navigation.navigate('Login');
+        axios.post('http://localhost:3000/api/notifications/new', { type: CLUBSTER_WELCOME });
       }
     }).catch(err => console.log('Could not sign up', err));
   };
@@ -78,6 +79,7 @@ export default class SignUp extends Component {
           label="Username"
           baseColor="rgba(255, 255, 255, 0.75)"
           tintColor='#59cbbd'
+          maxLength={12}
           textColor="rgba(255, 255, 255, 1)"
           onChangeText={username => this.setState({ username })}
           returnKeyType='next'
@@ -88,6 +90,7 @@ export default class SignUp extends Component {
           label="Name"
           baseColor="rgba(255, 255, 255, 0.75)"
           tintColor='#59cbbd'
+          maxLength={20}
           textColor="rgba(255, 255, 255, 1)"
           onChangeText={name => this.setState({ name })}
           returnKeyType='next'
@@ -98,6 +101,7 @@ export default class SignUp extends Component {
           label="Password"
           baseColor="rgba(255, 255, 255, 0.75)"
           tintColor='#59cbbd'
+          maxLength={14}
           textColor="rgba(255, 255, 255, 1)"
           onChangeText={password => this.setState({ password })}
           returnKeyType='next'
@@ -109,6 +113,7 @@ export default class SignUp extends Component {
           label="Confirm password"
           baseColor="rgba(255, 255, 255, 0.75)"
           tintColor='#59cbbd'
+          maxLength={14}
           textColor="rgba(255, 255, 255, 1)"
           onChangeText={confirmPassword => this.setState({ confirmPassword })}
           returnKeyType='go'

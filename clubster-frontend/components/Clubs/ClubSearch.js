@@ -95,10 +95,9 @@ export default class SearchClubs extends Component {
         return (
             <List containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}>
                 <FlatList
-                    data={this.state.organizations}
+                    data={this.state.organizations.slice(0, 40)}
                     renderItem={this._renderItem}
                     keyExtractor={organization => organization.name}
-                    ListHeaderComponent={false}
                     ListHeaderComponent={this.renderHeader}
                     ItemSeparatorComponent={this.renderSeparator}
                     ListFooterComponent={this.renderFooter}

@@ -53,12 +53,10 @@ User.statics.clubMemberPushing = async function(organizationID, memberID) {
 
 User.statics.clubAdminPushing = async function(organizationID, adminID) {
   await this.findByIdAndUpdate(adminID, { $push: { arrayClubsAdmin: organizationID } });
-  await this.findByIdAndUpdate(adminID, { $push: { arrayClubsMember: organizationID } });
 }
 
-User.statics.leaveClub = async function(organizationID, memberID) {
+User.statics.removeClubMember = async function(organizationID, memberID) {
   await this.findByIdAndUpdate(organizationID, { $pull: { arrayClubsAdmin: memberID } });
-  await this.findByIdAndUpdate(organizationID, { $pull: { arrayClubsMember: memberID } });
 }
 /*
 * Export so that other js files can use this schema

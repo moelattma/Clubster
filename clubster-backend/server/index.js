@@ -7,8 +7,6 @@ const eventRoutes = require('./models/Events/routes');
 const expensesRoutes = require('./models/Expenses/routes');
 const imageRoutes = require('./models/Images/routes');
 const notificationRoutes = require('./models/Notifications/routes');
-const conversationRoutes = require('./models/Conversations/routes');
-const messageRoutes = require('./models/Messages/routes');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
@@ -34,7 +32,7 @@ app.use(passport.initialize());
 // Passport Config
 require('./utils/passport')(passport);
 
-app.use('/api', [loginRoutes,organizationRoutes, profileRoutes, notificationRoutes,eventRoutes,conversationRoutes, messageRoutes, expensesRoutes, imageRoutes]);
+app.use('/api', [loginRoutes, organizationRoutes, profileRoutes, notificationRoutes, eventRoutes, expensesRoutes, imageRoutes]);
 
 const PORT = process.env.PORT || 3000;
 

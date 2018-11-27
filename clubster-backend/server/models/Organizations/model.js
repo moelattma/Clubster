@@ -73,7 +73,9 @@ Organization.statics.addMemberToClub = async function(organizationID, memberID) 
 
 Organization.statics.addAdminToClub = async function(organizationID, adminID) {
   await this.findByIdAndUpdate(organizationID, { $push: { admins: adminID } });
+  await this.findByIdAndUpdate(organizationID, { $push: { members: memberID } });
 }
+
 Organization.statics.deleteClubMember = async function(organizationID, memberID) {
   await this.findByIdAndUpdate(organizationID, { $pull: { members: memberID } });
 }

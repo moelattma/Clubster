@@ -51,7 +51,7 @@ export const HomeNavigator = createBottomTabNavigator(
             screen: Notifications,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <Ionicons name="ios-notifications-outline" size={42} color={tintColor} />
+                    <MaterialIcons name="notifications-none" size={46} color={tintColor} />
                 )
             }
         },
@@ -67,7 +67,7 @@ export const HomeNavigator = createBottomTabNavigator(
             screen: Profile,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <Ionicons name="logo-tux" size={44} color={tintColor} />
+                    <Ionicons name="logo-tux" size={46} color={tintColor} />
                 )
             }
         }
@@ -79,10 +79,10 @@ export const HomeNavigator = createBottomTabNavigator(
         initialRouteName: "ClubsNavigation",
         backBehavior: 'initialRoute',
         tabBarOptions: {
-            activeBackgroundColor: 'skyblue',
-            inactiveBackgroundColor: 'skyblue',
+            activeBackgroundColor: '#03A9F4',
+            inactiveBackgroundColor: '#03A9F4',
             inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
-            activeTintColor: '#1F629F',
+            activeTintColor: '#59cbbd',
             showLabel: false,
             showIcon: true
         }
@@ -143,10 +143,10 @@ export const AdminNavigator = createBottomTabNavigator(
         animationEnabled: true,
         swipeEnabled: true,
         tabBarOptions: {
-            activeBackgroundColor: '#E2E3E5',
-            inactiveBackgroundColor: '#E2E3E5',
+            activeBackgroundColor: '#03A9F4',
+            inactiveBackgroundColor: '#03A9F4',
             inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
-            activeTintColor: '#1F629F',
+            activeTintColor: '#59cbbd',
             showLabel: false,
             showIcon: true
         }
@@ -177,10 +177,10 @@ export const MemberNavigator = createBottomTabNavigator(
         animationEnabled: true,
         swipeEnabled: true,
         tabBarOptions: {
-            activeBackgroundColor: '#E2E3E5',
-            inactiveBackgroundColor: '#E2E3E5',
+            activeBackgroundColor: '#03A9F4',
+            inactiveBackgroundColor: '#03A9F4',
             inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
-            activeTintColor: '#1F629F',
+            activeTintColor: '#59cbbd',
             showLabel: false,
             showIcon: true
         }

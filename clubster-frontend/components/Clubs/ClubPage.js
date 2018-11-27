@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { ScrollView, AsyncStorage, TouchableOpacity, Image, StyleSheet, Button, Text, View, Dimensions, FlatList, TouchableWithoutFeedback } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import ClubsUI from './ClubsUI';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
 import t from 'tcomb-form-native';
 import { ImagePicker, Permissions, Constants } from 'expo';
 import converter from 'base64-arraybuffer';
-import { update } from 'tcomb';
+
+import { createStackNavigator } from 'react-navigation';
 
 const Form = t.form.Form;
 const Organization = t.struct({
@@ -21,7 +22,20 @@ const imageWidth = (window.width / 3) + 30;
 const imageHeight = window.width / 3;
 
 export default class ClubsPage extends Component {
+  static navigationOptions = ({}) => {
+    return {
+      header: null
+    };
+  }
 
+  render() {
+    return (
+      <ClubPageNavigator screenProps={{ home: this.props.screenProps.home, clubPage: this.props.navigation }} />
+    );
+  }
+}
+
+class ShowClubs extends Component {
   constructor() { // Initializing state
     super();
     this.state = {
@@ -31,11 +45,99 @@ export default class ClubsPage extends Component {
     }
   }
 
+  static navigationOptions = ({ navigation, screenProps }) => {
+    return {
+      headerLeft: (
+        <View style={{ marginLeft: 13 }}>
+          <FontAwesome
+            name="plus" size={32} color={'black'}
+            onPress={() => navigation.navigate('CreateClub')} />
+        </View>
+      ),
+      headerRight: (
+        <View style={{ marginRight: 6 }}>
+          <FontAwesome 
+            name="search" size={32} color={'black'} 
+            onPress={() => screenProps.clubPage.navigate('ClubSearch')} />
+        </View>
+      )
+    };
+  };
+
+  renderItem = ({ item }) => {
+    if (item.hasOwnProperty('empty') && item.empty === true) {
+      return <TouchableWithoutFeedback onPress={() => this.actionOnRow(item)}><View style={[styles.item, styles.itemInvisible]} /></TouchableWithoutFeedback>;
+    }
+    const { screenProps } = this.props;
+    return (
+      <TouchableWithoutFeedback onPress={() => { screenProps.home.navigate('AdminNavigation') }}>
+        <View style={styles.item}>
+          <Text style={styles.itemText}>{item.name}</Text>
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  };
+
+  componentWillMount() {
+    this.getUserClubs();
+    this.willFocus = this.props.navigation.addListener('willFocus', () => { this.getUserClubs(); });
+  };
+
+  getUserClubs() {
+    var getClubs = [];
+    axios.get("http://localhost:3000/api/organizations").then((response) => {
+      const { user } = response.data;
+      getClubs = user.arrayClubsAdmin;
+
+      for (var i = 0; i < user.arrayClubsAdmin.length; i++) {
+        const club = user.arrayClubsAdmin[i];
+        getClubs[i].imageUrl = 'data:image/jpeg;base64,' + converter.encode(club.imageId.img.data.data);
+        getClubs[i].isAdmin = true;
+      };
+
+      for (var i = 0; i < user.arrayClubsMember.length; i++) {
+        const club = user.arrayClubsMember[i];
+        getClubs.imageUrl = 'data:image/jpeg;base64,' + converter.encode(club.imageId.img.data.data);
+        getClubs.isAdmin = false;
+        getClubs.push(club);
+      };
+      this.setState({ clubs: getClubs }); // Setting up state variable
+    }).catch((err) => console.log(err));
+  }
+
+  navigateUser = (item) => {
+    this.props.screenProps.home.navigate('AdminMemNavigation', { item, isAdmin: item.isAdmin });
+  }
+
+  render() {
+    return (
+      <View style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={styles.root}>
+          {this.state.clubs.map((item, i) => (
+            <TouchableOpacity key={i} onPress={() => this.navigateUser(item)} >
+              <View style={styles.meetupCard} >
+                <View style={styles.meetupCardTopContainer}>
+                  <Image style={styles.imageHeight} source={{ uri: item.imageUrl }} />
+                </View>
+
+                <View style={styles.meetupCardBottomContainer}>
+                  <Text style={styles.meetupCardMetaName}>
+                    {item.name}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    );
+  }
+}
+
+class CreateClub extends Component {
   askPermissionsAsync = async () => {
     await Permissions.askAsync(Permissions.CAMERA);
     await Permissions.askAsync(Permissions.CAMERA_ROLL);
-    // you would probably do something to verify that permissions
-    // are actually granted, but I'm skipping that for brevity
   };
 
   useLibraryHandler = async () => {
@@ -75,119 +177,27 @@ export default class ClubsPage extends Component {
     });
   };
 
-  arrayBufferToBase64(buffer) {
-    var binary = '';
-    var bytes = [].slice.call(new Uint8Array(buffer));
-    bytes.forEach((b) => binary += String.fromCharCode(b));
-    return window.btoa(binary);
-  };
-
-  static navigationOptions = ({ navigation }) => {
-    return {
-      headerRight: (
-        <View style={{ marginRight: 6 }}>
-          <FontAwesome name="search" onPress={() => navigation.navigate('ClubSearch')} size={28} />
-        </View>
-      ),
-    };
-  };
-
-  renderItem = ({ item, index }) => {
-    if (item.hasOwnProperty('empty') && item.empty === true) {
-      return <TouchableWithoutFeedback onPress={() => this.actionOnRow(item)}><View style={[styles.item, styles.itemInvisible]} /></TouchableWithoutFeedback>;
-    }
-    const { screenProps } = this.props;
-    return (
-      <TouchableWithoutFeedback onPress={() => { screenProps.home.navigate('AdminNavigation') }}>
-        <View style={styles.item}>
-          <Text style={styles.itemText}>{item.name}</Text>
-        </View>
-      </TouchableWithoutFeedback>
-    );
-  };
-
-  handleSubmit = () => {
-    const name = this._formRef.getValue().Name;
-    const acronym = this._formRef.getValue().Abbreviation;
-    const purpose = this._formRef.getValue().Purpose;
-    const description = this._formRef.getValue().Description;
-    axios.post('http://localhost:3000/api/organizations/new', { name: name, acronym: acronym, purpose: purpose, description: description }).then((organization) => {
-      this.setState({ show: false });
-      this.setState({ clubs: this.state.clubs.concat(organization.data) });
-    }).catch((error) => {
-      console.log(error);
-    });
-  }
-
-  componentDidMount() {
-    var getClubs = [];
-    axios.get("http://localhost:3000/api/organizations").then((response) => {
-      const { user } = response.data;
-      arr = user.arrayClubsAdmin;
-
-      for(var i = 0; i < user.arrayClubsAdmin.length; i++) {
-        const club = user.arrayClubsAdmin[i];
-        arr[i].imageUrl = 'data:image/jpeg;base64,' + converter.encode(club.imageId.img.data.data);
-        arr[i].isAdmin = true;
-      };
-
-      for(var i = 0; i < user.arrayClubsMember.length; i++) {
-        const club = user.arrayClubsMember[i];
-        club.imageUrl = 'data:image/jpeg;base64,' + converter.encode(club.imageId.img.data.data);
-        club.isAdmin = false;
-        arr.push(club);
-      };
-      this.setState({ clubs: arr }); // Setting up state variable
-    }).catch((err) => console.log(err));
-  };
-
-  navigateUser = (item) => {
-    this.props.screenProps.home.navigate('AdminMemNavigation', { item, isAdmin: item.isAdmin });
-  }
-
-  renderElement() {
-    if (this.state.show == true) {
-      return (
-        <View>
-          <Form type={Organization} ref={(ref) => this._formRef = ref} />
-          <Button title="Sign Up!" onPress={this.useLibraryHandler} />
-        </View>
-      );
-    }
-    return (
-      <View style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.root}>
-          {this.state.clubs.map((item, i) => (
-            <TouchableOpacity key={i} onPress={() => this.navigateUser(item)} >
-              <View style={styles.meetupCard} >
-                <View style={styles.meetupCardTopContainer}>
-                  <Image style={styles.imageHeight} source={{ uri: item.imageUrl }} />
-                </View>
-
-                <View style={styles.meetupCardBottomContainer}>
-                  <Text style={styles.meetupCardMetaName}>
-                    {item.name}
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-        <TouchableOpacity style={styles.btn} onPress={() => { this.setState({ show: true }); }}>
-          <Text style={styles.plus}>+</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
   render() {
     return (
-      <View style={{ flex: 1 }}>
-        {this.renderElement()}
+      <View>
+        <Form type={Organization} ref={(ref) => this._formRef = ref} />
+        <Button title="Sign Up!" onPress={this.useLibraryHandler} />
       </View>
     );
   }
 }
+
+const ClubPageNavigator = createStackNavigator(
+  {
+    ShowClubs: { screen: ShowClubs },
+    CreateClub: { screen: CreateClub }
+  },
+  {
+    navigationOptions: {
+      headerBackImage: (<MaterialIcons name="arrow-back" size={32} color={'black'} />),
+    }
+  }
+)
 
 const styles = StyleSheet.create({
   row: {

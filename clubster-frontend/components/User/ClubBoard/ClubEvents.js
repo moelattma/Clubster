@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { View, Text, Dimensions, Button, FlatList, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import axios from 'axios';
 import t from 'tcomb-form-native';
-import EventsUI from '../../Clubs/EventsUI';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { createStackNavigator } from 'react-navigation';
@@ -44,8 +43,8 @@ export default class ClubEvents extends Component {
 }
 
 class ShowEvents extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       clubEvents: [],
@@ -73,8 +72,11 @@ class ShowEvents extends Component {
     }
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.getClubEvents();
+    this.willFocus = this.props.navigation.addListener('willFocus', () => {
+      this.getClubEvents();
+    });
   }
 
   getClubEvents() {
@@ -89,7 +91,7 @@ class ShowEvents extends Component {
 
   _renderItem = ({ item }) => {
     return (
-      <TouchableWithoutFeedback >
+      <TouchableWithoutFeedback style={styles.eventCard}>
         <View style={styles.eventContainer} >
           <Text style={styles.eventTitle}> {item.name} </Text>
         </View>
@@ -99,13 +101,19 @@ class ShowEvents extends Component {
 
   render() {
     return (
-      <EventsUI events = {this.state.clubEvents} />
+      <FlatList
+        data={this.state.clubEvents.reverse().slice(0, 20)}
+        renderItem={this._renderItem}
+        keyExtractor={clubEvent => clubEvent._id}
+        ItemSeparatorComponent={this.renderSeparator}
+        refreshing={this.state.loading}
+        onRefresh={() => this.getClubEvents()}
+      />
     );
   }
 }
 
 class CreateClubEvent extends Component {
-
   createEvent = () => {
     var clubEventsNew = [];
     const { _id } = this.props.screenProps;
@@ -113,13 +121,10 @@ class CreateClubEvent extends Component {
     const date = this._formRef.getValue().date;
     const description = this._formRef.getValue().description;
     const expense = this._formRef.getValue().expense;
-    axios.post(`http://localhost:3000/api/events/${_id}/new`, { name, date, description,expense }).then((event) => {
-      clubEventsNew = this.state.clubEvents.push(event.data);
-      this.setState({ clubEvents: clubEventsNew });
-    }).catch((error) => {
-      console.log(error);
+    axios.post(`http://localhost:3000/api/events/${_id}/new`, { name, date, description, expense }).then((response) => {
+      if(response.status == 201)
+        this.props.navigation.navigate('ShowEvents');
     });
-    this.props.navigation.navigate('ShowEvents');
   }
 
   render() {
@@ -132,7 +137,26 @@ class CreateClubEvent extends Component {
   }
 }
 
+const ClubEventNavigator = createStackNavigator(
+  {
+    ShowEvents: { screen: ShowEvents },
+    CreateClubEvent: { screen: CreateClubEvent }
+  },
+  {
+    navigationOptions: {
+      headerBackImage: (<MaterialIcons name="arrow-back" size={32} color={'black'} />),
+    }
+  }
+)
+
 const styles = StyleSheet.create({
+  eventCard: {
+    flex: 1,
+    backgroundColor: 'lavender',
+    paddingVertical: 5,
+    paddingHorizontal: 5,
+    marginVertical: 3
+  },
   eventContainer: {
     flex: 1,
     flexDirection: 'column',
@@ -151,15 +175,3 @@ const styles = StyleSheet.create({
     marginTop: 5
   }
 });
-
-const ClubEventNavigator = createStackNavigator(
-  {
-    ShowEvents: { screen: ShowEvents },
-    CreateClubEvent: { screen: CreateClubEvent }
-  },
-  {
-    navigationOptions: {
-      headerBackImage: (<MaterialIcons name="arrow-back" size={32} color={'black'} />),
-    }
-  }
-)

@@ -5,7 +5,6 @@
 
 const Organization = require('./model');
 const User = require('../Users/model');
-const Conversation = require('../Conversations/model');
 const Img = require('../Images/model');
 const fs = require('fs');
 
@@ -14,7 +13,7 @@ exports.getUserClubs = (req, res) => {
 	User.findOne({ _id: req.user._id }).populate({ path: 'arrayClubsAdmin', populate: { path: 'imageId' } })
 		.populate({ path: 'arrayClubsMember', populate: { path: 'imageId' } }).then((user) => {
 			return res.status(201).json({ 'user': user });	//populates array that user is admin of
-	}).catch((err) => console.log(err));
+		}).catch((err) => console.log(err));
 };
 
 // Display all the clubs in our Mongo Collection
@@ -99,25 +98,19 @@ exports.addOrg = (req, res) => {
 							description: description,
 							imageId: image._id
 						});
-						let chatRoom = new Conversation({
-							idOfClub: newOrg._id
-						});
 
 						newOrg.save().then((organization) => {
-							console.log('hee ', organization);
 							User.clubAdminPushing(organization._id, user._id);
 							Organization.addAdminToClub(organization._id, req.user._id);
-							chatRoom.save().then((chatRoom) => {
-								if (organization && chatRoom) {
-									Organization.findOne({ _id: organization._id }).populate('imageId').then((newOrganization) => {
-										if (!newOrganization) {
-											return res.status(400).json({ 'Error': 'No organizations found' });
-										} else {
-											return res.status(201).json({ 'organization': newOrganization });
-										}
-									});
-								}
-							});
+							if (organization) {
+								Organization.findOne({ _id: organization._id }).populate('imageId').then((newOrganization) => {
+									if (!newOrganization) {
+										return res.status(400).json({ 'Error': 'No organizations found' });
+									} else {
+										return res.status(201).json({ 'organization': newOrganization });
+									}
+								});
+							}
 						}).catch((err) => { console.log(err); return res.status(400).json({ 'Error': err }) });
 					}).catch((err) => {
 						console.log(err);

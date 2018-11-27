@@ -25,7 +25,7 @@ router.get('/organizations/:orgID/members', (req, res) => {
 	controller.getMembers(req, res);
 });
 
-router.post('/organizations/:orgID/:idOfMember', (req, res) => {
+router.post('/organizations/:orgID/:memberID', (req, res) => {
 	controller.deleteClubMember(req, res);
 });
 
