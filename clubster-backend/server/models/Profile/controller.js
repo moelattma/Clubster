@@ -5,6 +5,7 @@
 
 // grabs scheme in the profile/model
 const Profile = require('./model');
+const mongoose = require('mongoose');
 const Img = require('../Images/model');
 const fs = require('fs');
 
@@ -20,7 +21,7 @@ exports.changeProfile = (req,res) => {
       } else {
         Profile.findOneAndUpdate(
             {user: req.user._id},
-            {$set: {"image": image._id}},    // overwrites the previous profile with new one
+            {$set: {"image": mongoose.Types.ObjectId(image._id)}},    // overwrites the previous profile with new one
             {new: true}
         ).then((profile) => {
           Profile.findOne({user: req.user._id}).populate('image').then((profile) => {
@@ -56,7 +57,14 @@ exports.profileSubmission = (req, res) => {
                 {user: req.user._id},
                 {$set: newProfile},    // overwrites the previous profile with new one
                 {new: true}
-            ).then((profile) => res.json(profile))    // if sccueedd the return the profile
+            ).then((profile) => {
+              Profile.findOne({user: req.user._id}).populate('image').then((profile) => {
+                  if(profile)
+                    return res.status(201).json({'profile':profile});
+                  else
+                    return res.status(400).json({'err':'err'});
+              });
+            })    // if sccueedd the return the profile
         }else{
             new Profile(newProfile).save().then((profile) => res.json(profile));
         }
@@ -68,10 +76,11 @@ exports.profileSubmission = (req, res) => {
 exports.retrieveProfile = (req,res) => {
   const id = req.user._id;
   Profile.findOneAndUpdate({user: id}).then((profile) => {
-    if(profile) {
-      return res.status(201).json(profile);
-    } else {
-      return res.status(400).json({'err': 'err'});
-    }
+    Profile.findOne({user: req.user._id}).populate('image').then((profile) => {
+        if(profile)
+          return res.status(201).json({'profile':profile});
+        else
+          return res.status(400).json({'err':'err'});
+    });
   })
 }

@@ -20,8 +20,7 @@ export default class Login extends React.Component {
       })
         .then(response => {
           if (response.status == 200) {
-            // Set token to ls
-            console.log(response.data.token);
+            // Set token to ls\
             AsyncStorage.setItem('jwtToken', response.data.token);
             axios.defaults.headers.common['Authorization'] = response.data.token;
             this.props.navigation.navigate('ClubsterNavigation');               //Navigate to Clubs page if successful
@@ -37,9 +36,9 @@ export default class Login extends React.Component {
 
   render() {
     return (
-      <KeyboardAwareScrollView contentContainerStyle={styles.container} scrollEnabled={true} enableOnAndroid={true} 
+      <KeyboardAwareScrollView contentContainerStyle={styles.container} scrollEnabled={true} enableOnAndroid={true}
       alwaysBounceVertical={true} extraScrollHeight={40} keyboardShouldPersistTaps="handled" >
-        
+
         <Text style={styles.logoName}>Clubster</Text>
 
         <TextField

@@ -9,6 +9,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@pusher/chatkit": "^0.7.18",
     "axios": "^0.18.0",
     "base64-arraybuffer": "^0.1.5",
     "expo": "^30.0.1",

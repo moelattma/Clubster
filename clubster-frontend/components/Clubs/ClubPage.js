@@ -112,7 +112,6 @@ export default class ClubsPage extends Component {
     const purpose = this._formRef.getValue().Purpose;
     const description = this._formRef.getValue().Description;
     axios.post('http://localhost:3000/api/organizations/new', { name: name, acronym: acronym, purpose: purpose, description: description }).then((organization) => {
-      console.log(organization);
       this.setState({ show: false });
       this.setState({ clubs: this.state.clubs.concat(organization.data) });
     }).catch((error) => {

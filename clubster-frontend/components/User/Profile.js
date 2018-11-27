@@ -95,24 +95,39 @@ export default class Profile extends Component {
 
     componentWillMount() {
       axios.get('http://localhost:3000/api/profile').then((response) => {
-        console.log('yoooooooooooooooooooo ', response.data.major);
-        if(response.data.image) {
+        console.log(response.data.profile.hobbies);
+        if(response.data.profile.image) {
           this.setState({img: 'data:image/jpeg;base64,' + converter.encode(response.data.profile.image.img.data.data)});
         }
-        if(response.data.social) {
+        if(response.data.profile.major) {
           this.setState({
-            major: response.data.major,
-             hobbies: response.data.hobbies.join(','),
-             description: response.data.description,
-             Facebook: response.data.social.facebook,
-             linkedIn: response.data.social.linkedin,
-             instagram: response.data.social.instagram,
+            major: response.data.profile.major
+          });
+        }
+        if(response.data.profile.hobbies &&  response.data.profile.hobbies.includes(",")) {
+          this.setState({
+            hobbies: response.data.profile.hobbies.join(','),
+          });
+        }
+        if(response.data.profile.hobbies &&  !response.data.profile.hobbies.includes(",")) {
+          this.setState({
+            hobbies: response.data.profile.hobbies.toString(),
+          });
+        }
+        if(response.data.profile.social) {
+          this.setState({
+             major: response.data.profile.major,
+             hobbies: response.data.profile.hobbies.join(','),
+             description: response.data.profile.description,
+             Facebook: response.data.profile.social.facebook,
+             linkedIn: response.data.profile.social.linkedin,
+             instagram: response.data.profile.social.instagram,
           });
         } else {
           this.setState({
-            major: response.data.major,
-             hobbies: response.data.hobbies.join(','),
-             description: response.data.description,
+            major: response.data.profile.major,
+             hobbies: response.data.profile.hobbies.join(','),
+             description: response.data.profile.description,
           });
         }
       });
@@ -154,7 +169,6 @@ export default class Profile extends Component {
 
 
     render() {
-        console.log('HIIIII', this.state);
         return (
 
             <View>
@@ -162,19 +176,21 @@ export default class Profile extends Component {
                 <TouchableOpacity style = {styles.avatar} onPress= {() => this.changePicture()}><Image style={styles.imageAvatar} source={{uri: this.state.img}}/></TouchableOpacity>
                 <Text style = {{flexDirection: 'row',alignSelf:'center', marginTop: 70,fontSize: 20,color: 'black',fontWeight: 'bold'}}> Aimal Khan </Text>
                 <Text style={{flexDirection: 'row',alignSelf:'center',fontSize: 20,color: 'black',fontWeight: 'bold'}}> {this.state.major}</Text>
+                <View style={{flexDirection:'row', flexWrap:'wrap', justifyContent: 'center'}}>
+                  <Text style = {{textAlign:'center'}}>{this.state.description}</Text>
+                </View>
                 <View style = {{flexDirection: 'row',justifyContent: 'center'}}>
                   <SocialIcon type='facebook' onPress = {() => this.link(this.state.Facebook)} />
                   <SocialIcon type='instagram' onPress = {() => this.link(this.state.instagram)} />
                   <SocialIcon type='linkedin' onPress = {() => this.link(this.state.linkedIn)} />
                 </View>
-                <View style = {{height: 30}}>
-                </View>
 
-                <View style =  {{flexDirection: 'column', alignSelf:'center', marginTop:100}}>
+                <View style =  {{flexDirection: 'column', alignSelf:'center'}}>
                   <ScrollView horizontal={true} containerStyle={{flexDirection: "column",flexWrap: "wrap",alignItems: "flex-start"}}>
-                    {this.state.hobbies.split(',').map(d => this.renderElement(d))}
+                    {this.state.hobbies.length != 0 ? this.state.hobbies.split(',').map(d => this.renderElement(d)) : null}
                   </ScrollView>
                 </View>
+
 
                 {/* MODAL  */}
                 <View style={{ flex: 1 }}>

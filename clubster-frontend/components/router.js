@@ -24,7 +24,6 @@ import Dashboard from './User/ClubBoard/Dashboard';
 import ClubEvents from './User/ClubBoard/ClubEvents';
 import Expenses from './User/ClubBoard/Expenses';
 import MemberList from './User/ClubBoard/MembersList';
-import Chat from './User/ClubBoard/Chat';
 
 export const LoginNavigator = createSwitchNavigator(
     {
@@ -135,14 +134,6 @@ export const AdminNavigator = createBottomTabNavigator(
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
                     <Ionicons name="ios-people" size={46} color={tintColor} />
-                )
-            }
-        },
-        Chat: {
-            screen: Chat,
-            navigationOptions: {
-                tabBarIcon: ({ tintColor }) => (
-                    <FontAwesome name="wechat" size={38} color={tintColor} />
                 )
             }
         }
