@@ -56,8 +56,8 @@ class ShowClubs extends Component {
       ),
       headerRight: (
         <View style={{ marginRight: 6 }}>
-          <FontAwesome 
-            name="search" size={32} color={'black'} 
+          <FontAwesome
+            name="search" size={32} color={'black'}
             onPress={() => screenProps.clubPage.navigate('ClubSearch')} />
         </View>
       )
@@ -159,6 +159,7 @@ class CreateClub extends Component {
       name: "image1.jpg"
     });
     axios.post('http://localhost:3000/api/organizations/new', data).then((response) => {
+      console.log('heyooo ', this.state);
       var updatedClubs = this.state.clubs;
       const org = response.data.organization;
       updatedClubs.push({

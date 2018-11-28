@@ -8,6 +8,7 @@ const User = require('../Users/model');
 const Img = require('../Images/model');
 const fs = require('fs');
 
+
 exports.getUserClubs = (req, res) => {
 	console.log(req.user._id);
 	User.findOne({ _id: req.user._id }).populate({ path: 'arrayClubsAdmin', populate: { path: 'imageId' } })
@@ -16,9 +17,10 @@ exports.getUserClubs = (req, res) => {
 		}).catch((err) => console.log(err));
 };
 
+
 // Display all the clubs in our Mongo Collection
 exports.getAllClubs = (req, res) => {
-	Organization.find().then((organizations) => {
+	Organization.find().populate('imageId').then((organizations) => {
 		if (!organizations) {
 			return res.status(400).json({ 'Error': 'No organizations found' });
 		} else {
@@ -31,11 +33,11 @@ exports.isMember = (req, res) => {
 	const { orgID } = req.body;
 	const userID = req.user._id;
 
-	Organization.findByIdAndUpdate(orgID).then((organization) => {
+	Organization.findByIdAndUpdate(orgID).populate('imageId').then((organization) => {
 		if (!organization)
 			return res.status(400).json({ 'Error': 'No organization found' })
 		const isMember = organization.members.indexOf(userID) != -1 || organization.admins.indexOf(userID) != -1;
-		return res.status(201).json({ 'isMember': isMember });
+		return res.status(201).json({ 'isMember': isMember, 'organization': organization });
 	});
 }
 
@@ -60,11 +62,11 @@ exports.getMembers = (req, res) => {
 	const { orgID } = req.params;
 
 	// finds and return organization id of specific club
-	Organization.findByIdAndUpdate(orgID).populate('members').then((organization) => {
+	Organization.findByIdAndUpdate(orgID).populate({ path: 'members', populate: { path: 'avatar' } }).then((organization) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No organizations found' });
 		} else {
-			return res.status(201).json({ 'members': organization.members, 'adminCount': organization.admins.length });
+			return res.status(201).json({ 'members': organization.members, 'adminCount': organization.admins.length, 'admins': organization.admins, idOfUser: req.user._id  });
 		}
 	});
 }

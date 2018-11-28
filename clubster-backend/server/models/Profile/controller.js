@@ -24,12 +24,17 @@ exports.changeProfile = (req, res) => {
           { $set: { "image": mongoose.Types.ObjectId(image._id) } },    // overwrites the previous profile with new one
           { new: true }
         ).then((profile) => {
-          Profile.findOne({ user: req.user._id }).populate('image').then((profile) => {
-            if (profile)
-              return res.status(201).json({ 'profile': profile });
-            else
-              return res.status(400).json({ 'err': 'err' });
-          })
+          User.findOneAndUpdate(
+            { _id: req.user._id },
+            { $set: { "avatar": mongoose.Types.ObjectId(profile.image) } },    // overwrites the previous profile with new one
+            { new: true }).then((user) => {
+              Profile.findOne({ user: user._id }).populate('image').then((profile) => {
+                if (profile)
+                  return res.status(201).json({ 'profile': profile });
+                else
+                  return res.status(400).json({ 'err': 'err' });
+                });
+            });
         });
       }
     });

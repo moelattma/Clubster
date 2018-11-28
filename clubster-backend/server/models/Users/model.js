@@ -33,7 +33,9 @@ const User = new Schema({
     minlength: 8
   },
   avatar: {
-    type: String
+    type: Schema.Types.ObjectId,
+    ref: 'images',
+    required: false
   },
   arrayClubsMember: [{
     type: Schema.Types.ObjectId,

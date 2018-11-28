@@ -21,11 +21,11 @@ router.get('/organizations', passport.authenticate('jwt', {session:false}), (req
 	controller.getUserClubs(req, res);
 });
 
-router.get('/organizations/:orgID/members', (req, res) => {
+router.get('/organizations/:orgID/members', passport.authenticate('jwt', {session:false}),  (req, res) => {
 	controller.getMembers(req, res);
 });
 
-router.post('/organizations/:orgID/:memberID', (req, res) => {
+router.post('/organizations/:orgID/:memberID', passport.authenticate('jwt', {session:false}),  (req, res) => {
 	controller.deleteClubMember(req, res);
 });
 

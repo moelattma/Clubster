@@ -63,7 +63,6 @@ export default class Profile extends Component {
             aspect: [4, 3],
             base64: false,
         });
-        const token = await AsyncStorage.getItem('jwtToken');
         const data = new FormData();
         data.append('fileData', {
             uri: result.uri,
@@ -96,29 +95,22 @@ export default class Profile extends Component {
 
     componentWillMount() {
         axios.get('http://localhost:3000/api/profile').then((response) => {
+            console.log(response.status);
+            if(response.status != 201) {
+              return;
+            }
             const _data = response.data;
             const _profile = _data.profile;
-            // if(_data) {
-            //     if(_profile) {
-            //         this.setState({ 
-            //             major: _profile.major, hobbies: _profile.hobbies.join(','),
-            //             hobbies: _profile.hobbies.toString(), major: _profile.major, 
-            //             hobbies: _profile.hobbies.join(','), description: _profile.description, 
-            //             facebook: _profile.social.facebook, linkedIn: _profile.social.linkedin, 
-            //             instagram: _profile.social.instagram
-            //         });
-            //     }
-            // }
-            // console.log(response.data.name);
+
             if(_data.name)
                 this.setState({ name: _data.name })
-            if (_data.image) 
+            if (_profile.image)
                 this.setState({ img: 'data:image/jpeg;base64,' + converter.encode(_profile.image.img.data.data) });
-            if (_profile.major) 
+            if (_profile.major)
                 this.setState({ major: _profile.major });
-            if (_profile.hobbies && _profile.hobbies.includes(",")) 
+            if (_profile.hobbies && _profile.hobbies.includes(","))
                 this.setState({ hobbies: _profile.hobbies.join(',') });
-            if (_profile.hobbies && !_profile.hobbies.includes(",")) 
+            if (_profile.hobbies && !_profile.hobbies.includes(","))
                 this.setState({ hobbies: _profile.hobbies.toString() });
             if (_profile.social) {
                 this.setState({
@@ -133,7 +125,7 @@ export default class Profile extends Component {
                     description: _profile.description,
                 });
             }
-        });
+        }).catch((error) =>  {return;});
     }
 
     link = (url) => {
@@ -145,7 +137,6 @@ export default class Profile extends Component {
         if (url.indexOf('https') == -1) {
             url = "https://" + url;
         }
-        console.log('Yooo look ', url);
         Linking.openURL(url);
     }
 

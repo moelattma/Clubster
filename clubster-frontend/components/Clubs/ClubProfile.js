@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, Dimensions } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, View, Dimensions,Image } from 'react-native';
 import axios from 'axios';
+import converter from 'base64-arraybuffer';
 
 const { width: WIDTH } = Dimensions.get('window');
 
@@ -17,13 +18,18 @@ export default class ClubProfile extends Component {
         this.state = {
             organizationID: orgID,
             isLoading: true,
-            joinable: false
+            joinable: false,
+            img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg=='
         }
     }
 
     componentWillMount() {
         axios.post("http://localhost:3000/api/organizations/isMember", { orgID: this.state.organizationID }).then((response) => {
             this.setState({ joinable: (!response.data.isMember) });
+            if(response.data.organization.imageId) {
+                console.log('wow');
+                this.setState({img: 'data:image/jpeg;base64,' + converter.encode(response.data.organization.imageId.img.data.data)});
+            }
         });
         this.setState({ isLoading: false });
     }
@@ -67,8 +73,12 @@ export default class ClubProfile extends Component {
                         President: {organization.president}
                     </Text>
                     <Text style={{ textAlign: 'center', marginLeft: WIDTH / 10, marginRight: WIDTH / 10, marginTop: 20 }}>
+                        Purpose: {organization.purpose}
+                    </Text>
+                    <Text style={{ textAlign: 'center', marginLeft: WIDTH / 10, marginRight: WIDTH / 10, marginTop: 20 }}>
                         Description: {organization.description}
                     </Text>
+                    <Image style={styles.imageAvatar} source={{ uri: this.state.img }} />
                     {joins}
                 </View>
             );
@@ -85,6 +95,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#59cbbd',
         height: 60,
         width: WIDTH / 3
+    },
+    imageAvatar: {
+        width: 200,
+        height: 200,
+        borderColor: "white",
+        borderRadius: 100,
+        alignSelf: 'center',
+        position: 'relative'
     },
     joinText: {
         fontSize: 24,

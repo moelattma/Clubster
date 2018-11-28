@@ -31,11 +31,11 @@ const Events = new Schema({
     trim: true,
     unique: true
   },
-  going: [{
+  image: {
     type: Schema.Types.ObjectId,   //Specifiers
-    ref: 'users'
-  }], 
-  interested: [{
+    ref: 'images'
+  },
+  going: [{
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'users'
   }]
@@ -45,8 +45,8 @@ Events.statics.addGoingUser = async function(eventID, userID) {
   await this.findByIdAndUpdate(eventID, { $push: { going: userID } });
 }
 
-Events.statics.addInterestedUser = async function(eventID, userID) {
-  await this.findByIdAndUpdate(eventID, { $push: { interested: userID } });
+Events.statics.removeGoingUser = async function(eventID, userID) {
+  await this.findByIdAndUpdate(eventID, { $pull: { going: userID } });
 }
 
 /*
