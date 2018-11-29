@@ -33,8 +33,6 @@ exports.joinOrganization = (req, res) => {
 
 	if (accepted) { // add idOfMember to Org's array
 		Organization.findByIdAndUpdate(orgID).then((organization) => {
-			console.log('organization id is! ', orgID);
-			console.log('joiner id is! ', joinerID);
 			if (!organization) {
 				return res.status(400).json({ 'Error': 'No such organization found' });
 			} else {
@@ -100,5 +98,12 @@ exports.newNotification = (req, res) => {
 			break;
 	}
 
-	new Notification(notification).save().then((newNote) => { return res.status(201).json(newNote); });
+	Notification.findOne({ $and: [{ type: type }, {idOfOrganization: organization._id}, {idOfSender: senderID}]}).then((notification)=>{
+		if(notification){
+			return res.status(400).json({ 'Error': 'Duplicate notification sent' });
+		}
+		else{
+			new Notification(notification).save().then((newNote) => { return res.status(201).json(newNote); });
+		}
+	});
 }
