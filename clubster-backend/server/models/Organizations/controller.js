@@ -6,6 +6,7 @@
 const Organization = require('./model');
 const User = require('../Users/model');
 const Img = require('../Images/model');
+const Notification = require('../Notifications/model');
 const fs = require('fs');
 
 
@@ -33,11 +34,15 @@ exports.isMember = (req, res) => {
 	const { orgID } = req.body;
 	const userID = req.user._id;
 
-	Organization.findByIdAndUpdate(orgID).populate('imageId').then((organization) => {
+	Organization.findByIdAndUpdate(orgID).then((organization) => {
 		if (!organization)
 			return res.status(400).json({ 'Error': 'No organization found' })
-		const isMember = organization.members.indexOf(userID) != -1 || organization.admins.indexOf(userID) != -1;
-		return res.status(201).json({ 'isMember': isMember, 'organization': organization });
+		const isMember = organization.members.indexOf(userID) != -1;
+		var noteStatus;
+		Notification.findOne({$and : [{idOfSender: req.user._id}, {idOfOrganization: orgID}, {$or: [{type: "ORG_JOIN_ADMIN"}, {type: "ORG_JOIN_MEMBER"}]}]}).then((notification) => {
+			(notification && notification.isActive) ? noteStatus = true : noteStatus = false;
+		})
+		return res.status(201).json({ 'isMember': isMember && noteStatus, 'organization': organization });
 	});
 }
 

@@ -79,11 +79,11 @@ class ShowClubs extends Component {
   };
 
   componentWillMount() {
-    this.getUserClubs();
     this.willFocus = this.props.navigation.addListener('willFocus', () => { this.getUserClubs(); });
   };
 
   getUserClubs() {
+    console.log('Got user clubs');
     var getClubs = [];
     axios.get("http://localhost:3000/api/organizations").then((response) => {
       const { user } = response.data;
@@ -101,6 +101,11 @@ class ShowClubs extends Component {
         getClubs.isAdmin = false;
         getClubs.push(club);
       };
+      var str = '';
+      for(let i = 0;i<getClubs.length;i++) {
+        str += getClubs[i].name + ' ';
+      }
+      console.log(str);
       this.setState({ clubs: getClubs }); // Setting up state variable
     }).catch((err) => console.log(err));
   }
@@ -158,24 +163,8 @@ class CreateClub extends Component {
       type: 'multipart/form-data',
       name: "image1.jpg"
     });
-    axios.post('http://localhost:3000/api/organizations/new', data).then((response) => {
-      console.log('heyooo ', this.state);
-      var updatedClubs = this.state.clubs;
-      const org = response.data.organization;
-      updatedClubs.push({
-        president: org.president,
-        admins: org.admins,
-        name: org.name,
-        acronym: org.acronym,
-        description: org.description,
-        imageUrl: 'data:image/jpeg;base64,' + converter.encode(org.imageId.img.data.data),
-        purpose: org.purpose,
-        members: org.members,
-        events: org.events
-      });
-      this.setState({ clubs: updatedClubs });
-      this.setState({ show: false });
-    });
+    await axios.post('http://localhost:3000/api/organizations/new', data);
+    this.props.navigation.navigate('ShowClubs');
   };
 
   render() {

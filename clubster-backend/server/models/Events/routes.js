@@ -17,7 +17,7 @@ router.post('/events/:organizationID/new',upload.single('fileData'), passport.au
 	controller.addEvent(req, res);
 });
 
-router.post('/events/:eventID/:idOfAttender', passport.authenticate('jwt', {session:false}), (req, res) => {
+router.post('/events/:eventID', passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.addMemberToEvent(req, res);
 });
 

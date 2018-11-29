@@ -14,22 +14,51 @@ const fs = require('fs');
 exports.getEvents = (req, res) => {
 	const { organizationID } = req.params;
 
-	Organization.findByIdAndUpdate(organizationID).populate('events').then((organization) => {
+	Organization.findByIdAndUpdate(organizationID).populate({ path: 'events', populate: { path: 'image' } }).then((organization) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No events found' });
 		} else {
-			return res.status(201).json({ 'events': organization.events, userId: req.user._id });
+			return res.status(201).json({ 'events': organization.events, idOfUser: req.user._id });
 		}
 	}).catch((err) => console.log(err));
 };
 
 exports.addMemberToEvent = (req,res) => {
-	const { idOfAttender, eventID } = req.params;
+	const { eventID } = req.params;
+	const idOfAttender = req.user._id;
 	Events.findByIdAndUpdate(eventID).then((event) => {
 		if(event) {
 			var currentAttendees = event.going;
-			(currentAttendees.indexOf( mongoose.Types.ObjectId(idOfAttender)) > -1) ? Events.removeGoingUser(eventID, idOfAttender) : Events.addGoingUser(eventID, idOfAttender);
-			return res.status(201).json({event});
+			console.log('current: ', event.going);
+			var isInArray = event.going.some(function (friend) {
+    		return friend.equals(idOfAttender);
+			});
+			if(currentAttendees.length != 0 && isInArray) {
+				Events.findOneAndUpdate(
+   				{ _id: eventID },
+   				{ $pull: { going: mongoose.Types.ObjectId(idOfAttender) }},
+					{new: true, upsert: true},
+  					function (error, event) {
+        			if (error) {
+            		console.log(error);
+        			} else {
+            		return res.status(201).json({event});
+        	}
+    		});
+			} else {
+				console.log('here');
+				Events.findOneAndUpdate(
+					{ _id: eventID },
+					{ $push: { going: mongoose.Types.ObjectId(idOfAttender) }},
+					{new: true, upsert: true},
+						function (error, event) {
+							if (error) {
+								console.log(error);
+							} else {
+								return res.status(201).json({event});
+					}
+				});
+			}
 		} else {
 			return res.status(400).json({'err': 'err'});
 		}
@@ -40,7 +69,6 @@ exports.addEvent = (req, res) => {
 	const { organizationID } = req.params;
 	const { name, date, description, expense } = req.body;
 	var new_img = new Img;
-	console.log(req.file);
 	new_img.img.data = fs.readFileSync(req.file.path)
 	new_img.img.contentType = 'image/jpeg';
 	new_img.save().then((image) => {
@@ -53,6 +81,7 @@ exports.addEvent = (req, res) => {
 					name: name,
 					date: date,
 					description: description,
+					going: [req.user._id],
 					image: image._id
 				});
 				let expenses = new Expenses({
@@ -63,9 +92,11 @@ exports.addEvent = (req, res) => {
 						if(expense) {
 							clubEvent.save().then((event) => {
 								Organization.addEventToClub(organizationID, event._id);
-								Event.findOne({_id: event._id}).populate('image').then((event) => {
-									return res.status(201).json({ 'event': clubEvent });
-								}).catch(err => {return res.status(400).json({ 'Error': err })});
+								Events.findOne({_id: event._id}).populate('image').then((event) => {
+									return res.status(201).json({ 'event': event });
+								}).catch(err => {
+									return res.status(400).json({ 'Error': err });
+								});
 							}).catch((err) => {
 								return res.status(400).json({ 'Error': err });
 							});

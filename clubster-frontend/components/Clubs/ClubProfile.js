@@ -19,15 +19,15 @@ export default class ClubProfile extends Component {
             organizationID: orgID,
             isLoading: true,
             joinable: false,
-            img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg=='
+            img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==',
+            noteStatus: true
         }
     }
 
     componentWillMount() {
         axios.post("http://localhost:3000/api/organizations/isMember", { orgID: this.state.organizationID }).then((response) => {
-            this.setState({ joinable: (!response.data.isMember) });
+            this.setState({ joinable: (!response.data.isMember), noteStatus: response.data.noteStatus });
             if(response.data.organization.imageId) {
-                console.log('wow');
                 this.setState({img: 'data:image/jpeg;base64,' + converter.encode(response.data.organization.imageId.img.data.data)});
             }
         });
@@ -45,7 +45,11 @@ export default class ClubProfile extends Component {
 
     handleJoin = (organization, joinType) => {
         axios.post("http://localhost:3000/api/notifications/new", { type: joinType, organization })
-            .then()
+            .then((response) => {
+              if(response.status == 201) {
+                this.setState({ joinable: false})
+              }
+            })
             .catch((err) => console.log('couldnt find it', err));
     };
 
@@ -93,6 +97,12 @@ const styles = StyleSheet.create({
     joinButton: {
         justifyContent: 'center',
         backgroundColor: '#59cbbd',
+        height: 60,
+        width: WIDTH / 3
+    },
+    joinButtonDark: {
+        justifyContent: 'center',
+        backgroundColor: 'rgba(0,0,0,.6)',
         height: 60,
         width: WIDTH / 3
     },

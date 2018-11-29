@@ -67,7 +67,7 @@ export const HomeNavigator = createBottomTabNavigator(
             screen: Profile,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <Ionicons name="logo-tux" size={46} color={tintColor} />
+                    <Ionicons name="ios-person" size={46} color={tintColor} />
                 )
             }
         }

@@ -97,13 +97,5 @@ exports.newNotification = (req, res) => {
 			notification.message = `You have been rejected from ${organization.name} :(`;
 			break;
 	}
-
-	Notification.findOne({ $and: [{ type: type }, {idOfOrganization: organization._id}, {idOfSender: senderID}]}).then((notification)=>{
-		if(notification){
-			return res.status(400).json({ 'Error': 'Duplicate notification sent' });
-		}
-		else{
 			new Notification(notification).save().then((newNote) => { return res.status(201).json(newNote); });
-		}
-	});
 }
