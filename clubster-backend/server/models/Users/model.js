@@ -14,8 +14,7 @@ const Schema = mongoose.Schema;
 const User = new Schema({
   username: {
     type: String,   //Specifiers
-    required: true,
-    minlength: 6
+    required: true
   },
   name: {
     type: String,
@@ -29,8 +28,7 @@ const User = new Schema({
   },
   password: {
     type: String,
-    required: true,
-    minlength: 8
+    required: true
   },
   avatar: {
     type: Schema.Types.ObjectId,

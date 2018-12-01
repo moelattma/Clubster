@@ -1,13 +1,13 @@
-import React, { Component } from 'react';
-import { FlatList, TouchableOpacity, View, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
+import React, { PureComponent } from 'react';
+import { FlatList, TouchableOpacity, View, StyleSheet, ActivityIndicator } from 'react-native';
 import { List, ListItem, SearchBar } from 'react-native-elements';
 import _ from 'lodash';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import axios from 'axios';
 
-export default class SearchClubs extends Component {
-    constructor(props) {
-        super(props);
+export default class SearchClubs extends PureComponent {
+    constructor() {
+        super();
 
         this.state = {
             loading: false,
@@ -18,7 +18,7 @@ export default class SearchClubs extends Component {
         }
     }
 
-    componentDidMount() {
+    componentWillMount() {
         this.getOrganizations();
     }
 
@@ -76,7 +76,7 @@ export default class SearchClubs extends Component {
         <ListItem
             roundAvatar
             title={item.name}
-            onPress={() => this.props.navigation.navigate('ClubProfile', { item })}
+            onPress={() => this.props.navigation.navigate('ClubProfile', { _id: item._id, name: item.name })}
             subtitle={item.description}
             containerStyle={{ borderBottomWidth: 0, height: 80 }}
         />
