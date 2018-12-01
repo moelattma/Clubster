@@ -33,4 +33,14 @@ router.post('/organizations/isMember', passport.authenticate('jwt', {session:fal
 	controller.isMember(req, res);
 });
 
+// NEW ROUTES I'M MAKING
+
+router.get('/organizations/getOrg/:orgID', (req, res) => {
+	controller.retrieveOrg(req, res);
+});
+
+router.post('/organizations/updateOrg/:orgID', (req, res) => {
+	controller.updateOrg(req, res);
+});
+
 module.exports = router;
