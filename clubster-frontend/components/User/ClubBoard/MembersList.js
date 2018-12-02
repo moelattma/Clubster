@@ -51,30 +51,48 @@ export default class MemberList extends Component {
       url = 'data:image/jpeg;base64,' + converter.encode(item.avatar.img.data.data);
     }
     return (
-      <View>
-        <TouchableOpacity style={{ flex: 1, flexDirection: 'row', marginBottom: 3 }}
-          onPress={() => ToastAndroid.show(item.book_title, ToastAndroid.SHORT)}>
-          <Image style={{ width: 80, height: 80, marginLeft: 1, marginTop: 9, marginRight: 9,borderColor: "white",borderRadius: 100,alignSelf: 'center',position: 'relative' }} source={{ uri: url }} />
-          <View style={{ flex: 1, justifyContent: 'center', marginLeft: 5 }}>
-            <Text style={{ fontSize: 18, color: 'green', marginBottom: 15 }}>
-              {item.name}
-            </Text>
-            <Text style={{ fontSize: 16, color: 'red' }}>
-              {item.username}
-            </Text>
+      <View style={{ flexDirection: 'row', backgroundColor: 'lightgrey' }}>
+        <View style={{ flexDirection: 'row', flex: .85 }}>
+          <View>
+            <TouchableOpacity onPress={() => ToastAndroid.show(item.book_title, ToastAndroid.SHORT)}>
+              <Image style={styles.img} source={{uri: url}} />
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
+          {/* </View> */}
+
+          {/* <Image style={{ width: 80, height: 80, margin: 5 }}
+            source={{ uri: item.avatar }} /> */}
+
+          {/* <View style={{ flex: .50 }}> */}
+          <TouchableOpacity onPress={() => ToastAndroid.show(item.book_title, ToastAndroid.SHORT)}>
+          <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'stretch', }}>
+            <View >
+              <Text style={styles.nm}>
+                {item.name}
+              </Text>
+            </View>
+
+            <View >
+              <Text style={{ fontSize: 16, color: 'black', marginLeft: 10 }}>
+                Member since oct 10, 2018
+              </Text>
+            </View>
+          </View>
+          </TouchableOpacity>
+        </View>
+
+
 
         {/* Delete Button */}
-
-        <TouchableOpacity style={styles.btn} onPress={() => { this.deleteUser(item._id) }}>
-          <MaterialIcons
-            name="delete-forever"
-            size={35}
-            color={'black'}
-          />
-        </TouchableOpacity>
-      }
+        <View style={{ flex: .15, marginTop: 20 }}>
+          <TouchableOpacity style={styles.btn} onPress={() => { this.deleteUser(item._id) }}>
+            <MaterialIcons
+              name="delete-forever"
+              size={35}
+              color={'black'}
+            />
+          </TouchableOpacity>
+        </View>
 
       </View>
     )
@@ -136,22 +154,28 @@ export default class MemberList extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-    paddingLeft: 60,
-    paddingRight: 60
-  },
-  btn: {
-    position: 'absolute',
-    width: 40,
-    height: 40,
-    backgroundColor: '#fff',
-    borderRadius: 30,
-    //borderColor: 'black',
-    bottom: 35,
-    right: 0,
-    alignItems: 'center',
-    justifyContent: 'center'
-  }
+   flex: 1,
+   justifyContent: 'center',
+   backgroundColor: '#fff',
+   paddingLeft: 5,
+   paddingRight: 5
+ },
+ btn: {
+   width: 40,
+   height: 40,
+ },
+ nm: {
+   fontSize: 18,
+   color: 'black',
+   fontWeight: 'bold',
+   marginLeft: 10,
+   fontSize: 20,
+ },
+ img: {
+   borderRadius: 20,
+   borderWidth: 4,
+   borderColor: 'lightgrey',
+   height: 80,
+   width: 80
+ }
 });

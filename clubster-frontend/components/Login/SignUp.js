@@ -23,10 +23,10 @@ export default class SignUp extends Component {
       username,
       name
     }).then(response => {
-      console.log(response.status);
       if (response.status == 200 || response.status == 201) {
         this.props.navigation.navigate('Login');
-        axios.post('http://localhost:3000/api/notifications/new', { type: CLUBSTER_WELCOME });
+        axios.post("http://localhost:3000/api/notifications/newNoAuthenticate", 
+          { type: CLUBSTER_WELCOME, senderID: response.data.user._id });
       }
     }).catch(err => console.log('Could not sign up', err));
   };

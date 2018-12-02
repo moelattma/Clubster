@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { ScrollView, AsyncStorage, TouchableOpacity, Image, StyleSheet, Button, Text, View, Dimensions, FlatList, TouchableWithoutFeedback } from 'react-native';
+import { Image, StyleSheet, Button, Text, View, Dimensions, TouchableWithoutFeedback, FlatList } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
 import t from 'tcomb-form-native';
-import { ImagePicker, Permissions, Constants } from 'expo';
+import { ImagePicker, Permissions } from 'expo';
 import converter from 'base64-arraybuffer';
 
 import { createStackNavigator } from 'react-navigation';
@@ -21,8 +21,12 @@ const window = Dimensions.get('window');
 const imageWidth = (window.width / 3) + 30;
 const imageHeight = window.width / 3;
 
+const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
+const CLUB_WIDTH = WIDTH * 4 / 10;
+const CLUB_HEIGHT = HEIGHT * 1 / 4;
+
 export default class ClubsPage extends Component {
-  static navigationOptions = ({}) => {
+  static navigationOptions = ({ }) => {
     return {
       header: null
     };
@@ -41,7 +45,8 @@ class ShowClubs extends Component {
     this.state = {
       clubs: [],
       show: false,
-      img: 'https://facebook.github.io/react/logo-og.png'
+      img: 'https://facebook.github.io/react/logo-og.png',
+      loading: false
     }
   }
 
@@ -64,72 +69,67 @@ class ShowClubs extends Component {
     };
   };
 
-  renderItem = ({ item }) => {
-    if (item.hasOwnProperty('empty') && item.empty === true) {
-      return <TouchableWithoutFeedback onPress={() => this.actionOnRow(item)}><View style={[styles.item, styles.itemInvisible]} /></TouchableWithoutFeedback>;
-    }
-    const { screenProps } = this.props;
-    return (
-      <TouchableWithoutFeedback onPress={() => { screenProps.home.navigate('AdminNavigation') }}>
-        <View style={styles.item}>
-          <Text style={styles.itemText}>{item.name}</Text>
-        </View>
-      </TouchableWithoutFeedback>
-    );
-  };
-
   componentWillMount() {
-    this.getUserClubs();
     this.willFocus = this.props.navigation.addListener('willFocus', () => { this.getUserClubs(); });
   };
 
-  getUserClubs() {
+  getUserClubs = () => {
+    this.setState({ loading: true });
     var getClubs = [];
     axios.get("http://localhost:3000/api/organizations").then((response) => {
-      const { user } = response.data;
-      getClubs = user.arrayClubsAdmin;
+      const { arrayClubsAdmin, arrayClubsMember } = response.data;
+      getClubs = arrayClubsAdmin;
 
-      for (var i = 0; i < user.arrayClubsAdmin.length; i++) {
-        const club = user.arrayClubsAdmin[i];
-        getClubs[i].imageUrl = 'data:image/jpeg;base64,' + converter.encode(club.imageId.img.data.data);
+      for (var i = 0; i < arrayClubsAdmin.length; i++) {
+        getClubs[i].imageUrl = 'data:image/jpeg;base64,' + converter.encode(arrayClubsAdmin[i].imageId.img.data.data);
         getClubs[i].isAdmin = true;
       };
 
-      for (var i = 0; i < user.arrayClubsMember.length; i++) {
-        const club = user.arrayClubsMember[i];
-        getClubs.imageUrl = 'data:image/jpeg;base64,' + converter.encode(club.imageId.img.data.data);
-        getClubs.isAdmin = false;
+      for (var i = 0; i < arrayClubsMember.length; i++) {
+        var club = arrayClubsMember[i];
+        club.imageUrl = 'data:image/jpeg;base64,' + converter.encode(club.imageId.img.data.data);
+        club.isAdmin = false;
         getClubs.push(club);
       };
-      this.setState({ clubs: getClubs }); // Setting up state variable
-    }).catch((err) => console.log(err));
-  }
+      if(getClubs.length % 2 != 0)
+        getClubs.push({ empty: true });
+      this.setState({ clubs: getClubs, loading: false }); // Setting up state variable
+    }).catch((err) => {
+      console.log(err); 
+      this.setState({ loading: false });
+    });
+  };
 
   navigateUser = (item) => {
     this.props.screenProps.home.navigate('AdminMemNavigation', { item, isAdmin: item.isAdmin });
+  };
+
+  _renderItem = ({ item }) => {
+    if(item.empty) {
+      return <View style={[styles.eventContainer, { backgroundColor: 'transparent' }]} />;
+    }
+    return (
+      <TouchableWithoutFeedback onPressIn={() => this.navigateUser(item)}>
+        <View style={styles.eventContainer} >
+          <Image style={styles.imageHeight} source={{ uri: item.imageUrl }} />
+          <Text style={styles.eventTitle}> {item.name} </Text>
+          <Text style={{ position: 'absolute', right: 0, bottom: 0, fontSize: 12, fontWeight: 'bold' }}> {(item.isAdmin ? 'A' : 'M')} </Text>
+        </View>
+      </TouchableWithoutFeedback>
+    );
   }
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.root}>
-          {this.state.clubs.map((item, i) => (
-            <TouchableOpacity key={i} onPress={() => this.navigateUser(item)} >
-              <View style={styles.meetupCard} >
-                <View style={styles.meetupCardTopContainer}>
-                  <Image style={styles.imageHeight} source={{ uri: item.imageUrl }} />
-                </View>
-
-                <View style={styles.meetupCardBottomContainer}>
-                  <Text style={styles.meetupCardMetaName}>
-                    {item.name}
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
+      <FlatList
+        data={this.state.clubs.slice(0, 40)}
+        renderItem={this._renderItem}
+        horizontal={false}
+        numColumns={2}
+        keyExtractor={club => club._id}
+        refreshing={this.state.loading}
+        onRefresh={this.getUserClubs}
+      />
     );
   }
 }
@@ -147,7 +147,6 @@ class CreateClub extends Component {
       aspect: [4, 3],
       base64: false,
     });
-    const token = await AsyncStorage.getItem('jwtToken');
     const data = new FormData();
     data.append('name', this._formRef.getValue().Name);
     data.append('acronym', this._formRef.getValue().Abbreviation);
@@ -158,24 +157,8 @@ class CreateClub extends Component {
       type: 'multipart/form-data',
       name: "image1.jpg"
     });
-    axios.post('http://localhost:3000/api/organizations/new', data).then((response) => {
-      console.log('heyooo ', this.state);
-      var updatedClubs = this.state.clubs;
-      const org = response.data.organization;
-      updatedClubs.push({
-        president: org.president,
-        admins: org.admins,
-        name: org.name,
-        acronym: org.acronym,
-        description: org.description,
-        imageUrl: 'data:image/jpeg;base64,' + converter.encode(org.imageId.img.data.data),
-        purpose: org.purpose,
-        members: org.members,
-        events: org.events
-      });
-      this.setState({ clubs: updatedClubs });
-      this.setState({ show: false });
-    });
+    await axios.post('http://localhost:3000/api/organizations/new', data);
+    this.props.navigation.navigate('ShowClubs');
   };
 
   render() {
@@ -201,6 +184,21 @@ const ClubPageNavigator = createStackNavigator(
 )
 
 const styles = StyleSheet.create({
+  eventContainer: {
+    flex: 1,
+    height: CLUB_HEIGHT,
+    backgroundColor: '#59cbbd',
+    marginTop: 10,
+    marginRight: 4,
+    marginLeft: 4
+  },
+  eventTitle: {
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 20,
+    textAlign: 'center',
+    textAlignVertical: 'center'
+  },
   row: {
     flex: 1,
     flexDirection: 'row'

@@ -39,22 +39,32 @@ export default class Profile extends Component {
     _hideModal = () => this.setState({ show: false })
 
     submitProfile() {
+        var hobbiesList = this.state.hobbies.split(',');
+        var removeIndices = [];
+        
+        for(var i = 0; i < hobbiesList.length; i++) {
+            hobbiesList[i] = hobbiesList[i].trim();
+            if(hobbiesList[i] == "")
+                removeIndices.push(i);
+        }
+
+        var splicedCount = 0;
+        removeIndices.map(index => hobbiesList.splice(index - splicedCount++));
+
         axios.post('http://localhost:3000/api/profile', {
-            major: this.state.major, hobbies: this.state.hobbies,
+            major: this.state.major, hobbies: hobbiesList,
             facebook: this.state.facebook, instagram: this.state.instagram,
             linkedIn: this.state.linkedIn, description: this.state.description
         }).then((response) => {
             if (response.status == 201 || response.status == 200) {
-                this.setState({ show: false });
+                this.setState({ show: false, hobbies: hobbiesList.join(', ') });
             }
         })
-
     }
 
     changePicture = () => {
         this.useLibraryHandler();
     }
-
 
     useLibraryHandler = async () => {
         await this.askPermissionsAsync();
@@ -73,8 +83,6 @@ export default class Profile extends Component {
             this.setState({ img: 'data:image/jpeg;base64,' + converter.encode(response.data.profile.image.img.data.data) })
         });
     };
-
-
 
     arrayBufferToBase64(buffer) {
         var binary = '';
@@ -95,38 +103,19 @@ export default class Profile extends Component {
 
     componentWillMount() {
         axios.get('http://localhost:3000/api/profile').then((response) => {
-            console.log(response.status);
-            if(response.status != 201) {
-              return;
-            }
             const _data = response.data;
             const _profile = _data.profile;
-
-            if(_data.name)
-                this.setState({ name: _data.name })
-            if (_profile.image)
-                this.setState({ img: 'data:image/jpeg;base64,' + converter.encode(_profile.image.img.data.data) });
-            if (_profile.major)
-                this.setState({ major: _profile.major });
-            if (_profile.hobbies && _profile.hobbies.includes(","))
-                this.setState({ hobbies: _profile.hobbies.join(',') });
-            if (_profile.hobbies && !_profile.hobbies.includes(","))
-                this.setState({ hobbies: _profile.hobbies.toString() });
-            if (_profile.social) {
+            if (_profile) {
+                var _hobbies = (_profile.hobbies == null ? [] : _profile.hobbies);
                 this.setState({
-                    major: _profile.major, hobbies: _profile.hobbies.join(','),
-                    description: _profile.description, facebook: _profile.social.facebook,
-                    linkedIn: _profile.social.linkedin, instagram: _profile.social.instagram
-                });
-            } else {
-                this.setState({
-                    major: _profile.major,
-                    hobbies: _profile.hobbies.join(','),
-                    description: _profile.description,
+                    major: _profile.major, description: _profile.description,
+                    hobbies: _hobbies.join(', '), facebook: _profile.social.facebook, linkedIn: _profile.social.linkedin,
+                    instagram: _profile.social.instagram, img: 'data:image/jpeg;base64,' + converter.encode(_profile.image.img.data.data)
                 });
             }
-        }).catch((error) =>  {return;});
-    }
+            this.setState({ name: _data.name });
+        });
+    };
 
     link = (url) => {
         if (url == '' || url == null) {
@@ -142,17 +131,12 @@ export default class Profile extends Component {
 
 
     renderElement = (d, i) => (
-        <View
-            key={d}
+        <View key={i}
             style={{
-                justifyContent: "center",
-                alignItems: "center",
-                borderWidth: 1,
-                borderColor: "#898989",
-                backgroundColor: "white",
-                borderRadius: 12,
-                margin: 3,
-                height: 24
+                justifyContent: "center", alignItems: "center",
+                borderWidth: 1, borderColor: "#898989",
+                backgroundColor: "white", borderRadius: 12,
+                margin: 3, height: 24
             }}
         >
             <Text style={{ marginHorizontal: 8, fontSize: 16, color: "#898989" }}>
@@ -164,9 +148,16 @@ export default class Profile extends Component {
 
     render() {
         return (
-
             <View>
-                <View style={{ height: 200, backgroundColor: '#0006b1' }}></View>
+                <View style={{ height: 200, backgroundColor: '#59cbbd' }}>
+                    <TouchableOpacity style={styles.editButton} onPress={this._showModal} >
+                        <MaterialCommunityIcons
+                            name="account-edit"
+                            size={35}
+                            color={'white'}
+                        />
+                    </TouchableOpacity>
+                </View>
                 <TouchableOpacity style={styles.avatar} onPress={() => this.changePicture()}><Image style={styles.imageAvatar} source={{ uri: this.state.img }} /></TouchableOpacity>
                 <Text style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 70, fontSize: 20, color: 'black', fontWeight: 'bold' }}> {this.state.name} </Text>
                 <Text style={{ flexDirection: 'row', alignSelf: 'center', fontSize: 20, color: 'black', fontWeight: 'bold' }}> {this.state.major}</Text>
@@ -181,7 +172,7 @@ export default class Profile extends Component {
 
                 <View style={{ flexDirection: 'column', alignSelf: 'center' }}>
                     <ScrollView horizontal={true} containerStyle={{ flexDirection: "column", flexWrap: "wrap", alignItems: "flex-start" }}>
-                        {this.state.hobbies.length != 0 ? this.state.hobbies.split(',').map(d => this.renderElement(d)) : null}
+                        {this.state.hobbies.length != 0 ? this.state.hobbies.split(', ').map((d, i) => this.renderElement(d, i)) : null}
                     </ScrollView>
                 </View>
 
@@ -202,7 +193,7 @@ export default class Profile extends Component {
                                 Edit Profile
                             </Text>
                             <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="Major" onChangeText={(major) => this.setState({ major })} value={this.state.major} />
-                            <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="Hobbies(seperated by ,)" onChangeText={(hobbies) => this.setState({ hobbies })} value={this.state.hobbies} />
+                            <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="Hobbies (seperated by ,)" onChangeText={hobbies => this.setState({ hobbies })} value={this.state.hobbies} />
                             <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="Current Position" onChangeText={(currentPosition) => this.setState({ currentPosition })} value={this.state.currentPosition} />
                             <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="Facebook" onChangeText={(facebook) => this.setState({ facebook })} value={this.state.facebook} />
                             <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="Instagram" onChangeText={(instagram) => this.setState({ instagram })} value={this.state.instagram} />
@@ -220,14 +211,6 @@ export default class Profile extends Component {
                         </View>
                     </Modal>
                 </View>
-                <TouchableOpacity style={styles.editButton} onPress={this._showModal} >
-                    <MaterialCommunityIcons
-                        name="account-edit"
-                        size={35}
-                        color={'black'}
-                    />
-                </TouchableOpacity>
-
             </View>
 
         );
@@ -384,9 +367,7 @@ const styles = StyleSheet.create({
     },
     editButton: {
         position: 'absolute',
-        top: 600,
-        right: 0
+        right: 4,
+        top: 10
     }
-
-
 });

@@ -23,8 +23,8 @@ const app = express();
 
 
 //lets us access/write JSON objects and push to database
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true, parameterLimit:50000}));
 app.use(morgan('dev')); //debugging for HTTP requests
 
 // Passport middleware

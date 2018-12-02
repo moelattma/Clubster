@@ -33,8 +33,6 @@ exports.joinOrganization = (req, res) => {
 
 	if (accepted) { // add idOfMember to Org's array
 		Organization.findByIdAndUpdate(orgID).then((organization) => {
-			console.log('organization id is! ', orgID);
-			console.log('joiner id is! ', joinerID);
 			if (!organization) {
 				return res.status(400).json({ 'Error': 'No such organization found' });
 			} else {
@@ -60,8 +58,8 @@ exports.joinOrganization = (req, res) => {
 };
 
 exports.newNotification = (req, res) => {
-	const { type, organization, receiverID } = req.body;
-	const senderID = req.user._id;
+	const { type, _id, receiverID } = req.body;
+	const senderID = (req.user ? req.user._id : req.body.senderID);
 
 	let notification = ({
 		idOfSender: senderID,
@@ -72,33 +70,41 @@ exports.newNotification = (req, res) => {
 		message: ""
 	});
 
-	switch (type) {
-		case CLUBSTER_WELCOME:
-			notification.idOfReceivers = [senderID];
-			notification.message = `Welcome to Clubster!`
-			break;
+	if (_id) {
+		Organization.findById(_id).then((organization) => {
+			const { name, admins } = organization;
 
-		case ORG_JOIN_ADMIN:
-		case ORG_JOIN_MEM:
-			notification.idOfOrganization = organization._id;
-			notification.idOfReceivers = organization.admins;
-			notification.message = `${req.user.name} wants to join ${organization.name} as ` + ((type == ORG_JOIN_ADMIN) ? `an admin` : `a member`);
-			notification.isActive = true;
-			break;
+			switch (type) {
+				case ORG_JOIN_ADMIN:
+				case ORG_JOIN_MEM:
+					notification.idOfOrganization = _id;
+					notification.idOfReceivers = admins;
+					notification.message = `${req.user.name} wants to join ${name} as ` + ((type == ORG_JOIN_ADMIN) ? `an admin` : `a member`);
+					notification.isActive = true;
+					break;
 
-		case ACCEPT_ADMIN:
-		case ACCEPT_MEM:
-			notification.idOfOrganization = organization._id;
-			notification.idOfReceivers = [receiverID];
-			notification.message = `You have been accepted to ${organization.name} as ` + ((type == ACCEPT_ADMIN) ? `an admin` : `a member`);
-			break;
+				case ACCEPT_ADMIN:
+				case ACCEPT_MEM:
+					notification.idOfOrganization = _id;
+					notification.idOfReceivers = [receiverID];
+					notification.message = `You have been accepted to ${name} as ` + ((type == ACCEPT_ADMIN) ? `an admin` : `a member`);
+					break;
 
-		case REJECT_JOIN:
-			notification.idOfOrganization = organization._id;
-			notification.idOfReceivers = [receiverID];
-			notification.message = `You have been rejected from ${organization.name} :(`;
-			break;
+				case REJECT_JOIN:
+					notification.idOfOrganization = _id;
+					notification.idOfReceivers = [receiverID];
+					notification.message = `You have been rejected from ${name} :(`;
+					break;
+			}
+			new Notification(notification).save().then((newNote) => { return res.status(201).json(newNote); });
+		});
+	} else {
+		switch (type) {
+			case CLUBSTER_WELCOME:
+				notification.idOfReceivers = [senderID];
+				notification.message = `Welcome to Clubster!`
+				break;
+		}
+		new Notification(notification).save().then((newNote) => { return res.status(201).json(newNote); });
 	}
-
-	new Notification(notification).save().then((newNote) => { return res.status(201).json(newNote); });
 }

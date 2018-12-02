@@ -73,7 +73,7 @@ export default class Notifications extends Component {
 
     handleReject = (item) => {
         axios.post('http://localhost:3000/api/notifications/joinOrganization',
-            { _id: item._id, orgID: item.idOfOrganization._id, joinerID: item.idOfSender, joinType, accepted: false })
+            { _id: item._id, orgID: item.idOfOrganization._id, joinerID: item.idOfSender, REJECT_JOIN, accepted: false })
             .then((res) => {
                 if (res.status == 201)
                     item.isActive = false;

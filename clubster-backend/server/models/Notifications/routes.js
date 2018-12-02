@@ -14,4 +14,8 @@ router.post('/notifications/new', passport.authenticate('jwt', { session: false 
 	controller.newNotification(req, res);
 });
 
+router.post('/notifications/newNoAuthenticate', (req, res) => {
+	controller.newNotification(req, res);
+});
+
 module.exports = router;
