@@ -69,7 +69,7 @@ exports.getMembers = (req, res) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No organizations found' });
 		} else {
-			return res.status(201).json({ 'members': organization.members, 'adminCount': organization.admins.length, 'admins': organization.admins, idOfUser: req.user._id  });
+			return res.status(201).json({ 'members': organization.members, 'adminCount': organization.admins.length, 'admins': organization.admins, idOfUser: req.user._id });
 		}
 	});
 }
@@ -128,3 +128,59 @@ exports.addOrg = (req, res) => {
 		}
 	});
 };
+
+exports.retrieveOrg = (req, res) => {
+	//console.log({ req });
+	const { orgID } = req.params;
+
+	Organization.findOne({ _id: orgID }).populate('imageId').then((organization) => {
+		if (organization)
+			return res.status(201).json({ 'org': organization });
+		else
+			return res.status(400).json({ 'err': 'err' });
+	});
+};
+
+exports.updateOrg = (req, res) => {
+
+	console.log('hi');
+	const { orgID } = req.params;
+	//console.log(orgID);
+
+	const { name, acronym, purpose, description } = req.body;
+	
+	Organization.findById(orgID).then((organization) => {
+		if (organization) {
+
+			let updatedOrg = {
+				name: name,
+				president: organization.president,
+				acronym: acronym,
+				purpose: purpose,
+				description: description
+			};
+
+			console.log('Check this out');
+			console.log(updatedOrg);
+			console.log(orgID);
+		
+			Organization.findByIdAndUpdate(
+				orgID,
+				{ $set: updatedOrg },
+				{ new: true }
+			).then((organization) => {
+				Organization.findById(organization._id).populate('image').then((organization) => {
+					if (organization)
+						return res.status(201).json({ 'organization': organization });
+					else
+						return res.status(400).json({ 'err': 'err' })
+				}).catch(err => console.log(err));
+			})
+		} 
+		else {
+			return res.status(400).json({ 'err': 'err' })
+		}
+
+	}).catch(err => console.log(err));
+};
+

@@ -20,10 +20,11 @@ import ClubPage from './Clubs/ClubPage';
 import ClubSearch from './Clubs/ClubSearch';
 import ClubProfile from './Clubs/ClubProfile';
 
-import Dashboard from './User/ClubBoard/Dashboard';
+import Dashboard from './User/ClubBoard/Settings';
 import ClubEvents from './User/ClubBoard/ClubEvents';
 import Expenses from './User/ClubBoard/Expenses';
 import MemberList from './User/ClubBoard/MembersList';
+//import Settings from './User/ClubBoard/Settings';
 
 export const LoginNavigator = createSwitchNavigator(
     {
@@ -136,7 +137,15 @@ export const AdminNavigator = createBottomTabNavigator(
                     <Ionicons name="ios-people" size={46} color={tintColor} />
                 )
             }
-        }
+        },
+        // Settings: {
+        //     screen: Settings,
+        //     navigationOptions: {
+        //         tabBarIcon: ({ tintColor }) => (
+        //             <Ionicons name="ios-settings" size={46} color={tintColor}/>
+        //         )
+        //     }
+        // }
     },
     {
         initialRouteName: 'Dashboard',
