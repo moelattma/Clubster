@@ -11,6 +11,7 @@ const multer = require('multer');
 var upload = multer({ dest: 'uploads/' });
 
 router.post('/profilePhoto', upload.single('fileData'), passport.authenticate('jwt', { session: false }), (req, res) => {
+    console.log('hi');
     controller.changeProfile(req,res);
 });
 

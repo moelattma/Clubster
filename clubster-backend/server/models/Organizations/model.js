@@ -42,7 +42,7 @@ const Organization = new Schema({
   purpose: {
     type: String,
     required: true,
-    minlength: 32,
+    minlength: 16,
     trim: true,
     unique: true
   },
@@ -63,7 +63,8 @@ const Organization = new Schema({
   }],
   events: [{
     type: Schema.Types.ObjectId,   //Specifiers
-    ref: 'Events'
+    ref: 'events',
+    time: Date.now()
   }]
 });
 

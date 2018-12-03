@@ -8,6 +8,7 @@ const User = require('../Users/model');
 const Img = require('../Images/model');
 const Notification = require('../Notifications/model');
 const fs = require('fs');
+const mongoose = require('mongoose');
 
 
 exports.getUserClubs = (req, res) => {
@@ -142,13 +143,11 @@ exports.retrieveOrg = (req, res) => {
 };
 
 exports.updateOrg = (req, res) => {
-
-	console.log('hi');
 	const { orgID } = req.params;
 	//console.log(orgID);
 
 	const { name, acronym, purpose, description } = req.body;
-	
+
 	Organization.findById(orgID).then((organization) => {
 		if (organization) {
 
@@ -163,9 +162,9 @@ exports.updateOrg = (req, res) => {
 			console.log('Check this out');
 			console.log(updatedOrg);
 			console.log(orgID);
-		
+
 			Organization.findByIdAndUpdate(
-				orgID,
+				 mongoose.Types.ObjectId(orgID),
 				{ $set: updatedOrg },
 				{ new: true }
 			).then((organization) => {
@@ -176,7 +175,7 @@ exports.updateOrg = (req, res) => {
 						return res.status(400).json({ 'err': 'err' })
 				}).catch(err => console.log(err));
 			})
-		} 
+		}
 		else {
 			return res.status(400).json({ 'err': 'err' })
 		}
@@ -184,3 +183,33 @@ exports.updateOrg = (req, res) => {
 	}).catch(err => console.log(err));
 };
 
+exports.changePicture = (req, res) => {
+	const { orgID } = req.body;
+	console.log('entered', orgID);
+  var new_img = new Img;
+  new_img.img.data = fs.readFileSync(req.file.path)
+  new_img.img.contentType = 'image/jpeg';
+  new_img.save().then((image) => {
+  Organization.findOne({_id: orgID}).then((organization) => {
+      if (!organization) {
+        return res.status(400).json({ 'err': 'err' });
+      } else {
+				var url = image._id;
+				console.log('heeee ', image._id);
+        Organization.findOneAndUpdate(
+          { orgID },
+          { $set: { "imageId": mongoose.Types.ObjectId(url) } },    // overwrites the previous profile with new one
+          { new: true }
+        ).then((org) => {
+						Organization.findOne({_id: orgID}).populate('imageId').then((org) => {
+							if(!org) {
+								return res.status(400).json({'err': 'err'});
+							} else {
+								return res.status(201).json(org);
+							}
+						});
+      });
+  };
+});
+});
+}

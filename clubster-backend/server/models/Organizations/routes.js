@@ -39,8 +39,12 @@ router.get('/organizations/getOrg/:orgID', (req, res) => {
 	controller.retrieveOrg(req, res);
 });
 
-router.post('/organizations/updateOrg/:orgID', (req, res) => {
+router.post('/organizations/:orgID', (req, res) => {
 	controller.updateOrg(req, res);
+
 });
 
+router.post('/organizations/changeClubPic', (req, res) => {
+	controller.changePicture(req, res);
+});
 module.exports = router;

@@ -41,7 +41,7 @@ export default class Profile extends Component {
     submitProfile() {
         var hobbiesList = this.state.hobbies.split(',');
         var removeIndices = [];
-        
+
         for(var i = 0; i < hobbiesList.length; i++) {
             hobbiesList[i] = hobbiesList[i].trim();
             if(hobbiesList[i] == "")
@@ -68,20 +68,27 @@ export default class Profile extends Component {
 
     useLibraryHandler = async () => {
         await this.askPermissionsAsync();
-        let result = await ImagePicker.launchImageLibraryAsync({
-            allowsEditing: true,
-            aspect: [4, 3],
-            base64: false,
-        });
-        const data = new FormData();
-        data.append('fileData', {
-            uri: result.uri,
-            type: 'multipart/form-data',
-            name: "image1.jpg"
-        });
-        axios.post('http://localhost:3000/api/profilePhoto', data).then((response) => {
-            this.setState({ img: 'data:image/jpeg;base64,' + converter.encode(response.data.profile.image.img.data.data) })
-        });
+        try {
+          let result = await ImagePicker.launchImageLibraryAsync({
+              allowsEditing: true,
+              aspect: [4, 3],
+              base64: false,
+          });
+          if(result.cancelled)
+            return;
+          const data = new FormData();
+          data.append('fileData', {
+              uri: result.uri,
+              type: 'multipart/form-data',
+              name: "image1.jpg"
+          });
+            axios.post('http://localhost:3000/api/profilePhoto', data).then((response) => {
+                this.setState({ img: 'data:image/jpeg;base64,' + converter.encode(response.data.image.img.data.data) });
+            });
+        } catch(error) {
+          console.log(error);
+          return;
+        }
     };
 
     arrayBufferToBase64(buffer) {

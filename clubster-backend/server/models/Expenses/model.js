@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
+var Float = require('mongoose-float').loadType(mongoose);
 
 const Expenses = new Schema({
 	idOfClub: {
@@ -8,12 +8,14 @@ const Expenses = new Schema({
 		ref: 'organizations',
 		required: true
 	},
-
-	amount: {
-		type: Schema.Types.Decimal128,
+	idOfEvent: {
+		type: Schema.Types.ObjectId,
+		ref: 'events',
 		required: true
-	}
+	},
+	time : { type : Date, default: Date.now },
+	amount: { type: Float, required: true }
 });
 
 
-module.exports = mongoose.model('Expenses', Expenses);
+module.exports = mongoose.model('expenses', Expenses);

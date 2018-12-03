@@ -2,7 +2,7 @@ const Expenses = require('./model')
 exports.grabExpenses = (req, res) => {
 	const {organizationId} = req.params;
 	// Find the expenses based on the organization ID
-	Expenses.find({idOfClub: organizationId}).then((expenses) => {
+	Expenses.find({idOfClub: organizationId}).populate({path:'idOfEvent',populate:{path:'image'}}).then((expenses) => {
 		// if the expenses are not found
 		if (!expenses)
 		{

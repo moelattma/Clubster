@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, Button, TextInput, Linking, ScrollView } from 'react-native';
+import { TouchableOpacity,Dimensions, StyleSheet, Text, View, Button, TextInput, Linking, ScrollView, Image } from 'react-native';
 import Modal from "react-native-modal";
 import axios from 'axios';
 import { ImagePicker, Permissions, Constants } from 'expo';
@@ -7,7 +7,7 @@ import converter from 'base64-arraybuffer';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-
+const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 
 
 export default class Settings extends Component {
@@ -20,7 +20,7 @@ export default class Settings extends Component {
             acronym: 'abb',
             purpose: 'pur',
             description: 'des',
-            img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC',            
+            img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC',
         }
     }
 
@@ -35,6 +35,7 @@ export default class Settings extends Component {
 
     useLibraryHandler = async () => {
         await this.askPermissionsAsync();
+        const { _id } = this.props.screenProps;
         let result = await ImagePicker.launchImageLibraryAsync({
             allowsEditing: true,
             aspect: [4, 3],
@@ -46,16 +47,10 @@ export default class Settings extends Component {
             type: 'multipart/form-data',
             name: "image1.jpg"
         });
-        axios.post('http://localhost:3000/api/profilePhoto', data).then((response) => {
-            this.setState({ img: 'data:image/jpeg;base64,' + converter.encode(response.data.profile.image.img.data.data) })
-        });
-    };
-
-    arrayBufferToBase64(buffer) {
-        var binary = '';
-        var bytes = [].slice.call(new Uint8Array(buffer));
-        bytes.forEach((b) => binary += String.fromCharCode(b));
-        return window.btoa(binary);
+        axios.post(`http://localhost:3000/api/organizations/changeClubPic`, { data, orgID: _id}).then((response) => {
+            var url = 'data:image/jpeg;base64,' + converter.encode(response.data.imageId.img.data.data);
+            this.setState({ img: url });
+        }).catch((err) => {return;});
     };
 
     useCameraHandler = async () => {
@@ -68,20 +63,7 @@ export default class Settings extends Component {
         this.setState({ result });
     };
 
-    link = (url) => {
-        if (url == '' || url == null) {
-            return;
-        } else if (url.indexOf('http') > -1) {
-            url = url.replace('http', 'https');
-        }
-        if (url.indexOf('https') == -1) {
-            url = "https://" + url;
-        }
-        Linking.openURL(url);
-    }
-
-
-    componentWillMount() {
+    componentDidMount() {
         const { _id } = this.props.screenProps;
 
         axios.get(`http://localhost:3000/api/organizations/getOrg/${_id}`).then((response) => {
@@ -89,7 +71,7 @@ export default class Settings extends Component {
 
             this.setState({
                 president, name, acronym, purpose, description,
-                img: 'data:image/jpeg;base64,' + converter.encode(response.data.org.imageId.img.data.data) 
+                img: 'data:image/jpeg;base64,' + converter.encode(response.data.org.imageId.img.data.data)
             });
             //console.log(this.state);
             console.log(this.state.name);
@@ -102,17 +84,13 @@ export default class Settings extends Component {
     submitClubChanges() {
         const { _id } = this.props.screenProps;
         console.log('ORG ID');
-        console.log(_id);
-        axios.post(`http://localhost:3000/api/organizations/updateOrg/${_id}`, {
-            name: this.state.name,
-            acronym: this.state.acronym,
-            purpose: this.state.purpose,
-            description: this.state.description
-        }).then((response) => {
-            if (response.status == 201 || response.status == 200) {
-                console.log('SUCCESS: CHANGES SUBMITTED');
-            }
-        });
+        console.log(`http://localhost:3000/api/organizations/updateOrg/${_id}`);
+        axios.post(`http://localhost:3000/api/organizations/${_id}`, {name: this.state.name,
+        acronym: this.state.acronym,
+        purpose: this.state.purpose,
+        description: this.state.description}).then((response) => {
+          this.setState({ show: false });
+        }).catch((error) =>  {return;});
     }
 
     hide = () => {
@@ -129,21 +107,21 @@ export default class Settings extends Component {
                 <View>
 
                     <View>
-                        <View style={{ height: 200, backgroundColor: '#0006b1' }}></View>
+                        <TouchableOpacity><Image style={{ height: 200,width:WIDTH  }} source = {{uri: this.state.img}}/></TouchableOpacity>
                         <View style={{ flex: 1, flexDirection: 'column' }}>
-                            <Text style={{ fontWeight: 'bold', fontSize: 35 }}>
+                            <Text style={{ fontWeight: 'bold', fontSize: 35,textAlign: 'center' }}>
                                 {this.state.name} ({this.state.acronym})
                             </Text>
 
-                            <Text style={{ fontWeight: 'bold', fontSize: 20 }}>President:</Text>
-                            <Text>{this.state.president}</Text>
+                            <Text style={{ fontWeight: 'bold', fontSize: 20,textAlign: 'center' }}>President:</Text>
+                            <Text style={{ textAlign: 'center' }}>{this.state.president}</Text>
 
-                            <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Purpose:</Text>
-                            <Text>{this.state.purpose}</Text>
+                            <Text style={{ fontWeight: 'bold', fontSize: 20,textAlign: 'center' }}>Purpose:</Text>
+                            <Text style={{ textAlign: 'center' }}>{this.state.purpose}</Text>
 
 
-                            <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Description:</Text>
-                            <Text>{this.state.description}</Text>
+                            <Text style={{ fontWeight: 'bold', fontSize: 20, textAlign: 'center' }}>Description:</Text>
+                            <Text style={{ textAlign: 'center' }}>{this.state.description}</Text>
 
                         </View>
 

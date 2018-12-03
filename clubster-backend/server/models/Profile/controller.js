@@ -24,7 +24,7 @@ exports.changeProfile = (req, res) => {
           { $set: { "image": mongoose.Types.ObjectId(image._id) } },    // overwrites the previous profile with new one
           { new: true }
         ).then((profile) => {
-          return res.status(201).json({ 'profile': profile, 'image': new_image });
+          return res.status(201).json({ 'profile': profile, 'image':new_img });
         });
       }
     });

@@ -67,13 +67,15 @@ exports.addMemberToEvent = (req,res) => {
 
 exports.addEvent = (req, res) => {
 	const { organizationID } = req.params;
-	const { name, date, description, expense } = req.body;
+	var { name, date, description, expense } = req.body;
+	expense = parseFloat(expense);
 	var new_img = new Img;
 	new_img.img.data = fs.readFileSync(req.file.path)
 	new_img.img.contentType = 'image/jpeg';
 	new_img.save().then((image) => {
 		Organization.findByIdAndUpdate(organizationID).then((organization) => {
 			if (!organization) {
+					console.log('srry');
 				return res.status(400).json({ 'Error': 'No such organization exists' });
 			} else {
 				let clubEvent = new Events({
@@ -86,10 +88,12 @@ exports.addEvent = (req, res) => {
 				});
 				let expenses = new Expenses({
 					idOfClub:organizationID,
+					idOfEvent: clubEvent._id,
 					amount: expense
 				});
 				expenses.save().then((expense) => {
 						if(expense) {
+							console.log('srry');
 							clubEvent.save().then((event) => {
 								Organization.addEventToClub(organizationID, event._id);
 								Events.findOne({_id: event._id}).populate('image').then((event) => {

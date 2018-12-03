@@ -52,4 +52,4 @@ Events.statics.removeGoingUser = async function(eventID, userID) {
 /*
 * Export so that other js files can use this schema
 */
-module.exports = mongoose.model('Events', Events);
+module.exports = mongoose.model('events', Events);

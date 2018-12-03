@@ -28,8 +28,10 @@ export default class MemberList extends Component {
     };
   }
 
-  renderTrash = ({item}) => {
-    if(this.state.admins.indexOf(this.state.idOfUser) == -1) {
+
+
+  renderTrash = (item) => {
+    if(this.state.admins.indexOf(this.state.idOfUser) > -1 && this.state.idOfUser != item._id) {
       return (
         <TouchableOpacity style={styles.btn} onPress={() => { this.deleteUser(item._id) }}>
           <MaterialIcons
@@ -58,12 +60,6 @@ export default class MemberList extends Component {
               <Image style={styles.img} source={{uri: url}} />
             </TouchableOpacity>
           </View>
-          {/* </View> */}
-
-          {/* <Image style={{ width: 80, height: 80, margin: 5 }}
-            source={{ uri: item.avatar }} /> */}
-
-          {/* <View style={{ flex: .50 }}> */}
           <TouchableOpacity onPress={() => ToastAndroid.show(item.book_title, ToastAndroid.SHORT)}>
           <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'stretch', }}>
             <View >
@@ -71,28 +67,13 @@ export default class MemberList extends Component {
                 {item.name}
               </Text>
             </View>
-
             <View >
-              <Text style={{ fontSize: 16, color: 'black', marginLeft: 10 }}>
-                Member since oct 10, 2018
-              </Text>
+              {(this.state.admins.indexOf(item._id) > -1) ? <Text style={{ fontSize: 16, color: 'black', marginLeft: 10 }}>Admin</Text>: <Text style={{ fontSize: 16, color: 'black', marginLeft: 10 }}>Member</Text>}
             </View>
           </View>
           </TouchableOpacity>
         </View>
-
-
-
-        {/* Delete Button */}
-        <View style={{ flex: .15, marginTop: 20 }}>
-          <TouchableOpacity style={styles.btn} onPress={() => { this.deleteUser(item._id) }}>
-            <MaterialIcons
-              name="delete-forever"
-              size={35}
-              color={'black'}
-            />
-          </TouchableOpacity>
-        </View>
+      {this.renderTrash(item)}
 
       </View>
     )
