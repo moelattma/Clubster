@@ -4,10 +4,10 @@ import { HomeNavigator } from '../router'
 
 export default class HomeNavigation extends Component {
   render() {
-    const { navigation } = this.props;
+    const { navigation, screenProps } = this.props;
 
     return (
-      <HomeNavigator screenProps={{ home: navigation }} />
+      <HomeNavigator screenProps={{ home: navigation, logoutNavigation: screenProps.clubsterNavigation }} />
     );
   }
 }

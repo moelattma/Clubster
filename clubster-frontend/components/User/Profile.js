@@ -35,6 +35,19 @@ export default class Profile extends Component {
         return;
     }
 
+    handleLogout = async () => {
+      try {
+          await AsyncStorage.removeItem('jwtToken');
+          delete axios.defaults.headers.common['Authorization'];
+          console.log(this.props.screenProps);
+          this.props.screenProps.logoutNavigation.navigate('Login');
+      }
+      catch(exception) {
+          console.log(exception);
+          return false;
+      }
+    }
+
     _showModal = () => this.setState({ show: true })
     _hideModal = () => this.setState({ show: false })
 
@@ -157,6 +170,13 @@ export default class Profile extends Component {
         return (
             <View>
                 <View style={{ height: 200, backgroundColor: '#59cbbd' }}>
+                    <TouchableOpacity style={{ position: 'absolute', left: 4, top: 10 }} onPress={() => this.handleLogout()} >
+                        <MaterialCommunityIcons
+                            name="logout"
+                            size={35}
+                            color={'red'}
+                        />
+                    </TouchableOpacity>
                     <TouchableOpacity style={styles.editButton} onPress={this._showModal} >
                         <MaterialCommunityIcons
                             name="account-edit"
