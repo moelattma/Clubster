@@ -17,17 +17,13 @@ const Events = new Schema({
     ref: 'organizations'
   },
   name: {
-    type: String,
-    required: true
+    type: String
   },
   date: {
-    type: String,
-    required: true
+    type: String
   },
   description: {
     type: String,
-    required: true,
-    minlength: 10,
     trim: true,
     unique: true
   },

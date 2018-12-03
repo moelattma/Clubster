@@ -76,7 +76,6 @@ class ShowEvents extends Component {
   }
 
   componentDidMount() {
-    console.log('naah');
     this.willFocus = this.props.navigation.addListener('willFocus', () => {
       this.getClubEvents();
     });
@@ -100,7 +99,6 @@ class ShowEvents extends Component {
     var clubEvents = this.state.clubEvents;
     var id = this.state.idOfUser;
     axios.post(`http://localhost:3000/api/events/${item._id}`).then((response) => {
-      console.log(clubEvents[i].going);
       clubEvents[i].going = response.data.event.going;
       this.setState({clubEvents: clubEvents});
     })
@@ -162,43 +160,17 @@ class CreateClubEvent extends Component {
     await Permissions.askAsync(Permissions.CAMERA);
     await Permissions.askAsync(Permissions.CAMERA_ROLL);
   };
-
-  useLibraryHandler = async () => {
-    await this.askPermissionsAsync();
-    let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
-      base64: false,
-    });
-    const token = await AsyncStorage.getItem('jwtToken');
-    const data = new FormData();
-    data.append('name', this._formRef.getValue().Name);
-    data.append('acronym', this._formRef.getValue().Abbreviation);
-    data.append('purpose', this._formRef.getValue().Purpose);
-    data.append('description', this._formRef.getValue().Description);
-    data.append('fileData', {
-      uri: result.uri,
-      type: 'multipart/form-data',
-      name: "image1.jpg"
-    });
-    await axios.post(`http://localhost:3000/api/events/${_id}/new`, data);
-    this.props.navigation.navigate('ShowEvents');
-  };
-
-
+  
   createEvent = async () => {
-    var clubEventsNew = [];
     const { _id } = this.props.screenProps;
-    const name = this._formRef.getValue().name;
-    const date = this._formRef.getValue().date;
-    const description = this._formRef.getValue().description;
-    const expense = this._formRef.getValue().expense;
     await this.askPermissionsAsync();
     let result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       aspect: [4, 3],
       base64: false,
     });
+    if(result.cancelled)
+      return;
     const data = new FormData();
     data.append('name', this._formRef.getValue().name);
     data.append('date', this._formRef.getValue().date);

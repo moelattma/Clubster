@@ -14,7 +14,7 @@ const Expenses = new Schema({
 		required: true
 	},
 	time : { type : Date, default: Date.now },
-	amount: { type: Float, required: true }
+	amount: { type: Float }
 });
 
 

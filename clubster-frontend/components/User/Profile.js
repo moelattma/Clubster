@@ -19,7 +19,6 @@ export default class Profile extends Component {
             hobbies: '',
             facebook: '',
             instagram: '',
-            currentPosition: '',
             linkedIn: '',
             description: '',
             errors: {}
@@ -100,7 +99,6 @@ export default class Profile extends Component {
             });
         } catch(error) {
           console.log(error);
-          return;
         }
     };
 
@@ -221,7 +219,6 @@ export default class Profile extends Component {
                             </Text>
                             <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="Major" onChangeText={(major) => this.setState({ major })} value={this.state.major} />
                             <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="Hobbies (seperated by ,)" onChangeText={hobbies => this.setState({ hobbies })} value={this.state.hobbies} />
-                            <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="Current Position" onChangeText={(currentPosition) => this.setState({ currentPosition })} value={this.state.currentPosition} />
                             <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="Facebook" onChangeText={(facebook) => this.setState({ facebook })} value={this.state.facebook} />
                             <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="Instagram" onChangeText={(instagram) => this.setState({ instagram })} value={this.state.instagram} />
                             <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="LinkedIn" onChangeText={(linkedIn) => this.setState({ linkedIn })} value={this.state.linkedIn} />

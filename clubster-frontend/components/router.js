@@ -24,7 +24,6 @@ import Dashboard from './User/ClubBoard/Settings';
 import ClubEvents from './User/ClubBoard/ClubEvents';
 import Expenses from './User/ClubBoard/Expenses';
 import MemberList from './User/ClubBoard/MembersList';
-//import Settings from './User/ClubBoard/Settings';
 
 export const LoginNavigator = createSwitchNavigator(
     {

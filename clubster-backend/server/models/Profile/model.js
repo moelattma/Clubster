@@ -17,23 +17,18 @@ const Profile = new Schema({
     ref: 'users'
   },
   major: {
-    type: String,
-    required: true,
-    minlength: 4
+    type: String
   },
   description: {
     type: String,
-    required: true
   },
   image: {
     type: Schema.Types.ObjectId,
     ref: 'images'
   },
-  hobbies:
-    {
-      type: [String],
-      required: true,
-    },
+  hobbies: {
+    type: [String],
+  },
   social: {
     youtube: {
       type: String

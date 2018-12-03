@@ -3,8 +3,7 @@ const controller = require('./controller');
 const passport = require('passport');
 
 
-router.get('/:organizationId/expenses', (req, res) => {
-	console.log('hi!!!');
+router.get('/expenses/:orgID', (req, res) => {
 	controller.grabExpenses(req, res);
 });
 

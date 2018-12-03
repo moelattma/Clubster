@@ -27,8 +27,7 @@ exports.createUser = (req, res) => {
           username: username,
           name: name,
           email: email,
-          password: password,
-          // avatar
+          password: password
         });
 
         // Hashes the user's chosen password to make it more secure

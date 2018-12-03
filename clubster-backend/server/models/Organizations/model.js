@@ -21,17 +21,13 @@ const Organization = new Schema({
     ref: 'users'
   }],
   name: {
-    type: String,
-    required: true
+    type: String
   },
   acronym: {
-    type: String,
-    required: true
+    type: String
   },
   description: {
       type: String,
-      required: true,
-      minlength: 32,
       trim: true,
       unique: true
   },
@@ -41,8 +37,6 @@ const Organization = new Schema({
   },
   purpose: {
     type: String,
-    required: true,
-    minlength: 16,
     trim: true,
     unique: true
   },

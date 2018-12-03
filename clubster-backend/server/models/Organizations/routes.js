@@ -25,6 +25,10 @@ router.get('/organizations/:orgID/members', passport.authenticate('jwt', {sessio
 	controller.getMembers(req, res);
 });
 
+router.post('/organizations/modifyOrgPicture/:orgID', upload.single('fileData'), (req, res) => {
+	controller.changeClubPicture(req, res);
+});
+
 router.post('/organizations/:orgID/:memberID', passport.authenticate('jwt', {session:false}),  (req, res) => {
 	controller.deleteClubMember(req, res);
 });
@@ -33,18 +37,12 @@ router.post('/organizations/isMember', passport.authenticate('jwt', {session:fal
 	controller.isMember(req, res);
 });
 
-// NEW ROUTES I'M MAKING
-
 router.get('/organizations/getOrg/:orgID', (req, res) => {
 	controller.retrieveOrg(req, res);
 });
 
 router.post('/organizations/:orgID', (req, res) => {
 	controller.updateOrg(req, res);
-
 });
 
-router.post('/organizations/changeClubPic', (req, res) => {
-	controller.changePicture(req, res);
-});
 module.exports = router;

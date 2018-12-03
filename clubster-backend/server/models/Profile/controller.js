@@ -21,10 +21,9 @@ exports.changeProfile = (req, res) => {
       } else {
         Profile.findOneAndUpdate(
           { user: req.user._id },
-          { $set: { "image": mongoose.Types.ObjectId(image._id) } },    // overwrites the previous profile with new one
-          { new: true }
+          { $set: { "image": mongoose.Types.ObjectId(image._id) } }
         ).then((profile) => {
-          return res.status(201).json({ 'profile': profile, 'image':new_img });
+          return res.status(201).json({ 'profile': profile, 'image': new_img });
         });
       }
     });

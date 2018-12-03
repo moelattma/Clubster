@@ -112,7 +112,7 @@ class ShowClubs extends Component {
       <TouchableWithoutFeedback onPressIn={() => this.navigateUser(item)}>
         <View style={styles.eventContainer} >
           <Image style={styles.imageHeight} source={{ uri: item.imageUrl }} />
-          <Text style={styles.eventTitle}> {item.name} </Text>
+          <Text allowFontScaling numberOfLines={1} style={styles.eventTitle}> {item.name} </Text>
           <Text style={{ position: 'absolute', right: 0, bottom: 0, fontSize: 12, fontWeight: 'bold' }}> {(item.isAdmin ? 'A' : 'M')} </Text>
         </View>
       </TouchableWithoutFeedback>
@@ -147,6 +147,8 @@ class CreateClub extends Component {
       aspect: [4, 3],
       base64: false,
     });
+    if(result.cancelled)
+      return;
     const data = new FormData();
     data.append('name', this._formRef.getValue().Name);
     data.append('acronym', this._formRef.getValue().Abbreviation);

@@ -14,7 +14,6 @@ export default class ClubProfile extends Component {
 
         const { navigation } = this.props;
         const orgID = navigation.getParam('_id', null);
-        console.log(orgID)
 
         this.state = {
             organizationID: orgID,
@@ -52,7 +51,7 @@ export default class ClubProfile extends Component {
     };
 
     handleJoin = (orgID, joinType) => {
-        axios.post("http://localhost:3000/api/notifications/new", { type: joinType, _id: orgID })
+        axios.post("http://localhost:3000/api/notifications/new", { type: joinType, orgID })
             .then((response) => {
               if(response.status == 201) {
                 this.setState({ joinable: false})

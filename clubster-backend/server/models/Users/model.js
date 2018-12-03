@@ -56,7 +56,7 @@ User.statics.clubAdminPushing = async function(organizationID, adminID) {
 }
 
 User.statics.removeClubMember = async function(organizationID, memberID) {
-  await this.findByIdAndUpdate(organizationID, { $pull: { arrayClubsAdmin: memberID } });
+  await this.findByIdAndUpdate(memberID, { $pull: { arrayClubsMember: organizationID } });
 }
 /*
 * Export so that other js files can use this schema

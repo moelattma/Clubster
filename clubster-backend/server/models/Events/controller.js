@@ -23,44 +23,42 @@ exports.getEvents = (req, res) => {
 	}).catch((err) => console.log(err));
 };
 
-exports.addMemberToEvent = (req,res) => {
+exports.addMemberToEvent = (req, res) => {
 	const { eventID } = req.params;
 	const idOfAttender = req.user._id;
 	Events.findByIdAndUpdate(eventID).then((event) => {
-		if(event) {
+		if (event) {
 			var currentAttendees = event.going;
-			console.log('current: ', event.going);
 			var isInArray = event.going.some(function (friend) {
-    		return friend.equals(idOfAttender);
+				return friend.equals(idOfAttender);
 			});
-			if(currentAttendees.length != 0 && isInArray) {
-				Events.findOneAndUpdate(
-   				{ _id: eventID },
-   				{ $pull: { going: mongoose.Types.ObjectId(idOfAttender) }},
-					{new: true, upsert: true},
-  					function (error, event) {
-        			if (error) {
-            		console.log(error);
-        			} else {
-            		return res.status(201).json({event});
-        	}
-    		});
-			} else {
-				console.log('here');
+			if (currentAttendees.length != 0 && isInArray) {
 				Events.findOneAndUpdate(
 					{ _id: eventID },
-					{ $push: { going: mongoose.Types.ObjectId(idOfAttender) }},
-					{new: true, upsert: true},
-						function (error, event) {
-							if (error) {
-								console.log(error);
-							} else {
-								return res.status(201).json({event});
-					}
-				});
+					{ $pull: { going: mongoose.Types.ObjectId(idOfAttender) } },
+					{ new: true, upsert: true },
+					function (error, event) {
+						if (error) {
+							console.log(error);
+						} else {
+							return res.status(201).json({ event });
+						}
+					});
+			} else {
+				Events.findOneAndUpdate(
+					{ _id: eventID },
+					{ $push: { going: mongoose.Types.ObjectId(idOfAttender) } },
+					{ new: true, upsert: true },
+					function (error, event) {
+						if (error) {
+							console.log(error);
+						} else {
+							return res.status(201).json({ event });
+						}
+					});
 			}
 		} else {
-			return res.status(400).json({'err': 'err'});
+			return res.status(400).json({ 'err': 'err' });
 		}
 	}).catch((err) => console.log(err));
 }
@@ -75,7 +73,7 @@ exports.addEvent = (req, res) => {
 	new_img.save().then((image) => {
 		Organization.findByIdAndUpdate(organizationID).then((organization) => {
 			if (!organization) {
-					console.log('srry');
+				console.log('srry');
 				return res.status(400).json({ 'Error': 'No such organization exists' });
 			} else {
 				let clubEvent = new Events({
@@ -87,25 +85,25 @@ exports.addEvent = (req, res) => {
 					image: image._id
 				});
 				let expenses = new Expenses({
-					idOfClub:organizationID,
+					idOfClub: organizationID,
 					idOfEvent: clubEvent._id,
 					amount: expense
 				});
 				expenses.save().then((expense) => {
-						if(expense) {
-							console.log('srry');
-							clubEvent.save().then((event) => {
-								Organization.addEventToClub(organizationID, event._id);
-								Events.findOne({_id: event._id}).populate('image').then((event) => {
-									return res.status(201).json({ 'event': event });
-								}).catch(err => {
-									return res.status(400).json({ 'Error': err });
-								});
-							}).catch((err) => {
+					if (expense) {
+						console.log('srry');
+						clubEvent.save().then((event) => {
+							Organization.addEventToClub(organizationID, event._id);
+							Events.findOne({ _id: event._id }).populate('image').then((event) => {
+								return res.status(201).json({ 'event': event });
+							}).catch(err => {
 								return res.status(400).json({ 'Error': err });
 							});
-						}
-					}).catch((err) => {
+						}).catch((err) => {
+							return res.status(400).json({ 'Error': err });
+						});
+					}
+				}).catch((err) => {
 					return res.status(400).json({ 'Error': err });
 				});
 

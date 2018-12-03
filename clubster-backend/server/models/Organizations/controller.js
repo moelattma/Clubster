@@ -39,10 +39,10 @@ exports.isMember = (req, res) => {
 			return res.status(400).json({ 'Error': 'No organization found' })
 		const isMember = organization.members.indexOf(userID) != -1;
 		var noteStatus;
-		Notification.findOne({$and : [{idOfSender: req.user._id}, {idOfOrganization: orgID}, {$or: [{type: "ORG_JOIN_ADMIN"}, {type: "ORG_JOIN_MEMBER"}]}]}).then((notification) => {
+		Notification.findOne({ $and: [{ idOfSender: req.user._id }, { idOfOrganization: orgID }, { $or: [{ type: "ORG_JOIN_ADMIN" }, { type: "ORG_JOIN_MEMBER" }] }] }).then((notification) => {
 			(notification && notification.isActive) ? noteStatus = true : noteStatus = false;
 		})
-		return res.status(201).json({ 'isMember': isMember && noteStatus, 'organization': organization });
+		return res.status(201).json({ 'isMember': isMember || noteStatus, 'organization': organization });
 	});
 }
 
@@ -66,11 +66,14 @@ exports.getMembers = (req, res) => {
 	const { orgID } = req.params;
 
 	// finds and return organization id of specific club
-	Organization.findByIdAndUpdate(orgID).populate({ path: 'members', populate: { path: 'avatar' } }).then((organization) => {
+	Organization.findByIdAndUpdate(orgID).select('members admins president').populate({ path: 'members', populate: { path: 'avatar' }, select: 'name avatar _id' }).then((organization) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No organizations found' });
 		} else {
-			return res.status(201).json({ 'members': organization.members, 'adminCount': organization.admins.length, 'admins': organization.admins, idOfUser: req.user._id });
+			User.findOne({ name: organization.president }).then((president) => {
+				if (president)
+					return res.status(201).json({ 'members': organization.members, 'admins': organization.admins, 'idOfUser': req.user._id, 'president': president._id });
+			});
 		}
 	});
 }
@@ -131,7 +134,6 @@ exports.addOrg = (req, res) => {
 };
 
 exports.retrieveOrg = (req, res) => {
-	//console.log({ req });
 	const { orgID } = req.params;
 
 	Organization.findOne({ _id: orgID }).populate('imageId').then((organization) => {
@@ -164,7 +166,7 @@ exports.updateOrg = (req, res) => {
 			console.log(orgID);
 
 			Organization.findByIdAndUpdate(
-				 mongoose.Types.ObjectId(orgID),
+				mongoose.Types.ObjectId(orgID),
 				{ $set: updatedOrg },
 				{ new: true }
 			).then((organization) => {
@@ -186,30 +188,53 @@ exports.updateOrg = (req, res) => {
 exports.changePicture = (req, res) => {
 	const { orgID } = req.body;
 	console.log('entered', orgID);
-  var new_img = new Img;
-  new_img.img.data = fs.readFileSync(req.file.path)
-  new_img.img.contentType = 'image/jpeg';
-  new_img.save().then((image) => {
-  Organization.findOne({_id: orgID}).then((organization) => {
-      if (!organization) {
-        return res.status(400).json({ 'err': 'err' });
-      } else {
+	var new_img = new Img;
+	new_img.img.data = fs.readFileSync(req.file.path)
+	new_img.img.contentType = 'image/jpeg';
+	new_img.save().then((image) => {
+		Organization.findOne({ _id: orgID }).then((organization) => {
+			if (!organization) {
+				return res.status(400).json({ 'err': 'err' });
+			} else {
 				var url = image._id;
 				console.log('heeee ', image._id);
-        Organization.findOneAndUpdate(
-          { orgID },
-          { $set: { "imageId": mongoose.Types.ObjectId(url) } },    // overwrites the previous profile with new one
-          { new: true }
-        ).then((org) => {
-						Organization.findOne({_id: orgID}).populate('imageId').then((org) => {
-							if(!org) {
-								return res.status(400).json({'err': 'err'});
-							} else {
-								return res.status(201).json(org);
-							}
-						});
-      });
-  };
-});
-});
-}
+				Organization.findOneAndUpdate(
+					{ orgID },
+					{ $set: { "imageId": mongoose.Types.ObjectId(url) } },    // overwrites the previous profile with new one
+					{ new: true }
+				).then((org) => {
+					Organization.findOne({ _id: orgID }).populate('imageId').then((org) => {
+						if (!org) {
+							return res.status(400).json({ 'err': 'err' });
+						} else {
+							return res.status(201).json(org);
+						}
+					});
+				});
+			};
+		});
+	});
+};
+
+exports.changeClubPicture = (req, res) => {
+	const { orgID } = req.params;
+
+	var new_img = new Img;
+	new_img.img.data = fs.readFileSync(req.file.path)
+	new_img.img.contentType = 'image/jpeg';
+	new_img.save().then((image) => {
+		Organization.findOne({ _id: orgID }).then((organization) => {
+			console.log(organization.name);
+			if (!organization) {
+				return res.status(400).json({ 'err': 'err' });
+			} else {
+				Organization.findOneAndUpdate(
+					{ _id: orgID },
+					{ $set: { "imageId": mongoose.Types.ObjectId(image._id) } }
+				).then((organization) => {
+					return res.status(201).json({ 'organization': organization, 'imageId': new_img });
+				});
+			}
+		});
+	});
+};

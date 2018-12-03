@@ -58,26 +58,25 @@ exports.joinOrganization = (req, res) => {
 };
 
 exports.newNotification = (req, res) => {
-	const { type, _id, receiverID } = req.body;
+	const { type, _id, orgID, receiverID } = req.body;
 	const senderID = (req.user ? req.user._id : req.body.senderID);
 
 	let notification = ({
 		idOfSender: senderID,
-		idOfOrganization: null,
-		idOfReceivers: [],
+		idOfOrganization: orgID,
+		idOfReceivers: [receiverID],
 		type: type,
 		isActive: false,
 		message: ""
 	});
 
-	if (_id) {
-		Organization.findById(_id).then((organization) => {
+	if (orgID) {
+		Organization.findById(orgID).then((organization) => {
 			const { name, admins } = organization;
 
 			switch (type) {
 				case ORG_JOIN_ADMIN:
 				case ORG_JOIN_MEM:
-					notification.idOfOrganization = _id;
 					notification.idOfReceivers = admins;
 					notification.message = `${req.user.name} wants to join ${name} as ` + ((type == ORG_JOIN_ADMIN) ? `an admin` : `a member`);
 					notification.isActive = true;
@@ -85,14 +84,10 @@ exports.newNotification = (req, res) => {
 
 				case ACCEPT_ADMIN:
 				case ACCEPT_MEM:
-					notification.idOfOrganization = _id;
-					notification.idOfReceivers = [receiverID];
 					notification.message = `You have been accepted to ${name} as ` + ((type == ACCEPT_ADMIN) ? `an admin` : `a member`);
 					break;
 
 				case REJECT_JOIN:
-					notification.idOfOrganization = _id;
-					notification.idOfReceivers = [receiverID];
 					notification.message = `You have been rejected from ${name} :(`;
 					break;
 			}
