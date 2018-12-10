@@ -23,7 +23,10 @@ exports.changeProfile = (req, res) => {
           { user: req.user._id },
           { $set: { "image": mongoose.Types.ObjectId(image._id) } }
         ).then((profile) => {
-          return res.status(201).json({ 'profile': profile, 'image': new_img });
+          User.findOneAndUpdate({ _id: req.user._id },
+            { $set: { "avatar": mongoose.Types.ObjectId(image._id) } }).then(() => {
+              return res.status(201).json({ 'profile': profile, 'image': new_img });
+            });
         });
       }
     });
