@@ -6,10 +6,11 @@
 */
 
 //Import Node.js libraries.
-const Notification = require('./model');              //import Notification Schema
-const Organization = require('../Organizations/model')
-const User = require('../Users/model')
+const Notification = require('./model');	//import Notification Schema
+const Organization = require('../Organizations/model')	//import Notification Schema
+const User = require('../Users/model');	//import User Model
 
+//Tags later utilized in code
 const CLUBSTER_WELCOME = "CLUBSTER_WELCOME";
 const ORG_JOIN_ADMIN = "ORG_JOIN_ADMIN";
 const ORG_JOIN_MEM = "ORG_JOIN_MEMBER";
@@ -17,8 +18,10 @@ const ACCEPT_ADMIN = "ACCEPT_ADMIN";
 const ACCEPT_MEM = "ACCEPT_MEMBER";
 const REJECT_JOIN = "REJECT_JOIN";
 
+/*
+* gets all notifications based on the userid
+*/
 exports.grabNotifications = (req, res) => {
-	//gets all notifications based on the userid
 	Notification.find({ idOfReceivers: { $in: [req.user._id] } }).populate('idOfOrganization').then((notifications) => {
 		if (!notifications) {
 			return res.status(400).json({ 'Error': 'No notifications found' });
@@ -28,6 +31,9 @@ exports.grabNotifications = (req, res) => {
 	});
 };
 
+/*
+* Notification to add joinerID to organization's members or adim arrat
+*/
 exports.joinOrganization = (req, res) => {
 	const { _id, joinerID, orgID, joinType, accepted } = req.body;
 
@@ -36,10 +42,10 @@ exports.joinOrganization = (req, res) => {
 			if (!organization) {
 				return res.status(400).json({ 'Error': 'No such organization found' });
 			} else {
-				if (joinType == ORG_JOIN_MEM) {
+				if (joinType == ORG_JOIN_MEM) {	//add as member
 					Organization.addMemberToClub(orgID, joinerID);
 					User.clubMemberPushing(orgID, joinerID);
-				} else if (joinType == ORG_JOIN_ADMIN) {
+				} else if (joinType == ORG_JOIN_ADMIN) {	//add as admin
 					Organization.addAdminToClub(orgID, joinerID);
 					User.clubAdminPushing(orgID, joinerID);
 				}

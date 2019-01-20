@@ -37,10 +37,11 @@ const Events = new Schema({
   }]
 });
 
+//Method to add a user going to an event. Async/Await method
 Events.statics.addGoingUser = async function(eventID, userID) {
   await this.findByIdAndUpdate(eventID, { $push: { going: userID } });
 }
-
+//Method to remove a user from an event. Async/Await method
 Events.statics.removeGoingUser = async function(eventID, userID) {
   await this.findByIdAndUpdate(eventID, { $pull: { going: userID } });
 }

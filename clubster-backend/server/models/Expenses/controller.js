@@ -1,4 +1,6 @@
-const Expenses = require('./model')
+const Expenses = require('./model');
+
+//Method to grab expenses of an eventID.
 exports.grabExpenses = (req, res) => {
 	const { orgID } = req.params;
 	// Find the expenses based on the organization ID

@@ -1,4 +1,7 @@
-// server.js
+/*
+* This is the routes file for the Images schema. Based on the url axios has inside, the appropriate function will execute
+* author: ayunus@ucsc.edu mmajidi@ucsc.edu
+*/
 const fs = require('fs');
 const multer = require('multer');
 const router = require('express').Router();
