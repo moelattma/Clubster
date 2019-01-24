@@ -25,6 +25,10 @@ export default class Profile extends Component {
         }
     }
 
+    handlePhotoAction = () => {
+        console.log('photo image')
+    }
+
     askPermissionsAsync = async () => {
         await Permissions.askAsync(Permissions.CAMERA);
         await Permissions.askAsync(Permissions.CAMERA_ROLL);
@@ -189,6 +193,19 @@ export default class Profile extends Component {
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
                     <Text style={{ textAlign: 'center' }}>{this.state.description}</Text>
                 </View>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                <TouchableOpacity style={styles.button} onPress={this.handlePhotoAction.bind(this)}>
+                    <Text style={styles.buttonText}> Photos </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={this.handlePhotoAction.bind(this)}>
+                    <Text style={styles.buttonText}> Clubs </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={this.handlePhotoAction.bind(this)}>
+                    <Text style={styles.buttonText}> Skills </Text>
+                </TouchableOpacity>
+                </View>
+
                 <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
                     <SocialIcon type='facebook' onPress={() => this.link(this.state.facebook)} />
                     <SocialIcon type='instagram' onPress={() => this.link(this.state.instagram)} />
@@ -242,6 +259,21 @@ export default class Profile extends Component {
 }
 
 const styles = StyleSheet.create({
+    button:{
+        backgroundColor: '#E0E0E0',
+        borderRadius: 20,
+        borderWidth: 1.5,
+        borderColor: '#338293',
+        margin: 10
+    },
+    buttonText:{
+        color: '#338293',
+        textAlign: 'center',
+        marginLeft: 25,
+        marginRight: 25,
+        marginTop: 10,
+        marginBottom: 10
+    },
     header: {
         backgroundColor: "#00BFFF",
         height: 200,
