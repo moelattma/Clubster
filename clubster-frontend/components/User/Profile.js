@@ -264,7 +264,8 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         borderWidth: 1.5,
         borderColor: '#338293',
-        margin: 10
+        margin: 10,
+        width: '27%'
     },
     buttonText:{
         color: '#338293',
@@ -272,7 +273,8 @@ const styles = StyleSheet.create({
         marginLeft: 25,
         marginRight: 25,
         marginTop: 10,
-        marginBottom: 10
+        marginBottom: 10,
+        fontFamily: 'Helvetica',
     },
     header: {
         backgroundColor: "#00BFFF",

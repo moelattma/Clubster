@@ -7,9 +7,7 @@ export default class Clubster extends Component {
   render() {
     return (
       <SafeAreaView forceInset={{ bottom: 'never' }} style={styles.SafeAreaView}>
-
-      <LoginNavigator/>
-
+        <LoginNavigator/>
       </SafeAreaView>
     );
   }
@@ -18,7 +16,7 @@ export default class Clubster extends Component {
 const styles = StyleSheet.create({
   SafeAreaView: {
       flex: 1,
-      backgroundColor: '#ddd'
+      backgroundColor: '#E0E0E0'
   }
 })
 
