@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, FlatList, Dimensions } from 'react-native'
+import { TouchableOpacity, StyleSheet, Text, View, FlatList, Dimensions, Image } from 'react-native'
 import axios from 'axios';
 
 const { width: WIDTH } = Dimensions.get('window');
@@ -14,7 +14,8 @@ export default class Notifications extends Component {
         super(props);
         this.state = {
             notifications: [],
-            refreshing: false
+            refreshing: false,
+            img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC',
         };
     }
 
@@ -31,8 +32,11 @@ export default class Notifications extends Component {
 
     _renderItem = ({ item }) => {
         return (
-            <View style={{ flex: 1, flexDirection: 'row', height: 50, alignItems: 'center' }}>
-                <View style={{ flexDirection: 'row', alignSelf: 'flex-start', width: (item.isActive ? itemWidth : WIDTH), alignItems: 'center' }}>
+            <View style={{ flex: 1, flexDirection: 'row', height: 100  }}>
+                <TouchableOpacity style={styles.avatar}>
+                    <Image style={styles.imageAvatar} source={{ uri: this.state.img }} />
+                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', alignSelf: 'stretch', width: (item.isActive ? itemWidth : WIDTH), alignItems: 'center' }}>
                     <Text style={{ fontSize: 18, textAlignVertical: 'center', textAlign: 'left' }}> {item.message} </Text>
                 </View>
                 {this._renderButtons(item)}
@@ -43,7 +47,7 @@ export default class Notifications extends Component {
     _renderButtons = (item) => {
         if (item.isActive) {
             return (
-                <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end' }}>
+                <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'flex-end' }}>
                     <TouchableOpacity style={styles.acceptReject} onPress={() => this.handleAccept(item)}>
                         <Text style={styles.acceptRejectText}> Accept </Text>
                     </TouchableOpacity>
@@ -93,7 +97,7 @@ export default class Notifications extends Component {
     renderSeparator = () => {
         return (
             <View
-                style={{ height: 1, width: '100%', backgroundColor: 'black' }}>
+                style={{ height: 1, width: '100%', backgroundColor: '#338293' }}>
             </View>
         )
     }
@@ -128,9 +132,14 @@ const styles = StyleSheet.create({
         marginBottom: 5
     },
     acceptReject: {
-        marginLeft: 10,
-        backgroundColor: '#59cbbd',
-        alignSelf: 'center'
+        marginLeft: 5,
+        marginTop: 5,
+        marginBottom: 5,
+        marginRight: 5,
+        width: 65,
+        height: 30,
+        backgroundColor: '#338293',
+        alignSelf: 'center',
     },
     acceptRejectText: {
         marginLeft: 8,
@@ -139,6 +148,27 @@ const styles = StyleSheet.create({
         marginBottom: 6,
         textAlignVertical: 'center',
         textAlign: 'center',
-        fontSize: 14
+        fontSize: 14,
+        color: '#fff'
+    },
+    avatar: {
+        width: 50,
+        height: 50,
+        borderRadius: 50,
+        borderWidth: 4,
+        borderColor: "white",
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        marginTop: 25,
+        marginRight: 10,
+        marginBottom: 10
+    },
+    imageAvatar: {
+        width: 50,
+        height: 50,
+        borderColor: "white",
+        borderRadius: 50,
+        alignSelf: 'center',
+        position: 'relative'
     }
 });
