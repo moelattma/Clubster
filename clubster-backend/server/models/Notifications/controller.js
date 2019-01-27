@@ -84,13 +84,13 @@ exports.newNotification = (req, res) => {
 				case ORG_JOIN_ADMIN:
 				case ORG_JOIN_MEM:
 					notification.idOfReceivers = admins;
-					notification.message = `${req.user.name} wants to join ${name} as ` + ((type == ORG_JOIN_ADMIN) ? `an admin` : `a member`);
+					notification.message = `${req.user.name} wants to join ${name} as ` + ((type == ORG_JOIN_ADMIN) ? `an admin!` : `a member!`);
 					notification.isActive = true;
 					break;
 
 				case ACCEPT_ADMIN:
 				case ACCEPT_MEM:
-					notification.message = `You have been accepted to ${name} as ` + ((type == ACCEPT_ADMIN) ? `an admin` : `a member`);
+					notification.message = `You have been accepted to ${name} as ` + ((type == ACCEPT_ADMIN) ? `an admin!` : `a member!`);
 					break;
 
 				case REJECT_JOIN:
@@ -103,7 +103,7 @@ exports.newNotification = (req, res) => {
 		switch (type) {
 			case CLUBSTER_WELCOME:
 				notification.idOfReceivers = [senderID];
-				notification.message = `Welcome to Clubster!`
+				notification.message = `Welcome to Clubster! This is your notifications page.`
 				break;
 		}
 		new Notification(notification).save().then((newNote) => { return res.status(201).json(newNote); });
