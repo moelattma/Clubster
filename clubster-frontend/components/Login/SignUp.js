@@ -25,7 +25,7 @@ export default class SignUp extends Component {
     }).then(response => {
       if (response.status == 200 || response.status == 201) {
         this.props.navigation.navigate('Login');
-        axios.post("http://localhost:3000/api/notifications/newNoAuthenticate", 
+        axios.post("http://localhost:3000/api/notifications/newNoAuthenticate",
           { type: CLUBSTER_WELCOME, senderID: response.data.user._id });
       }
     }).catch(err => console.log('Could not sign up', err));
@@ -56,15 +56,17 @@ export default class SignUp extends Component {
     let { errors = {} } = this.state;
 
     return (
-      <KeyboardAwareScrollView contentContainerStyle={styles.regForm} scrollEnabled={true} enableOnAndroid={true} 
+      <KeyboardAwareScrollView contentContainerStyle={styles.regForm} scrollEnabled={true} enableOnAndroid={true}
         enableAutomaticScroll={true} alwaysBounceVertical={true} keyboardShouldPersistTaps="handled" extraScrollHeight={80}>
         <Text style={styles.header}>
           Register for Clubster
         </Text>
 
+
+        <Text style={styles.labelUser}>Email</Text>
         <TextField
-          inputContainerStyle={styles.inputContainer}
-          label="Email"
+          inputContainerStyle={styles.inputUser}
+          /*label="Email"*/
           baseColor="rgba(255, 255, 255, 0.75)"
           tintColor='#59cbbd'
           textColor="rgba(255, 255, 255, 1)"
@@ -73,10 +75,10 @@ export default class SignUp extends Component {
           returnKeyType='next'
           error={errors.email}
         />
-
+        <Text style={styles.labelUser}>Username</Text>
         <TextField
-          inputContainerStyle={styles.inputContainer}
-          label="Username"
+          inputContainerStyle={styles.inputUser}
+          /*label="Username"*/
           baseColor="rgba(255, 255, 255, 0.75)"
           tintColor='#59cbbd'
           maxLength={12}
@@ -85,9 +87,11 @@ export default class SignUp extends Component {
           returnKeyType='next'
           error={errors.username} />
 
+        <Text style={styles.labelUser}>Name</Text>
+
         <TextField
-          inputContainerStyle={styles.inputContainer}
-          label="Name"
+          inputContainerStyle={styles.inputUser}
+          //label="Name"
           baseColor="rgba(255, 255, 255, 0.75)"
           tintColor='#59cbbd'
           maxLength={20}
@@ -95,10 +99,10 @@ export default class SignUp extends Component {
           onChangeText={name => this.setState({ name })}
           returnKeyType='next'
           error={errors.name} />
-
+        <Text style={styles.labelUser}>Password</Text>
         <TextField
-          inputContainerStyle={styles.inputContainer}
-          label="Password"
+          inputContainerStyle={styles.inputUser}
+          //label="Password"
           baseColor="rgba(255, 255, 255, 0.75)"
           tintColor='#59cbbd'
           maxLength={14}
@@ -107,10 +111,10 @@ export default class SignUp extends Component {
           returnKeyType='next'
           secureTextEntry={true}
           error={errors.password} />
-
+        <Text style={styles.labelUser}>Confirm password</Text>
         <TextField
-          inputContainerStyle={styles.inputContainer}
-          label="Confirm password"
+          inputContainerStyle={styles.inputUser}
+          //label="Confirm password"
           baseColor="rgba(255, 255, 255, 0.75)"
           tintColor='#59cbbd'
           maxLength={14}
@@ -139,7 +143,7 @@ const styles = StyleSheet.create({
   regForm: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#03A9F4',
+    backgroundColor: '#192879',
     paddingLeft: 60,
     paddingRight: 60
   },
@@ -158,21 +162,37 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1
   },
   button: {
-    alignSelf: 'stretch',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#59cbbd',
-    marginTop: 30
+    alignSelf: 'center',
+    height: 50,
+    width: 290,
+    marginTop: 25,
+    justifyContent: 'center',
+    backgroundColor: '#50D9EA',
+    marginBottom: 6,
+    borderRadius: 8
   },
   btntext: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 25
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: "bold",
+    textAlign: 'center'
   },
   login: {
     position: 'absolute',
     bottom: 5,
     alignContent: 'center',
     alignSelf: 'center'
+  },
+  inputUser: {
+    width: 300,
+    height: 50,
+    borderColor: '#43519D',
+    backgroundColor: '#283786',
+    borderRadius: 8
+  },
+  labelUser: {
+    fontSize: 20,
+    color: '#414E93',
+    marginBottom: 8
   }
 });
