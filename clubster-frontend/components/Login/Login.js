@@ -39,28 +39,32 @@ export default class Login extends React.Component {
       <KeyboardAwareScrollView contentContainerStyle={styles.container} scrollEnabled={true} enableOnAndroid={true}
       alwaysBounceVertical={true} extraScrollHeight={40} keyboardShouldPersistTaps="handled" >
 
-        <Text style={styles.logoName}>Clubster</Text>
+      <Text style={styles.logoName}>Clubster</Text>
 
-        <TextField
-          inputContainerStyle={styles.textContainer}
-          label="Username"
-          baseColor="rgba(255, 255, 255, 0.75)"
-          tintColor='#59cbbd'
-          textColor="rgba(255, 255, 255, 1)"
-          onChangeText={username => this.setState({ username })}
-          returnKeyType='next'
-        />
+      <Text style={styles.labelUser}>Username</Text>
 
-        <TextField
-          inputContainerStyle={styles.textContainer}
-          label="Password"
-          baseColor="rgba(255, 255, 255, 0.75)"
-          tintColor='#59cbbd'
-          textColor="rgba(255, 255, 255, 1)"
-          onChangeText={password => this.setState({ password })}
-          secureTextEntry={true}
-          returnKeyType='none'
-        />
+      <TextField
+        inputContainerStyle={styles.inputUser}
+        /*label="Username"*/
+        baseColor="rgba(255, 255, 255, 0.75)"
+        tintColor='#59cbbd'
+        textColor="rgba(255, 255, 255, 1)"
+        onChangeText={username => this.setState({ username })}
+        returnKeyType='next'
+      />
+
+      <Text style={styles.labelUser}>Password</Text>
+
+      <TextField
+        inputContainerStyle={styles.inputUser}
+        /*label="Password"*/
+        baseColor="rgba(255, 255, 255, 0.75)"
+        tintColor='#59cbbd'
+        textColor="rgba(255, 255, 255, 1)"
+        onChangeText={password => this.setState({ password })}
+        secureTextEntry={true}
+        returnKeyType='none'
+      />
 
         <TouchableOpacity style={styles.login} onPress={this.handleLogin.bind(this)}>
           <Text style={styles.loginText}> Log In </Text>
@@ -78,30 +82,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#03A9F4',
+    backgroundColor: '#192879',
     paddingLeft: 60,
     paddingRight: 60
   },
   inputContainer: {
-    marginTop: 10
-  },
-  textContainer: {
-    borderBottomColor: 'rgba(255, 255, 255, 0.9)',
-    borderBottomWidth: 1
+    marginTop: 30
   },
   login: {
     alignSelf: 'center',
-    backgroundColor: '#59cbbd',
-    height: 60,
-    width: WIDTH / 2,
-    marginTop: 15,
+    backgroundColor: '#50D9EA',
+    height: 50,
+    width: 290,
+    marginTop: 30,
     justifyContent: 'center',
-    marginBottom: 6
+    marginBottom: 6,
+    borderRadius: 8
   },
   loginText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 28,
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: "bold",
     textAlign: 'center'
   },
   signupText: {
@@ -117,5 +118,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     color: '#fff',
     marginLeft: 40
+  },
+  inputUser: {
+    width: 300,
+    height: 50,
+    borderColor: '#43519D',
+    backgroundColor: '#283786',
+    borderRadius: 8
+  },
+  labelUser: {
+    fontSize: 20,
+    color: '#414E93',
+    marginBottom: 8
   }
+
 });
