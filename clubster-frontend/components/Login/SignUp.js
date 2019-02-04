@@ -64,6 +64,7 @@ export default class SignUp extends Component {
 
 
         <Text style={styles.labelUser}>Email</Text>
+
         <TextField
           inputContainerStyle={styles.inputUser}
           /*label="Email"*/

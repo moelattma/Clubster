@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, Dimensions, Keyboard, AsyncStorage } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, Dimensions, Keyboard, AsyncStorage, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { TextField } from 'react-native-material-textfield';
 import axios from 'axios';
@@ -43,6 +43,9 @@ export default class Login extends React.Component {
 
       <Text style={styles.labelUser}>Username</Text>
 
+
+
+
       <TextField
         inputContainerStyle={styles.inputUser}
         /*label="Username"*/
@@ -53,7 +56,7 @@ export default class Login extends React.Component {
         returnKeyType='next'
       />
 
-      <Text style={styles.labelUser}>Password</Text>
+    <Text style={styles.labelUser}>Password</Text>
 
       <TextField
         inputContainerStyle={styles.inputUser}
@@ -121,7 +124,7 @@ const styles = StyleSheet.create({
   },
   inputUser: {
     width: 300,
-    height: 50,
+    height: 60,
     borderColor: '#43519D',
     backgroundColor: '#283786',
     borderRadius: 8
