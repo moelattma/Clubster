@@ -12,8 +12,8 @@ const mongoose = require('mongoose');
 
 
 exports.getUserClubs = (req, res) => {
-	User.findOne({ _id: req.user._id }).select("arrayClubsAdmin arrayClubsMember").populate({ path: 'arrayClubsAdmin', populate: { path: 'imageId' }, select: "imageId name _id" })
-		.populate({ path: 'arrayClubsMember', populate: { path: 'imageId' }, select: 'imageId name _id' }).then((user) => {
+	User.findOne({ _id: req.user._id }).select("arrayClubsAdmin arrayClubsMember").populate({ path: 'arrayClubsAdmin', populate: { path: 'imageId' }, select: "imageId name _id acronym" })
+		.populate({ path: 'arrayClubsMember', populate: { path: 'imageId' }, select: 'imageId name _id acronym' }).then((user) => {
 			return res.status(201).json({ 'arrayClubsAdmin': user.arrayClubsAdmin, 'arrayClubsMember': user.arrayClubsMember });	//populates array that user is admin of
 		}).catch((err) => console.log(err));
 };

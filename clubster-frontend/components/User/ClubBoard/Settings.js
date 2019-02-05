@@ -107,7 +107,7 @@ export default class Settings extends Component {
                     <View>
                         <TouchableOpacity onPressIn={() => this.useLibraryHandler()}><Image style={{ height: 200, width: WIDTH }} source={{ uri: this.state.img }} /></TouchableOpacity>
                         <View style={{ flex: 1, flexDirection: 'column' }}>
-                            <Text style={{ fontWeight: 'bold', fontSize: 35, textAlign: 'center' }}>
+                            <Text style={{ fontWeight: 'bold', fontSize: 35, backgroundColor: 'lightblue', textAlign: 'center' }}>
                                 {this.state.name} ({this.state.acronym})
                             </Text>
                             <Text style={{ fontWeight: 'bold', fontSize: 20, textAlign: 'center' }}>President:</Text>
@@ -208,6 +208,12 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    joinButton: {
+        justifyContent: 'center',
+        backgroundColor: '#59cbbd',
+        height: 60,
+        width: WIDTH / 3
     },
     // buttonRow: {
     //     flex: 1,

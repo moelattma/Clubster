@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Image, StyleSheet, Button, Text, View, Dimensions, TouchableWithoutFeedback, FlatList } from 'react-native';
+import { Image, StyleSheet, Button, Text, TouchableOpacity, View, Dimensions, TouchableWithoutFeedback, FlatList } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
@@ -43,7 +43,9 @@ class ShowClubs extends Component {
   constructor() { // Initializing state
     super();
     this.state = {
-      clubs: [],
+      clubsAdmin: [],
+      clubsMember: [],
+      tappedAdmin: false,
       show: false,
       img: 'https://facebook.github.io/react/logo-og.png',
       loading: false
@@ -65,6 +67,13 @@ class ShowClubs extends Component {
             name="search" size={32} color={'black'}
             onPress={() => screenProps.clubPage.navigate('ClubSearch')} />
         </View>
+      ),
+      headerTop: (
+        <View style={{ marginTop: 43 }}>
+          <FontAwesome
+            name="plus" size={32} color={'black'}
+            onPress={() => navigation.navigate('CreateClub')} />
+        </View>
       )
     };
   };
@@ -75,27 +84,30 @@ class ShowClubs extends Component {
 
   getUserClubs = () => {
     this.setState({ loading: true });
-    var getClubs = [];
+    var getClubsAdmin = [];
+    var getClubsMember = [];
     axios.get("http://localhost:3000/api/organizations").then((response) => {
       const { arrayClubsAdmin, arrayClubsMember } = response.data;
-      getClubs = arrayClubsAdmin;
+      getClubsAdmin = arrayClubsAdmin;
 
       for (var i = 0; i < arrayClubsAdmin.length; i++) {
-        getClubs[i].imageUrl = 'data:image/jpeg;base64,' + converter.encode(arrayClubsAdmin[i].imageId.img.data.data);
-        getClubs[i].isAdmin = true;
+        getClubsAdmin[i].imageUrl = 'data:image/jpeg;base64,' + converter.encode(arrayClubsAdmin[i].imageId.img.data.data);
+        getClubsAdmin[i].isAdmin = true;
       };
 
       for (var i = 0; i < arrayClubsMember.length; i++) {
         var club = arrayClubsMember[i];
         club.imageUrl = 'data:image/jpeg;base64,' + converter.encode(club.imageId.img.data.data);
         club.isAdmin = false;
-        getClubs.push(club);
+        getClubsMember.push(club);
       };
-      if(getClubs.length % 2 != 0)
-        getClubs.push({ empty: true });
-      this.setState({ clubs: getClubs, loading: false }); // Setting up state variable
+      if (getClubsAdmin.length % 2 != 0)
+        getClubsAdmin.push({ empty: true });
+      if (getClubsMember.length % 2 != 0)
+        getClubsMember.push({ empty: true });
+      this.setState({ clubsAdmin: getClubsAdmin, clubsMember: getClubsMember, loading: false }); // Setting up state variable
     }).catch((err) => {
-      console.log(err); 
+      console.log(err);
       this.setState({ loading: false });
     });
   };
@@ -105,31 +117,71 @@ class ShowClubs extends Component {
   };
 
   _renderItem = ({ item }) => {
-    if(item.empty) {
+    if (item.empty) {
       return <View style={[styles.eventContainer, { backgroundColor: 'transparent' }]} />;
     }
     return (
-      <TouchableWithoutFeedback onPressIn={() => this.navigateUser(item)}>
+      <TouchableWithoutFeedback onPressIn={() => this.navigateUser(item)} style={{ flex: 1, flexDirection: 'row' }}>
         <View style={styles.eventContainer} >
           <Image style={styles.imageHeight} source={{ uri: item.imageUrl }} />
           <Text allowFontScaling numberOfLines={1} style={styles.eventTitle}> {item.name} </Text>
           <Text style={{ position: 'absolute', right: 0, bottom: 0, fontSize: 12, fontWeight: 'bold' }}> {(item.isAdmin ? 'A' : 'M')} </Text>
+          <Text style={{ position: 'absolute', left: 0, bottom: 0, fontSize: 12, fontWeight: 'bold' }}> {item.acronym} </Text>
         </View>
       </TouchableWithoutFeedback>
     );
   }
 
+   _renderBanner = () => {
+     return (
+       <View style={{ flex: 1, flexDirection: 'row', position: 'absolute', top: 0, alignSelf: 'center', justifyContent: 'space-evenly', backgroundColor: 'darkblue', width: WIDTH}}>
+           <TouchableOpacity onPressIn={() => this.toggleAdmin(false)} style={styles.button} >
+             <Text style={styles.itemText}> Member </Text>
+           </TouchableOpacity>
+           <TouchableOpacity onPressIn={() => this.toggleAdmin(true)} style={styles.button} >
+            <Text style={styles.itemText}> Admin </Text>
+           </TouchableOpacity>
+       </View>
+     );
+   }
+
+  toggleAdmin = (tapped) => {
+    this.setState({ tappedAdmin: tapped });
+  }
+
+  _renderClubs = () => {
+    if (this.state.tappedAdmin) {
+      return (
+        <FlatList
+          data={this.state.clubsAdmin.slice(0, 40)}
+          renderItem={this._renderItem}
+          horizontal={false}
+          numColumns={2}
+          keyExtractor={club => club._id}
+          refreshing={this.state.loading}
+          onRefresh={this.getUserClubs}
+        />)
+    }
+    else {
+      return (
+        <FlatList
+          data={this.state.clubsMember.slice(0, 40)}
+          renderItem={this._renderItem}
+          horizontal={false}
+          numColumns={2}
+          keyExtractor={club => club._id}
+          refreshing={this.state.loading}
+          onRefresh={this.getUserClubs}
+        />)
+    }
+  }
+
   render() {
     return (
-      <FlatList
-        data={this.state.clubs.slice(0, 40)}
-        renderItem={this._renderItem}
-        horizontal={false}
-        numColumns={2}
-        keyExtractor={club => club._id}
-        refreshing={this.state.loading}
-        onRefresh={this.getUserClubs}
-      />
+      <View>
+        {this._renderClubs()}
+        {this._renderBanner()}
+      </View>
     );
   }
 }
@@ -147,7 +199,7 @@ class CreateClub extends Component {
       aspect: [4, 3],
       base64: false,
     });
-    if(result.cancelled)
+    if (result.cancelled)
       return;
     const data = new FormData();
     data.append('name', this._formRef.getValue().Name);
@@ -176,7 +228,7 @@ class CreateClub extends Component {
 const ClubPageNavigator = createStackNavigator(
   {
     ShowClubs: { screen: ShowClubs },
-    CreateClub: { screen: CreateClub }
+    CreateClub: { screen: CreateClub },
   },
   {
     navigationOptions: {
@@ -189,8 +241,9 @@ const styles = StyleSheet.create({
   eventContainer: {
     flex: 1,
     height: CLUB_HEIGHT,
+    position: 'relative',
     backgroundColor: '#59cbbd',
-    marginTop: 10,
+    marginTop: 90,
     marginRight: 4,
     marginLeft: 4
   },

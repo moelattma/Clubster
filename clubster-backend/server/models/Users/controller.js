@@ -46,10 +46,12 @@ exports.createUser = (req, res) => {
 exports.findUser = (req, res) => {
   const { username, password } = req.body;
   User.findOne({ username: username }).then((user) => {
+    // checks if both username and password are valid
     if (!user) {
       return res.status(400).json({ 'Error': 'User does not exist' });
     } else {
       bcrypt.compare(password, user.password).then(same => {
+        // both password and username are correct and sends success token to server
         if (same) {
           const payload = { _id: user._id, name: user.name, avatar: user.avatar };
           let token = jwt.sign(payload, 'secret', { expiresIn: 3600 }, (err, token) => {
