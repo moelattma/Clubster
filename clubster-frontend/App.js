@@ -1,13 +1,23 @@
 import React, { Component } from 'react';
-import { AppRegistry } from 'react-native';
+import { AppRegistry, StyleSheet } from 'react-native';
+import {SafeAreaView} from 'react-navigation';
 import { AdminNavigator, LoginNavigator } from './components/router';
 
 export default class Clubster extends Component {
   render() {
     return (
-      <LoginNavigator/>
+      <SafeAreaView forceInset={{ bottom: 'never' }} style={styles.SafeAreaView}>
+        <LoginNavigator/>
+      </SafeAreaView>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  SafeAreaView: {
+      flex: 1,
+      backgroundColor: '#E0E0E0'
+  }
+})
 
 AppRegistry.registerComponent('Clubster', () => Clubster);
