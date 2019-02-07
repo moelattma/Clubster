@@ -130,7 +130,6 @@ export default class Settings extends Component {
                         </TouchableOpacity>
                         </View>
 
-
                         <View style={styles.mainContainer}>
                             <Text style={styles.nameText}>
                                 {this.state.name}
@@ -155,8 +154,8 @@ export default class Settings extends Component {
                     <View>
                         <Modal isVisible={this.state.show} onRequestClose={this.hide}>
                             <View style={styles.modalView}>
-                                <View style={{ marginLeft: 320, padding: 5 }}>
-                                    <TouchableOpacity onPress={this._hideModal} >
+                                <View>
+                                    <TouchableOpacity onPress={this._hideModal}>
                                         <MaterialIcons
                                             name="cancel"
                                             size={30}
@@ -236,14 +235,13 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         alignSelf: 'stretch',
         backgroundColor: 'white',
-        margin: 2,
-        padding: 5,
+        margin: 5,
+        padding: 10,
         borderRadius: 5
     },
     textInArea: {
         alignSelf: 'stretch',
         backgroundColor: 'white',
-        margin: 5,
     },
     descriptionArea: {
         justifyContent: 'flex-start'
@@ -251,7 +249,8 @@ const styles = StyleSheet.create({
     modalView: {
         backgroundColor: "#fff",
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        borderRadius: 10,
     },
     joinButton: {
         justifyContent: 'center',

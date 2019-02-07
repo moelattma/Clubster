@@ -179,11 +179,24 @@ export default class Profile extends Component {
                         />
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.avatar} onPress={() => this.changePicture()}><Image style={styles.imageAvatar} source={{ uri: this.state.img }} /></TouchableOpacity>
-                <Text style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 70, fontSize: 20, color: 'black', fontWeight: 'bold' }}> {this.state.name} </Text>
-                <Text style={{ flexDirection: 'row', alignSelf: 'center', fontSize: 20, color: 'black', fontWeight: 'bold' }}> {this.state.major}</Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
-                    <Text style={{ textAlign: 'center' }}>{this.state.description}</Text>
+                <TouchableOpacity style={styles.avatar} 
+                onPress={() => this.changePicture()}>
+                    <Image style={styles.imageAvatar} 
+                    source={{ uri: this.state.img }} />
+                </TouchableOpacity>
+                <Text style={{ flexDirection: 'row', alignSelf: 'center', 
+                    marginTop: 70, fontSize: 20, color: 'black', fontWeight: 'bold' }}>
+                     {this.state.name} 
+                </Text>
+                <Text style={{ flexDirection: 'row', alignSelf: 'center',
+                     fontSize: 20, color: 'black', fontWeight: 'bold' }}> 
+                     {this.state.major}
+                </Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap',
+                 justifyContent: 'center' }}>
+                    <Text style={{ textAlign: 'center' }}>
+                        {this.state.description}
+                    </Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
