@@ -41,14 +41,11 @@ export default class Login extends React.Component {
 
       <Text style={styles.logoName}>Clubster</Text>
 
-      <Text style={styles.labelUser}>Username</Text>
-
-
 
 
       <TextField
         inputContainerStyle={styles.inputUser}
-        /*label="Username"*/
+        label="Username"
         baseColor="rgba(255, 255, 255, 0.75)"
         tintColor='#59cbbd'
         textColor="rgba(255, 255, 255, 1)"
@@ -56,11 +53,11 @@ export default class Login extends React.Component {
         returnKeyType='next'
       />
 
-    <Text style={styles.labelUser}>Password</Text>
+
 
       <TextField
         inputContainerStyle={styles.inputUser}
-        /*label="Password"*/
+        label="Password"
         baseColor="rgba(255, 255, 255, 0.75)"
         tintColor='#59cbbd'
         textColor="rgba(255, 255, 255, 1)"
@@ -104,7 +101,7 @@ const styles = StyleSheet.create({
   },
   loginText: {
     color: '#FFFFFF',
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "bold",
     textAlign: 'center'
   },
@@ -125,14 +122,14 @@ const styles = StyleSheet.create({
   inputUser: {
     width: 300,
     height: 60,
-    borderColor: '#43519D',
-    backgroundColor: '#283786',
-    borderRadius: 8
+
+    borderRadius: 8,
+    fontSize: 50
   },
   labelUser: {
     fontSize: 20,
     color: '#414E93',
     marginBottom: 8
-  }
+  },
 
 });

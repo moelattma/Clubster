@@ -62,12 +62,9 @@ export default class SignUp extends Component {
           Register for Clubster
         </Text>
 
-
-        <Text style={styles.labelUser}>Email</Text>
-
         <TextField
           inputContainerStyle={styles.inputUser}
-          /*label="Email"*/
+          label="Email"
           baseColor="rgba(255, 255, 255, 0.75)"
           tintColor='#59cbbd'
           textColor="rgba(255, 255, 255, 1)"
@@ -76,10 +73,10 @@ export default class SignUp extends Component {
           returnKeyType='next'
           error={errors.email}
         />
-        <Text style={styles.labelUser}>Username</Text>
+
         <TextField
           inputContainerStyle={styles.inputUser}
-          /*label="Username"*/
+          label="Username"
           baseColor="rgba(255, 255, 255, 0.75)"
           tintColor='#59cbbd'
           maxLength={12}
@@ -88,11 +85,9 @@ export default class SignUp extends Component {
           returnKeyType='next'
           error={errors.username} />
 
-        <Text style={styles.labelUser}>Name</Text>
-
         <TextField
           inputContainerStyle={styles.inputUser}
-          //label="Name"
+          label="Name"
           baseColor="rgba(255, 255, 255, 0.75)"
           tintColor='#59cbbd'
           maxLength={20}
@@ -100,10 +95,10 @@ export default class SignUp extends Component {
           onChangeText={name => this.setState({ name })}
           returnKeyType='next'
           error={errors.name} />
-        <Text style={styles.labelUser}>Password</Text>
+
         <TextField
           inputContainerStyle={styles.inputUser}
-          //label="Password"
+          label="Password"
           baseColor="rgba(255, 255, 255, 0.75)"
           tintColor='#59cbbd'
           maxLength={14}
@@ -112,10 +107,10 @@ export default class SignUp extends Component {
           returnKeyType='next'
           secureTextEntry={true}
           error={errors.password} />
-        <Text style={styles.labelUser}>Confirm password</Text>
+
         <TextField
           inputContainerStyle={styles.inputUser}
-          //label="Confirm password"
+          label="Confirm password"
           baseColor="rgba(255, 255, 255, 0.75)"
           tintColor='#59cbbd'
           maxLength={14}
@@ -186,9 +181,7 @@ const styles = StyleSheet.create({
   },
   inputUser: {
     width: 300,
-    height: 50,
-    borderColor: '#43519D',
-    backgroundColor: '#283786',
+    height: 60,
     borderRadius: 8
   },
   labelUser: {
