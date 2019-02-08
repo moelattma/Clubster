@@ -116,8 +116,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontStyle: 'italic',
     justifyContent: 'center',
-    color: '#fff',
-    marginLeft: 40
+    color: '#fff' 
   },
   inputUser: {
     width: 300,

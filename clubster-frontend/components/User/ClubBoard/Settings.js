@@ -7,7 +7,7 @@ import converter from 'base64-arraybuffer';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
+const { WIDTH, HEIGHT } = Dimensions.get('window');
 
 export default class Settings extends Component {
     constructor() {
@@ -105,34 +105,57 @@ export default class Settings extends Component {
             <View>
                 <View>
                     <View>
-                        <TouchableOpacity onPressIn={() => this.useLibraryHandler()}><Image style={{ height: 200, width: WIDTH }} source={{ uri: this.state.img }} /></TouchableOpacity>
-                        <View style={{ flex: 1, flexDirection: 'column' }}>
-                            <Text style={{ fontWeight: 'bold', fontSize: 35, textAlign: 'center' }}>
-                                {this.state.name} ({this.state.acronym})
-                            </Text>
-                            <Text style={{ fontWeight: 'bold', fontSize: 20, textAlign: 'center' }}>President:</Text>
-                            <Text style={{ textAlign: 'center' }}>{this.state.president}</Text>
-                            <Text style={{ fontWeight: 'bold', fontSize: 20, textAlign: 'center' }}>Purpose:</Text>
-                            <Text style={{ textAlign: 'center' }}>{this.state.purpose}</Text>
-                            <Text style={{ fontWeight: 'bold', fontSize: 20, textAlign: 'center' }}>Description (include location):</Text>
-                            <Text style={{ textAlign: 'center' }}>{this.state.description}</Text>
-                        </View>
-                    </View>
-
-                    {/* MODAL */}
-                    <View>
-                        <TouchableOpacity style={{ marginTop: 320, marginLeft: 372 }} onPress={this._showModal} >
+                        <TouchableOpacity style={ styles.editButton} 
+                            onPress={this._showModal} >
                             <FontAwesome
                                 name="edit"
                                 size={35}
                                 color={'black'}
                             />
                         </TouchableOpacity>
+                        <TouchableOpacity onPressIn={() => this.useLibraryHandler()}>
+                            <Image style={{ height: 200, width: WIDTH }} 
+                                source={{ uri: this.state.img }} />
+                        </TouchableOpacity>
 
+                        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                        <TouchableOpacity style={styles.button}>
+                            <Text style={styles.buttonText}> About </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.button}>
+                            <Text style={styles.buttonText}> Photos </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.button}>
+                            <Text style={styles.buttonText}> Members </Text>
+                        </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.mainContainer}>
+                            <Text style={styles.nameText}>
+                                {this.state.name}
+                            </Text>
+                            <Text style={styles.subText}>
+                                President:
+                            </Text>
+                            <Text style={{ marginLeft: 10, marginBottom: 7 }}>
+                                {this.state.president}
+                            </Text>
+                            <Text style={styles.subText}>
+                                Purpose/ description:
+                            </Text>
+                            <Text style={{ marginLeft: 10, marginBottom: 7 }}>
+                                {this.state.purpose}
+                            </Text>
+                        </View>
+                    </View>
+
+
+                    {/*---------- MODAL  ---------------*/}
+                    <View>
                         <Modal isVisible={this.state.show} onRequestClose={this.hide}>
                             <View style={styles.modalView}>
-                                <View style={{ marginLeft: 320, padding: 5 }}>
-                                    <TouchableOpacity onPress={this._hideModal} >
+                                <View>
+                                    <TouchableOpacity onPress={this._hideModal}>
                                         <MaterialIcons
                                             name="cancel"
                                             size={30}
@@ -145,16 +168,20 @@ export default class Settings extends Component {
                                         Edit Club Information
                                 </Text>
                                     <View style={styles.textInAreaContainer}>
-                                        <TextInput style={styles.textInArea} label='Name' underlineColorAndroid="transparent" onChangeText={(name) => this.setState({ name })} value={this.state.name} />
+                                        <TextInput placeholder='club name/ acronym'
+                                         style={styles.textInArea}
+                                         label='Name' underlineColorAndroid="transparent"
+                                          onChangeText={(name) => this.setState({ name })} 
+                                          value={this.state.name} />
                                     </View>
+                                    
                                     <View style={styles.textInAreaContainer}>
-                                        <TextInput style={styles.textInArea} label='Acronym' underlineColorAndroid="transparent" onChangeText={(acronym) => this.setState({ acronym })} value={this.state.acronym} />
-                                    </View>
-                                    <View style={styles.textInAreaContainer}>
-                                        <TextInput style={styles.textInArea} label='Purpose' underlineColorAndroid="transparent" multiline={true} numberOfLines={3} onChangeText={(purpose) => this.setState({ purpose })} value={this.state.purpose} />
-                                    </View>
-                                    <View style={styles.textInAreaContainer}>
-                                        <TextInput style={styles.descriptionArea} lable='Description' underlineColorAndroid="transparent" multiline={true} numberOfLines={6} onChangeText={(description) => this.setState({ description })} value={this.state.description} />
+                                        <TextInput placeholder='purpose/ description'
+                                        style={styles.textInArea} 
+                                        label='Purpose' underlineColorAndroid="transparent"
+                                         multiline={true} numberOfLines={3} 
+                                         onChangeText={(purpose) => this.setState({ purpose })} 
+                                         value={this.state.purpose} />
                                     </View>
                                     <View >
                                         <View>
@@ -175,46 +202,77 @@ export default class Settings extends Component {
 }
 
 const styles = StyleSheet.create({
-
+    mainContainer: {
+    width: WIDTH / 2,
+        flexDirection: 'column'
+    },
     screen: {
         paddingVertical: 20,
         paddingHorizontal: 5,
     },
-
+    editButton:{
+        alignSelf: 'flex-end',
+        margin: 10
+    },
     pageTitle: {
         justifyContent: 'center',
         fontSize: 30,
         fontWeight: 'bold'
     },
-
+    nameText:{
+        fontWeight: '600', 
+        fontSize: 25, 
+        margin: 10
+    },
+    subText:{ 
+        fontWeight: '500', 
+        fontSize: 20,
+        marginLeft: 10,
+        marginBottom: 5
+    },
     textInAreaContainer: {
         borderColor: 'lightgrey',
         borderWidth: 1,
-        //padding: 1,
         alignSelf: 'stretch',
         backgroundColor: 'white',
-        margin: 2
+        margin: 5,
+        padding: 10,
+        borderRadius: 5
     },
     textInArea: {
-        // alignSelf: 'stretch',
-        // backgroundColor: 'white',
-        // margin: 3
+        alignSelf: 'stretch',
+        backgroundColor: 'white',
     },
     descriptionArea: {
         justifyContent: 'flex-start'
     },
-
     modalView: {
         backgroundColor: "#fff",
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        borderRadius: 10,
     },
-    // buttonRow: {
-    //     flex: 1,
-    //     flexDirection: 'row',
-    //     justifyContent: 'space-between'
-    // },
-    // buttonContainer: {
-    //     flex: 0.5
-    // }
+    joinButton: {
+        justifyContent: 'center',
+        backgroundColor: '#59cbbd',
+        height: 60,
+        width: WIDTH / 3
+    },
+    button:{
+        backgroundColor: '#E0E0E0',
+        borderRadius: 20,
+        borderWidth: 1.5,
+        borderColor: '#338293',
+        margin: 10,
+        width: '27%',
+    },
+    buttonText:{
+        color: '#338293',
+        textAlign: 'center',
+        marginLeft: 10,
+        marginRight: 10,
+        marginTop: 10,
+        marginBottom: 10,
+        fontFamily: 'Helvetica',
+    },
 });

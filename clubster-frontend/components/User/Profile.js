@@ -17,9 +17,6 @@ export default class Profile extends Component {
             img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC',
             major: '',
             hobbies: '',
-            facebook: '',
-            instagram: '',
-            linkedIn: '',
             description: '',
             errors: {}
         }
@@ -121,7 +118,7 @@ export default class Profile extends Component {
             base64: false,
         });
         this.setState({ result });
-    };
+    };  
 
     componentWillMount() {
         axios.get('http://localhost:3000/api/profile').then((response) => {
@@ -129,11 +126,6 @@ export default class Profile extends Component {
             const _profile = _data.profile;
             if (_profile) {
                 var _hobbies = (_profile.hobbies == null ? [] : _profile.hobbies);
-                this.setState({
-                    major: _profile.major, description: _profile.description,
-                    hobbies: _hobbies.join(', '), facebook: _profile.social.facebook, linkedIn: _profile.social.linkedin,
-                    instagram: _profile.social.instagram, img: 'data:image/jpeg;base64,' + converter.encode(_profile.image.img.data.data)
-                });
             }
             this.setState({ name: _data.name });
         });
@@ -187,11 +179,24 @@ export default class Profile extends Component {
                         />
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.avatar} onPress={() => this.changePicture()}><Image style={styles.imageAvatar} source={{ uri: this.state.img }} /></TouchableOpacity>
-                <Text style={{ flexDirection: 'row', alignSelf: 'center', marginTop: 70, fontSize: 20, color: 'black', fontWeight: 'bold' }}> {this.state.name} </Text>
-                <Text style={{ flexDirection: 'row', alignSelf: 'center', fontSize: 20, color: 'black', fontWeight: 'bold' }}> {this.state.major}</Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
-                    <Text style={{ textAlign: 'center' }}>{this.state.description}</Text>
+                <TouchableOpacity style={styles.avatar} 
+                onPress={() => this.changePicture()}>
+                    <Image style={styles.imageAvatar} 
+                    source={{ uri: this.state.img }} />
+                </TouchableOpacity>
+                <Text style={{ flexDirection: 'row', alignSelf: 'center', 
+                    marginTop: 70, fontSize: 20, color: 'black', fontWeight: 'bold' }}>
+                     {this.state.name} 
+                </Text>
+                <Text style={{ flexDirection: 'row', alignSelf: 'center',
+                     fontSize: 20, color: 'black', fontWeight: 'bold' }}> 
+                     {this.state.major}
+                </Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap',
+                 justifyContent: 'center' }}>
+                    <Text style={{ textAlign: 'center' }}>
+                        {this.state.description}
+                    </Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
@@ -204,12 +209,6 @@ export default class Profile extends Component {
                 <TouchableOpacity style={styles.button} onPress={this.handlePhotoAction.bind(this)}>
                     <Text style={styles.buttonText}> Skills </Text>
                 </TouchableOpacity>
-                </View>
-
-                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                    <SocialIcon type='facebook' onPress={() => this.link(this.state.facebook)} />
-                    <SocialIcon type='instagram' onPress={() => this.link(this.state.instagram)} />
-                    <SocialIcon type='linkedin' onPress={() => this.link(this.state.linkedIn)} />
                 </View>
 
                 <View style={{ flexDirection: 'column', alignSelf: 'center' }}>
@@ -375,11 +374,13 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: 'black',
         fontWeight: 'bold',
+        fontFamily: 'Helvetica',
     },
     major: {
         fontSize: 14,
         color: 'black',
         fontStyle: 'italic',
+        fontFamily: 'Helvetica',
     },
 
     // CSS for Bar
