@@ -1,3 +1,9 @@
-node_modules/
+clubster-frontend/node_modules/*
+clubster-backend/node_modules/*
+node_modules/*
 .expo/*
 npm-debug.*
+clubster-backend/package-lock.json
+clubster-backend/package.json
+clubster-frontend/package-lock.json
+clubster-frontend/package.json
