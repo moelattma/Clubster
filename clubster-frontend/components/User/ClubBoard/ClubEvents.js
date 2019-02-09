@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Dimensions, Button, FlatList, TouchableWithoutFeedback, StyleSheet, Image } from 'react-native';
+import { View, Dimensions, FlatList, TouchableWithoutFeedback, StyleSheet, Image } from 'react-native';
 import axios from 'axios';
 import t from 'tcomb-form-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -7,8 +7,10 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { createStackNavigator } from 'react-navigation';
 import tx from 'tcomb-additional-types';
 import { ImagePicker, Permissions, Constants } from 'expo';
+import { Font, AppLoading } from "expo";
 const Form = t.form.Form;
 import converter from 'base64-arraybuffer';
+import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const EVENT_WIDTH = WIDTH * 9 / 10;
@@ -75,7 +77,11 @@ class ShowEvents extends Component {
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    await Font.loadAsync({
+      Roboto: require("native-base/Fonts/Roboto.ttf"),
+      Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
+    });
     this.willFocus = this.props.navigation.addListener('willFocus', () => {
       this.getClubEvents();
     });
@@ -126,17 +132,37 @@ class ShowEvents extends Component {
       url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC';
 
     return (
-      <View style={styles.eventCard}>
-          <Image source = {{uri:url}} style = {styles.eventContainer} />
-          <View style = {{flexDirection: 'row'}}>
-            <Text style={styles.eventTitle}> {item.name} </Text>
-            <Text style = {styles.eventTitle2}>{item.date}</Text>
-          </View>
-          <View style = {{flexDirection: 'row'}}>
-            <Text style={styles.eventTitle}> {item.description} </Text>
-          </View>
-          { item.going.indexOf(this.state.idOfUser) > -1 ? <FontAwesome name="star" size={24} color={'black'} style={{ position: 'absolute', bottom: 5, right: 5 }} onPress={() => this._handleGoing(item)} /> : <FontAwesome name="star" size={24} color={'white'} style={{ position: 'absolute', bottom: 5, right: 5 }} onPress={() => this._handleGoing(item)} /> }
-        </View>
+      <Card>
+        <CardItem>
+          <Left>
+            <Thumbnail source={{uri:url}} />
+            <Body>
+              <Text>NativeBase</Text>
+              <Text note>GeekyAnts</Text>
+            </Body>
+          </Left>
+        </CardItem>
+        <CardItem cardBody>
+          <Image source={{uri: url}} style={{height: 200, width: null, flex: 1}}/>
+        </CardItem>
+        <CardItem>
+          <Left>
+            <Button transparent>
+              <Icon active name="thumbs-up" />
+              <Text>12 Likes</Text>
+            </Button>
+          </Left>
+          <Body>
+            <Button transparent>
+              <Icon active name="chatbubbles" />
+              <Text>4 Comments</Text>
+            </Button>
+          </Body>
+          <Right>
+            <Text>11h ago</Text>
+          </Right>
+        </CardItem>
+      </Card>
     );
   }
 
