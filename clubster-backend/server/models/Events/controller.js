@@ -128,3 +128,55 @@ exports.addEvent = (req, res) => {
 		});
 	});
 }
+
+exports.getLikes = (req, res) => {
+	const { eventID } = req.params;	// grabs the eventID from url
+	Events.findByIdAndUpdate(eventID).populate('likers').then((event) => {
+		if (!event) {
+			return res.status(400).json({ 'Error': 'No events found' });
+		} else {
+			return res.status(201).json({ event }); 
+		}
+	});
+}
+ 
+exports.addLikeToEvent = (req, res) => {
+	const { eventID } = req.params;	// grabs the eventID from url
+	const idOfAttender = req.user._id;
+	Events.findByIdAndUpdate(eventID).then((event) => {
+		if (event) {
+			var currentLikes = event.likes;	//grabs current array of members(id form)
+			var isInArray = event.currentLikes.some(function (friend) {	//checks if the user is already in event's going array
+				return friend.equals(idOfAttender);
+			});
+			//if user is in array, remove his/her id from the memeber array. Add him if otherwise.
+			if (currentLikes.length != 0 && isInArray) {
+				Events.findOneAndUpdate(
+					{ _id: eventID },
+					{ $pull: { likes: mongoose.Types.ObjectId(idOfAttender) } },
+					{ new: true, upsert: true },
+					function (error, event) {
+						if (error) {
+							console.log(error);
+						} else {
+							return res.status(201).json({ event });
+						}
+					});
+			} else {
+				Events.findOneAndUpdate(
+					{ _id: eventID },
+					{ $push: { likes: mongoose.Types.ObjectId(idOfAttender) } },
+					{ new: true, upsert: true },
+					function (error, event) {
+						if (error) {
+							console.log(error);
+						} else {
+							return res.status(201).json({ event });
+						}
+					});
+			}
+		} else {
+			return res.status(400).json({ 'err': 'err' });	//error
+		}
+	}).catch((err) => console.log(err));
+}

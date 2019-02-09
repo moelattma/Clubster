@@ -34,6 +34,14 @@ const Events = new Schema({
   going: [{
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'users'
+  }],
+  likes: [{
+    type: Schema.Types.ObjectId,   //Specifiers
+    ref: 'users'
+  }],
+  comments: [{
+    type: Schema.Types.ObjectId,   //Specifiers
+    ref: 'users'
   }]
 });
 

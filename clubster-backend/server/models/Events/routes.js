@@ -13,12 +13,20 @@ router.get('/events/:organizationID', passport.authenticate('jwt', {session:fals
 	controller.getEvents(req, res); // If url is of the form ../events/jewiofheifjwof the getEvents method will run
 });
 
+router.get('/events/:eventID/like', passport.authenticate('jwt', {session:false}), (req, res) => {
+	controller.getLikes(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
+});
+
 router.post('/events/:organizationID/new',upload.single('fileData'), passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.addEvent(req, res); // If url is of the form ../events/jewiofheifjwof/new the addEvent method will run
 });
 
 router.post('/events/:eventID', passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.addMemberToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
+});
+
+router.post('/events/:eventID/like', passport.authenticate('jwt', {session:false}), (req, res) => {
+	controller.addLikeToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
 //Export
