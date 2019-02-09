@@ -160,7 +160,7 @@ class CreateClubEvent extends Component {
     await Permissions.askAsync(Permissions.CAMERA);
     await Permissions.askAsync(Permissions.CAMERA_ROLL);
   };
-  
+
   createEvent = async () => {
     const { _id } = this.props.screenProps;
     await this.askPermissionsAsync();
