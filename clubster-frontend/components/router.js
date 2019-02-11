@@ -22,7 +22,7 @@ import ClubProfile from './Clubs/ClubProfile';
 
 import Dashboard from './User/ClubBoard/Settings';
 import ClubEvents from './User/ClubBoard/ClubEvents';
-import Expenses from './User/ClubBoard/Expenses';
+import Chat from './User/ClubBoard/Chat';
 import MemberList from './User/ClubBoard/MembersList';
 
 export const LoginNavigator = createSwitchNavigator(
@@ -122,7 +122,7 @@ export const AdminNavigator = createBottomTabNavigator(
             }
         },
         Expenses: {
-            screen: Expenses,
+            screen: Chat,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
                     <FontAwesome name="money" size={38} color={tintColor} />

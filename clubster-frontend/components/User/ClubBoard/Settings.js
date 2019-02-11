@@ -105,7 +105,7 @@ export default class Settings extends Component {
             <View>
                 <View>
                     <View>
-                        <TouchableOpacity style={ styles.editButton} 
+                        <TouchableOpacity style={ styles.editButton}
                             onPress={this._showModal} >
                             <FontAwesome
                                 name="edit"
@@ -114,7 +114,7 @@ export default class Settings extends Component {
                             />
                         </TouchableOpacity>
                         <TouchableOpacity onPressIn={() => this.useLibraryHandler()}>
-                            <Image style={{ height: 200, width: WIDTH }} 
+                            <Image style={{ height: 200, width: WIDTH }}
                                 source={{ uri: this.state.img }} />
                         </TouchableOpacity>
 
@@ -171,16 +171,16 @@ export default class Settings extends Component {
                                         <TextInput placeholder='club name/ acronym'
                                          style={styles.textInArea}
                                          label='Name' underlineColorAndroid="transparent"
-                                          onChangeText={(name) => this.setState({ name })} 
+                                          onChangeText={(name) => this.setState({ name })}
                                           value={this.state.name} />
                                     </View>
-                                    
+
                                     <View style={styles.textInAreaContainer}>
                                         <TextInput placeholder='purpose/ description'
-                                        style={styles.textInArea} 
+                                        style={styles.textInArea}
                                         label='Purpose' underlineColorAndroid="transparent"
-                                         multiline={true} numberOfLines={3} 
-                                         onChangeText={(purpose) => this.setState({ purpose })} 
+                                         multiline={true} numberOfLines={3}
+                                         onChangeText={(purpose) => this.setState({ purpose })}
                                          value={this.state.purpose} />
                                     </View>
                                     <View >
@@ -220,12 +220,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     nameText:{
-        fontWeight: '600', 
-        fontSize: 25, 
+        fontWeight: '600',
+        fontSize: 25,
         margin: 10
     },
-    subText:{ 
-        fontWeight: '500', 
+    subText:{
+        fontWeight: '500',
         fontSize: 20,
         marginLeft: 10,
         marginBottom: 5
@@ -272,7 +272,6 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         marginRight: 10,
         marginTop: 10,
-        marginBottom: 10,
-        fontFamily: 'Helvetica',
+        marginBottom: 10
     },
 });

@@ -115,15 +115,13 @@ const styles = StyleSheet.create({
     fontSize: 60,
     fontWeight: 'bold',
     fontStyle: 'italic',
-    justifyContent: 'center',
-    color: '#fff' 
+    textAlign: 'center',
+    color: '#fff'
   },
   inputUser: {
     width: 300,
     height: 60,
-
-    borderRadius: 8,
-    fontSize: 50
+    borderRadius: 8
   },
   labelUser: {
     fontSize: 20,

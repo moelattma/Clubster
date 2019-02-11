@@ -4,7 +4,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
 import t from 'tcomb-form-native';
-import { ImagePicker, Permissions } from 'expo';
+import { ImagePicker, Permissions, Font } from 'expo';
 import converter from 'base64-arraybuffer';
 
 import { createStackNavigator } from 'react-navigation';
@@ -78,7 +78,7 @@ class ShowClubs extends Component {
     };
   };
 
-  componentWillMount() {
+  async componentWillMount() {
     this.willFocus = this.props.navigation.addListener('willFocus', () => { this.getUserClubs(); });
   };
 
@@ -259,13 +259,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   button: {
-    backgroundColor: 'lightblue',
-    padding: 12,
-    margin: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 4,
-    borderColor: 'rgba(0, 0, 0, 0.1)',
+    backgroundColor: '#E0E0E0',
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: '#338293',
+    margin: 10,
+    width: '27%'
   },
   modalContent: {
     backgroundColor: 'white',
@@ -309,9 +308,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   itemText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 20
+    textAlign: 'center',
+    marginLeft: 25,
+    marginRight: 25,
+    marginTop: 10,
+    marginBottom: 10
   },
   root: {
     flexDirection: 'row',
