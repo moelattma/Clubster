@@ -12,15 +12,35 @@ const { WIDTH, HEIGHT } = Dimensions.get('window');
 export default class Settings extends Component {
     constructor() {
         super();
+
         this.state = {
             isLoading: true,
-            show: false,
             president: '',
             name: '',
             acronym: '',
             purpose: '',
             description: '',
             img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC',
+        }
+    }
+
+    static navigationOptions = ({ navigation, screenProps }) => {
+        rightHeader = (
+            <TouchableOpacity style={styles.editButton} onPress={() => {
+                navigation.setParams({ showModal: true }); }} >
+                <FontAwesome name="edit" size={35} color={'black'} />
+            </TouchableOpacity>
+        );
+    
+        return {
+            headerLeft: (
+                <View style={{ marginLeft: 13 }}>
+                    <MaterialIcons
+                        name="arrow-back" size={32} color={'white'}
+                        onPress={() => screenProps.clubBoardNav.navigate('HomeNavigation')} />
+                </View>
+            ),
+            headerRight: (screenProps.isAdmin ? rightHeader : null)
         }
     }
 
@@ -41,8 +61,8 @@ export default class Settings extends Component {
             aspect: [4, 3],
             base64: false,
         });
-        if(result.cancelled)
-          return;
+        if (result.cancelled)
+            return;
         const data = new FormData();
         data.append('fileData', {
             uri: result.uri,
@@ -64,6 +84,10 @@ export default class Settings extends Component {
         });
         this.setState({ result });
     };
+
+    componentWillMount() {
+        this.props.navigation.setParams({ showModal: false });
+    }
 
     componentDidMount() {
         const { _id } = this.props.screenProps;
@@ -87,7 +111,7 @@ export default class Settings extends Component {
             purpose: this.state.purpose,
             description: this.state.description
         }).then((response) => {
-            this.setState({ show: false });
+            this.props.navigation.setParams({ showModal: false });
         }).catch((error) => { return; });
     }
 
@@ -98,36 +122,31 @@ export default class Settings extends Component {
     _showModal = () => this.setState({ show: true })
     _hideModal = () => this.setState({ show: false })
 
-
     render() {
-        if(this.state.isLoading) return null;
+        if (this.state.isLoading) return null;
         return (
             <View>
                 <View>
                     <View>
-                        <TouchableOpacity style={ styles.editButton}
-                            onPress={this._showModal} >
-                            <FontAwesome
-                                name="edit"
-                                size={35}
-                                color={'black'}
-                            />
-                        </TouchableOpacity>
+                        {/* {this.props.screenProps.isAdmin ?
+                            <TouchableOpacity style={styles.editButton} onPress={this._showModal} >
+                                <FontAwesome name="edit" size={35} color={'black'} />
+                            </TouchableOpacity> : null} */}
                         <TouchableOpacity onPressIn={() => this.useLibraryHandler()}>
                             <Image style={{ height: 200, width: WIDTH }}
                                 source={{ uri: this.state.img }} />
                         </TouchableOpacity>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                        <TouchableOpacity style={styles.button}>
-                            <Text style={styles.buttonText}> About </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.button}>
-                            <Text style={styles.buttonText}> Photos </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.button}>
-                            <Text style={styles.buttonText}> Members </Text>
-                        </TouchableOpacity>
+                            <TouchableOpacity style={styles.button}>
+                                <Text style={styles.buttonText}> About </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.button}>
+                                <Text style={styles.buttonText}> Photos </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.button}>
+                                <Text style={styles.buttonText}> Members </Text>
+                            </TouchableOpacity>
                         </View>
 
                         <View style={styles.mainContainer}>
@@ -152,10 +171,10 @@ export default class Settings extends Component {
 
                     {/*---------- MODAL  ---------------*/}
                     <View>
-                        <Modal isVisible={this.state.show} onRequestClose={this.hide}>
+                        <Modal isVisible={this.props.navigation.getParam('showModal')} onRequestClose={this.hide}>
                             <View style={styles.modalView}>
                                 <View>
-                                    <TouchableOpacity onPress={this._hideModal}>
+                                    <TouchableOpacity onPress={() => { this.props.navigation.setParams({ showModal: false }) }}>
                                         <MaterialIcons
                                             name="cancel"
                                             size={30}
@@ -169,19 +188,19 @@ export default class Settings extends Component {
                                 </Text>
                                     <View style={styles.textInAreaContainer}>
                                         <TextInput placeholder='club name/ acronym'
-                                         style={styles.textInArea}
-                                         label='Name' underlineColorAndroid="transparent"
-                                          onChangeText={(name) => this.setState({ name })}
-                                          value={this.state.name} />
+                                            style={styles.textInArea}
+                                            label='Name' underlineColorAndroid="transparent"
+                                            onChangeText={(name) => this.setState({ name })}
+                                            value={this.state.name} />
                                     </View>
 
                                     <View style={styles.textInAreaContainer}>
                                         <TextInput placeholder='purpose/ description'
-                                        style={styles.textInArea}
-                                        label='Purpose' underlineColorAndroid="transparent"
-                                         multiline={true} numberOfLines={3}
-                                         onChangeText={(purpose) => this.setState({ purpose })}
-                                         value={this.state.purpose} />
+                                            style={styles.textInArea}
+                                            label='Purpose' underlineColorAndroid="transparent"
+                                            multiline={true} numberOfLines={3}
+                                            onChangeText={(purpose) => this.setState({ purpose })}
+                                            value={this.state.purpose} />
                                     </View>
                                     <View >
                                         <View>
@@ -203,14 +222,14 @@ export default class Settings extends Component {
 
 const styles = StyleSheet.create({
     mainContainer: {
-    width: WIDTH / 2,
+        width: WIDTH / 2,
         flexDirection: 'column'
     },
     screen: {
         paddingVertical: 20,
         paddingHorizontal: 5,
     },
-    editButton:{
+    editButton: {
         alignSelf: 'flex-end',
         margin: 10
     },
@@ -219,12 +238,12 @@ const styles = StyleSheet.create({
         fontSize: 30,
         fontWeight: 'bold'
     },
-    nameText:{
+    nameText: {
         fontWeight: '600',
         fontSize: 25,
         margin: 10
     },
-    subText:{
+    subText: {
         fontWeight: '500',
         fontSize: 20,
         marginLeft: 10,
@@ -258,7 +277,7 @@ const styles = StyleSheet.create({
         height: 60,
         width: WIDTH / 3
     },
-    button:{
+    button: {
         backgroundColor: '#E0E0E0',
         borderRadius: 20,
         borderWidth: 1.5,
@@ -266,7 +285,7 @@ const styles = StyleSheet.create({
         margin: 10,
         width: '27%',
     },
-    buttonText:{
+    buttonText: {
         color: '#338293',
         textAlign: 'center',
         marginLeft: 10,

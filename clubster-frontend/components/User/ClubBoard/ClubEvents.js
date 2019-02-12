@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Dimensions, FlatList, TouchableWithoutFeedback, StyleSheet, Image } from 'react-native';
+import { View, Dimensions, FlatList, TouchableWithoutFeedback, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import axios from 'axios';
 import t from 'tcomb-form-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -50,6 +50,8 @@ class ShowEvents extends Component {
   constructor(props) {
     super(props);
 
+    this._isMounted = false;
+
     this.state = {
       clubEvents: [],
       loading: false,
@@ -78,13 +80,19 @@ class ShowEvents extends Component {
   }
 
   async componentDidMount() {
+    this._isMounted = true;
     await Font.loadAsync({
       Roboto: require("native-base/Fonts/Roboto.ttf"),
       Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
     });
     this.willFocus = this.props.navigation.addListener('willFocus', () => {
-      this.getClubEvents();
+      if (this._isMounted)
+        this.getClubEvents();
     });
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   getClubEvents() {
@@ -92,26 +100,28 @@ class ShowEvents extends Component {
     this.setState({ loading: true })
     axios.get(`http://localhost:3000/api/events/${_id}`)
       .then((response) => {
-        this.setState({ clubEvents: response.data.events, idOfUser: response.data.idOfUser });
+        if (this._isMounted) {
+          this.setState({ clubEvents: response.data.events, idOfUser: response.data.idOfUser });
+          this.setState({ loading: false });
+        }
       });
-    this.setState({ loading: false })
   }
 
   _handleGoing = (item) => {
-    for(var i = 0;i<this.state.clubEvents.length;i++) {
-      if(this.state.clubEvents[i]._id === item._id)
+    for (var i = 0; i < this.state.clubEvents.length; i++) {
+      if (this.state.clubEvents[i]._id === item._id)
         break;
     }
     var clubEvents = this.state.clubEvents;
     var id = this.state.idOfUser;
     axios.post(`http://localhost:3000/api/events/${item._id}`).then((response) => {
       clubEvents[i].going = response.data.event.going;
-      this.setState({clubEvents: clubEvents});
+      this.setState({ clubEvents: clubEvents });
     })
   }
 
   renderButton = (item) => {
-    if(item.going && item.going.indexOf(this.state.idOfUser) > -1) {
+    if (item.going && item.going.indexOf(this.state.idOfUser) > -1) {
       return (
         <FontAwesome
           name="star" size={24} color={'black'} style={{ position: 'absolute', bottom: 5, right: 5 }}
@@ -126,7 +136,7 @@ class ShowEvents extends Component {
 
   _renderItem = ({ item }) => {
     var url;
-    if(item.image)
+    if (item.image)
       url = 'data:image/jpeg;base64,' + converter.encode(item.image.img.data.data);
     else
       url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC';
@@ -135,7 +145,7 @@ class ShowEvents extends Component {
       <Card>
         <CardItem>
           <Left>
-            <Thumbnail source={{uri:url}} />
+            <Thumbnail source={{ uri: url }} />
             <Body>
               <Text>NativeBase</Text>
               <Text note>GeekyAnts</Text>
@@ -143,7 +153,7 @@ class ShowEvents extends Component {
           </Left>
         </CardItem>
         <CardItem cardBody>
-          <Image source={{uri: url}} style={{height: 200, width: null, flex: 1}}/>
+          <Image source={{ uri: url }} style={{ height: 200, width: null, flex: 1 }} />
         </CardItem>
         <CardItem>
           <Left>
@@ -181,7 +191,6 @@ class ShowEvents extends Component {
 }
 
 class CreateClubEvent extends Component {
-
   askPermissionsAsync = async () => {
     await Permissions.askAsync(Permissions.CAMERA);
     await Permissions.askAsync(Permissions.CAMERA_ROLL);
@@ -195,7 +204,7 @@ class CreateClubEvent extends Component {
       aspect: [4, 3],
       base64: false,
     });
-    if(result.cancelled)
+    if (result.cancelled)
       return;
     const data = new FormData();
     data.append('name', this._formRef.getValue().name);
@@ -215,7 +224,8 @@ class CreateClubEvent extends Component {
     return (
       <View style={{ flex: 1 }}>
         <Form type={Event} ref={(ref) => this._formRef = ref} />
-        <Button title="Create this Event!" onPress={() => this.createEvent()} />
+        <TouchableOpacity  style={{ backgroundColor: 'blue', width: WIDTH * 8 / 9, height: 10 }} onPress={() => this.createEvent()} > 
+        </TouchableOpacity>
       </View>
     );
   }

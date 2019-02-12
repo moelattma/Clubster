@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { TextInput,TouchableOpacity, StyleSheet, Text, View, FlatList, ScrollView, Image } from 'react-native';
-import axios from 'axios';
-import converter from 'base64-arraybuffer';
+import { TextInput, StyleSheet, Text, View } from 'react-native';
 import io from "socket.io-client";
 
 export default class Chat extends Component {
@@ -15,7 +13,7 @@ export default class Chat extends Component {
     }
 
     componentDidMount() {
-      this.socket = io(`http://localhost:3000/?id=' + ${this.state.id}`);
+      this.socket = io(`http://localhost:3000/?_id=' + ${this.props.screenProps._id}`);
       this.socket.on('chat message', msg => {
         this.setState({ chatMessages: [...this.state.chatMessages, msg]});
       });

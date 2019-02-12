@@ -273,7 +273,6 @@ const styles = StyleSheet.create({
         marginRight: 25,
         marginTop: 10,
         marginBottom: 10,
-        fontFamily: 'Helvetica',
     },
     header: {
         backgroundColor: "#00BFFF",

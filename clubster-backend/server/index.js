@@ -41,7 +41,7 @@ const port = 3000;
 
 io.sockets.on('connection', socket => {
   console.log("url"+socket.handshake.url);
-  clientId=socket.handshake.query.id;
+  clientId=socket.handshake.query._id;
   console.log("connected clientId:"+clientId);
   console.log('a user connected');
   socket.on("chat message", msg => {

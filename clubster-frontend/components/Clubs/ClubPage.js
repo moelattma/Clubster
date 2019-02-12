@@ -67,13 +67,6 @@ class ShowClubs extends Component {
             name="search" size={32} color={'black'}
             onPress={() => screenProps.clubPage.navigate('ClubSearch')} />
         </View>
-      ),
-      headerTop: (
-        <View style={{ marginTop: 43 }}>
-          <FontAwesome
-            name="plus" size={32} color={'black'}
-            onPress={() => navigation.navigate('CreateClub')} />
-        </View>
       )
     };
   };
@@ -132,18 +125,18 @@ class ShowClubs extends Component {
     );
   }
 
-   _renderBanner = () => {
-     return (
-       <View style={{ flex: 1, flexDirection: 'row', position: 'absolute', top: 0, alignSelf: 'center', justifyContent: 'space-evenly', backgroundColor: 'darkblue', width: WIDTH}}>
-           <TouchableOpacity onPressIn={() => this.toggleAdmin(false)} style={styles.button} >
-             <Text style={styles.itemText}> Member </Text>
-           </TouchableOpacity>
-           <TouchableOpacity onPressIn={() => this.toggleAdmin(true)} style={styles.button} >
-            <Text style={styles.itemText}> Admin </Text>
-           </TouchableOpacity>
-       </View>
-     );
-   }
+  _renderBanner = () => {
+    return (
+      <View style={{ flex: 1, flexDirection: 'row', position: 'absolute', top: 0, alignSelf: 'center', justifyContent: 'space-evenly', backgroundColor: 'darkblue', width: WIDTH }}>
+        <TouchableOpacity onPressIn={() => this.toggleAdmin(false)} style={styles.button} >
+          <Text style={styles.itemText}> Member </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPressIn={() => this.toggleAdmin(true)} style={styles.button} >
+          <Text style={styles.itemText}> Admin </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   toggleAdmin = (tapped) => {
     this.setState({ tappedAdmin: tapped });
