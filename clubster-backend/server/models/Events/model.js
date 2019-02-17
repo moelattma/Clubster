@@ -41,7 +41,7 @@ const Events = new Schema({
   }],
   comments: [{
     type: Schema.Types.ObjectId,   //Specifiers
-    ref: 'users'
+    ref: 'comments'
   }]
 });
 

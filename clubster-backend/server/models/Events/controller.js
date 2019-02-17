@@ -10,6 +10,7 @@ const Expenses = require('../Expenses/model');	//Expenses Schema
 const mongoose = require('mongoose');	//mongoose, library to communicate with backend
 const Img = require('../Images/model');	//image model
 const fs = require('fs');	//file system
+const Comments = require('../Comments/model');
 
 /*
 *	Method to grab all events for an organization. This is used when tapping the events tab.
@@ -135,11 +136,11 @@ exports.getLikes = (req, res) => {
 		if (!event) {
 			return res.status(400).json({ 'Error': 'No events found' });
 		} else {
-			return res.status(201).json({ event }); 
+			return res.status(201).json({ event });
 		}
 	});
 }
- 
+
 exports.addLikeToEvent = (req, res) => {
 	const { eventID } = req.params;	// grabs the eventID from url
 	const idOfAttender = req.user._id;
@@ -179,4 +180,44 @@ exports.addLikeToEvent = (req, res) => {
 			return res.status(400).json({ 'err': 'err' });	//error
 		}
 	}).catch((err) => console.log(err));
+}
+
+exports.getComments = (req, res) => {
+	const { eventID } = req.params;	// grabs id of organization in route URL.
+	//Find the orgnaization with id = organizationID and populate it's array of events along with each event's image.
+	Events.findByIdAndUpdate(eventID).populate({ path: 'comments'}).then((organization) => {
+		if (!organization) {
+			return res.status(400).json({ 'Error': 'No events found' });	//organization is null, DNE
+		} else {
+			return res.status(201).json({ 'comments': organization.comments, idOfUser: req.user._id }); //returns organization's events along with idOfUser
+		}
+	}).catch((err) => console.log(err));
+}
+
+exports.addCommentToEvent = (req, res) => {
+	const { eventID } = req.params;
+	const { text } = req.body;
+	let comment = new Comments({
+  	userID: req.user._id,
+		content: text
+	});
+	comment.save().then((comment) => {
+			if(comment){
+				Events.findOneAndUpdate(
+					{ _id: eventID },
+					{ $push: { comments: comment._id } },
+					{ new: true, upsert: true },
+					function (error, event) {
+						if (error) {
+							console.log(error);
+						} else {
+							return res.status(201).json({ event });
+						}
+					});
+			}
+			else {
+				return res.status(400).json({ 'Error': 'No comments found' });
+			}
+	})
+
 }
