@@ -11,10 +11,11 @@ const Img = require('../Images/model');
 const fs = require('fs');
 
 exports.changeProfile = (req, res) => {
-  var new_img = new Img;
-  new_img.img.data = fs.readFileSync(req.file.path)
-  new_img.img.contentType = 'image/jpeg';
-  new_img.save().then((image) => {
+  const { imageUrl } = req.body;
+  let image = new Img({
+    avatar: imageUrl
+  })
+  image.save().then((image) => {
     Profile.findOne({ user: req.user._id }).then((profile) => {
       if (!profile) {
         return res.status(400).json({ 'err': 'err' });

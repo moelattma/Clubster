@@ -95,20 +95,30 @@ export default class Profile extends Component {
               type: 'multipart/form-data',
               name: "image1.jpg"
           });
-          const uploadConfig = await axios.get('http://localhost:3000/api/upload');
-          const upload = await axios.put(uploadConfig.data.url, file, {
-            headers: {
-              'Content-Type': file.type
-            }
-          });
-          const res = await axios.post('http://localhost:3000/api/profilePhoto', {
-            imageUrl: uploadConfig.data.key
-          });
-          this.setState({img:imageUrl})
+            axios.post('http://localhost:3000/api/profilePhoto', data).then((response) => {
+                this.setState({ img: 'data:image/jpeg;base64,' + converter.encode(response.data.image.img.data.data) });
+            });
         } catch(error) {
           console.log(error);
         }
     };
+
+    arrayBufferToBase64(buffer) {
+        var binary = '';
+        var bytes = [].slice.call(new Uint8Array(buffer));
+        bytes.forEach((b) => binary += String.fromCharCode(b));
+        return window.btoa(binary);
+    };
+
+    useCameraHandler = async () => {
+        await this.askPermissionsAsync();
+        let result = await ImagePicker.launchCameraAsync({
+            allowsEditing: true,
+            aspect: [4, 3],
+            base64: false,
+        });
+        this.setState({ result });
+    };  
 
     componentWillMount() {
         axios.get('http://localhost:3000/api/profile').then((response) => {
@@ -120,6 +130,19 @@ export default class Profile extends Component {
             this.setState({ name: _data.name });
         });
     };
+
+    link = (url) => {
+        if (url == '' || url == null) {
+            return;
+        } else if (url.indexOf('http') > -1) {
+            url = url.replace('http', 'https');
+        }
+        if (url.indexOf('https') == -1) {
+            url = "https://" + url;
+        }
+        Linking.openURL(url);
+    }
+
 
     renderElement = (d, i) => (
         <View key={i}
@@ -156,17 +179,17 @@ export default class Profile extends Component {
                         />
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.avatar}
+                <TouchableOpacity style={styles.avatar} 
                 onPress={() => this.changePicture()}>
-                    <Image style={styles.imageAvatar}
-                    source={{ uri: 'https://s3-us-west-2.amazonaws.com/qwerty-bucket/' + this.state.img}} />
+                    <Image style={styles.imageAvatar} 
+                    source={{ uri: this.state.img }} />
                 </TouchableOpacity>
-                <Text style={{ flexDirection: 'row', alignSelf: 'center',
+                <Text style={{ flexDirection: 'row', alignSelf: 'center', 
                     marginTop: 70, fontSize: 20, color: 'black', fontWeight: 'bold' }}>
-                     {this.state.name}
+                     {this.state.name} 
                 </Text>
                 <Text style={{ flexDirection: 'row', alignSelf: 'center',
-                     fontSize: 20, color: 'black', fontWeight: 'bold' }}>
+                     fontSize: 20, color: 'black', fontWeight: 'bold' }}> 
                      {this.state.major}
                 </Text>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap',

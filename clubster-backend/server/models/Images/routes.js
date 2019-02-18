@@ -7,13 +7,24 @@ const multer = require('multer');
 const router = require('express').Router();
 var upload = multer({ dest: 'uploads/' });
 const Img = require('./model');
-router.post('/img_data', upload.single('fileData'), function(req, res) {
+const AWS = require('aws-sdk');
+const {accessKeyId,secretAccessKey} = require('../../../config');
+const uuid = require('uuid/v1');
+const s3 = new AWS.S3({
+  accessKeyId: accessKeyId,
+  secretAccessKey: secretAccessKey
+});
 
-    var new_img = new Img;
-    new_img.img.data = fs.readFileSync(req.file.path)
-    new_img.img.contentType = 'image/jpeg';
-    new_img.save();
-    return res.status(201).json({ message: 'New image added to the db!' });
+router.post('/img_data', upload.single('fileData'), function(req, res) {
+  s3.getSignedUrl(
+    'putObject',
+    {
+      Bucket: 'qwerty-bucket',
+      ContentType: 'image/jpeg',
+      Key: key
+    },
+    (err, url) => res.send({ key, url })
+  );
 });
 
 

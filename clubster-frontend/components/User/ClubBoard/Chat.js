@@ -3,13 +3,15 @@ import { TextInput,TouchableOpacity, StyleSheet, Text, View, FlatList, ScrollVie
 import axios from 'axios';
 import converter from 'base64-arraybuffer';
 import io from "socket.io-client";
+import { GiftedChat } from 'react-native-gifted-chat';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 export default class Chat extends Component {
     constructor(props) {
       super(props);
       this.state = {
         chatMessage: '',
-        chatMessages: [],
+        messages: [],
         id:'1'
       };
     }
@@ -17,33 +19,29 @@ export default class Chat extends Component {
     componentDidMount() {
       this.socket = io(`http://localhost:3000/?id=' + ${this.state.id}`);
       this.socket.on('chat message', msg => {
-        this.setState({ chatMessages: [...this.state.chatMessages, msg]});
+        this.setState({ messages: [...this.state.messages, msg]});
       });
     }
 
-    submitChatMessage() {
-      this.socket.emit("chat message", this.state.chatMessage);
-      this.setState({chatMessage: ''});
+    submitChatMessage(messages = []) {
+      this.socket.emit("chat message", messages[0]);
+      this.setState(previousState => ({
+        messages: GiftedChat.append(previousState.messages, messages),
+      }))
     }
 
 
     render() {
-      const chatMessages = this.state.chatMessages.map((chatMessage,i) => (
-        <Text key= {i}>{chatMessage}</Text>
-      ));
       return (
-        <View style={styles.container}>
-        <TextInput
-          style = {{height:40, borderWidth:2}}
-          autoCorrect = {false}
-          value = {this.state.chatMessage}
-          onSubmitEditing = {() => this.submitChatMessage()}
-          onChangeText = {chatMessage => {
-            this.setState({chatMessage});
-          }}
+        <KeyboardAwareScrollView contentContainerStyle={styles.container} scrollEnabled={true} enableOnAndroid={true}>
+          <GiftedChat
+            messages={this.state.messages}
+            onSend={messages => this.submitChatMessage(messages)}
+            user={{
+              _id: 1,
+            }}
           />
-          {chatMessages}
-        </View>
+        </KeyboardAwareScrollView>
       );
   }
 }
