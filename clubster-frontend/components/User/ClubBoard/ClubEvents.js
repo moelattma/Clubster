@@ -110,17 +110,39 @@ class ShowEvents extends Component {
     })
   }
 
-  renderButton = (item) => {
+  goToEventProfile = () => {
+    console.log("here"); // Mo: handle navigation
+  }
+
+  renderGoing = (item) => {
     if(item.going && item.going.indexOf(this.state.idOfUser) > -1) {
       return (
-        <FontAwesome
-          name="star" size={24} color={'black'} style={{ position: 'absolute', bottom: 5, right: 5 }}
-          onPress={() => this._handleGoing(item)} />
+        <Button transparent>
+          <Icon active name="star" />
+          <Text>{item.going.length} going</Text>
+        </Button>
       )
     } else {
-      <FontAwesome
-        name="star" size={24} color={'white'} style={{ position: 'absolute', bottom: 5, right: 5 }}
-        onPress={() => this._handleGoing(item)} />
+      <Button transparent>
+          <Icon name="star" />
+          <Text>{item.going.length} going</Text>
+        </Button>
+    }
+  }
+
+  renderLikes = ({ item }) => {
+    if(item.likers && item.likers.indexOf(this.state.idOfUser) > -1) {
+      return (
+        <Button transparent>
+          <Icon active name="thumbs-up" />
+          <Text>{item.likers.length} likes</Text>
+        </Button>
+      ) 
+    } else {
+      <Button transparent>
+        <Icon name="thumbs-up" />
+        <Text>{item.likes.length} likes</Text>
+      </Button>
     }
   }
 
@@ -147,19 +169,28 @@ class ShowEvents extends Component {
         </CardItem>
         <CardItem>
           <Left>
-            <Button transparent>
-              <Icon active name="thumbs-up" />
-              <Text>12 Likes</Text>
+            <Text>Title: {item.name}</Text>
+            <Text>Date: {item.date}</Text>
+            <Text>Location: {item.location}</Text>
+          </Left>
+          <Right>
+            <Button bordered onPress = {()=>{goToEventProfile()}}>
+              <Text>Know More</Text>
             </Button>
+          </Right>
+        </CardItem>
+        <CardItem>
+          <Left>
+            {renderLikes()}
           </Left>
           <Body>
             <Button transparent>
               <Icon active name="chatbubbles" />
-              <Text>4 Comments</Text>
+              <Text>{item.comments.length} comments</Text>
             </Button>
           </Body>
           <Right>
-            <Text>11h ago</Text>
+            {renderGoing()}
           </Right>
         </CardItem>
       </Card>

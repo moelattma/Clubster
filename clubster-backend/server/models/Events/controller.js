@@ -18,7 +18,7 @@ const Comments = require('../Comments/model');
 exports.getEvents = (req, res) => {
 	const { organizationID } = req.params;	// grabs id of organization in route URL.
 	//Find the orgnaization with id = organizationID and populate it's array of events along with each event's image.
-	Organization.findByIdAndUpdate(organizationID).populate({ path: 'events', populate: { path: 'image' } }).then((organization) => {
+	Organization.findByIdAndUpdate(organizationID).populate({ path: 'events', populate: { path: 'image going comments likers' } }).then((organization) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No events found' });	//organization is null, DNE
 		} else {
