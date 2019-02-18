@@ -79,7 +79,6 @@ class ShowEvents extends Component {
   }
 
   async componentDidMount() {
-    console.log('hi');
     await Font.loadAsync({
       Roboto: require("native-base/Fonts/Roboto.ttf"),
       Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
@@ -149,7 +148,7 @@ class ShowEvents extends Component {
   _renderItem = ({ item }) => {
     var url;
     if (item.image)
-      url = 'data:image/jpeg;base64,' + converter.encode(item.image.img.data.data);
+      url = 'https://s3-us-west-1.amazonaws.com/qwerty-bucket/' + item.image;
     else
       url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC';
 
@@ -241,25 +240,45 @@ class CreateClubEvent extends Component {
   createEvent = async () => {
     const { _id } = this.props.screenProps;
     await this.askPermissionsAsync();
-    let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
-      base64: false,
-    });
-    if (result.cancelled)
-      return;
-    const data = new FormData();
-    data.append('name', this._formRef.getValue().name);
-    data.append('time', this._formRef.getValue().time);
-    data.append('description', this._formRef.getValue().description);
-    data.append('location', this._formRef.getValue().location);
-    data.append('fileData', {
-      uri: result.uri,
-      type: 'multipart/form-data',
-      name: "image1.jpg"
-    });
-    await axios.post(`http://localhost:3000/api/events/${_id}/new`, data);
-    this.props.navigation.navigate('ShowEvents');
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+          allowsEditing: true,
+          aspect: [4, 3],
+          base64: false,
+      });
+      if(result.cancelled)
+        return;
+      const data = new FormData();
+      const key = `${v1()}.jpeg`;
+      const file = {
+          uri: result.uri,
+          type: 'image/jpeg',
+          name: key
+      };
+      const options = {
+        keyPrefix: '5c4d565f7b98cc025466c7ed/',
+        bucket: 'qwerty-bucket',
+        region: 'us-west-1',
+        accessKey:accessKeyId,
+        secretKey: secretAccessKey,
+        successActionStatus:201
+      }
+      var imageURL;
+      const fileUpload = await RNS3.put(file,options).then((response)=> {
+         console.log(response.body.postResponse.key);
+         imageURL = response.body.postResponse.key;
+      }).catch((err) => {console.log(err)});
+      data.append('name', this._formRef.getValue().name);
+      data.append('time', this._formRef.getValue().time);
+      data.append('description', this._formRef.getValue().description);
+      data.append('location', this._formRef.getValue().location);
+      data.append('imageURL', imageURL);
+      console.log(fileUpload);
+      await axios.post(`http://localhost:3000/api/events/${_id}/new`, data);
+      this.props.navigation.navigate('ShowEvents');
+    } catch(error) {
+      console.log(error);
+    }
   }
 
   render() {
@@ -267,7 +286,6 @@ class CreateClubEvent extends Component {
       <View style={{ flex: 1 }}>
         <Form type={Event} ref={(ref) => this._formRef = ref} />
         <TouchableOpacity onPress={() => this.createEvent()} style={{ height: 10, width: 60, backgroundColor: 'blue' }}>
-
         </TouchableOpacity>
       </View>
     );

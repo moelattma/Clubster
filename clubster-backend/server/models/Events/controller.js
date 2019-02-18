@@ -6,7 +6,6 @@
 // Import
 const Events = require('./model');	//events schema
 const Organization = require('../Organizations/model');	//organizations schema
-const Expenses = require('../Expenses/model');	//Expenses Schema
 const mongoose = require('mongoose');	//mongoose, library to communicate with backend
 const Img = require('../Images/model');	//image model
 const fs = require('fs');	//file system

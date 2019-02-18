@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { AsyncStorage, View, ScrollView, StyleSheet, Text, Image, TouchableOpacity, Button, TextInput, Linking } from 'react-native';
-import { ImagePicker, Permissions, Constants } from 'expo';
+import { Font, ImagePicker, Permissions, Constants } from 'expo';
 import axios from 'axios';
 import Modal from "react-native-modal";
 import converter from 'base64-arraybuffer';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { SocialIcon } from 'react-native-elements'
-
+import ImageGrid from './Cards/ImageGrid';
 export default class Profile extends Component {
     constructor() {
         super();
@@ -80,37 +80,53 @@ export default class Profile extends Component {
     }
 
     useLibraryHandler = async () => {
-        await this.askPermissionsAsync();
-        try {
-          let result = await ImagePicker.launchImageLibraryAsync({
-              allowsEditing: true,
-              aspect: [4, 3],
-              base64: false,
-          });
-          if(result.cancelled)
-            return;
-          const data = new FormData();
-          data.append('fileData', {
-              uri: result.uri,
-              type: 'multipart/form-data',
-              name: "image1.jpg"
-          });
-          const uploadConfig = await axios.get('http://localhost:3000/api/upload');
-          const upload = await axios.put(uploadConfig.data.url, file, {
-            headers: {
-              'Content-Type': file.type
-            }
-          });
-          const res = await axios.post('http://localhost:3000/api/profilePhoto', {
-            imageUrl: uploadConfig.data.key
-          });
-          this.setState({img:imageUrl})
-        } catch(error) {
-          console.log(error);
+      await this.askPermissionsAsync();
+      try {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            aspect: [4, 3],
+            base64: false,
+        });
+        if(result.cancelled)
+          return;
+        const key = `${v1()}.jpeg`;
+        const file = {
+            uri: result.uri,
+            type: 'image/jpeg',
+            name: key
+        };
+        const options = {
+          keyPrefix: '5c4d565f7b98cc025466c7ed/',
+          bucket: 'qwerty-bucket',
+          region: 'us-west-1',
+          accessKey:accessKeyId,
+          secretKey: secretAccessKey,
+          successActionStatus:201
         }
+        var imageURL;
+        const fileUpload = await RNS3.put(file,options).then((response)=> {
+           console.log(response.body.postResponse.key);
+           imageURL = response.body.postResponse.key;
+        }).catch((err) => {console.log(err)});
+        const data = {
+          imageURL: imageURL
+        }
+        console.log(fileUpload);
+        axios.post('http://localhost:3000/api/profilePhoto', data).then((response) => {
+            console.log(response);
+            this.setState({img: 'https://s3-us-west-1.amazonaws.com/qwerty-bucket/' + response.data.profile.image});
+            console.log(this.state.img);
+        });
+      } catch(error) {
+        console.log(error);
+      }
     };
 
-    componentWillMount() {
+    async componentWillMount() {
+      await Font.loadAsync({
+        Roboto: require("native-base/Fonts/Roboto.ttf"),
+        Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
+      });
         axios.get('http://localhost:3000/api/profile').then((response) => {
             const _data = response.data;
             const _profile = _data.profile;
@@ -159,7 +175,7 @@ export default class Profile extends Component {
                 <TouchableOpacity style={styles.avatar}
                 onPress={() => this.changePicture()}>
                     <Image style={styles.imageAvatar}
-                    source={{ uri: 'https://s3-us-west-2.amazonaws.com/qwerty-bucket/' + this.state.img}} />
+                    source={{ uri: this.state.img}} />
                 </TouchableOpacity>
                 <Text style={{ flexDirection: 'row', alignSelf: 'center',
                     marginTop: 70, fontSize: 20, color: 'black', fontWeight: 'bold' }}>
@@ -187,14 +203,9 @@ export default class Profile extends Component {
                     <Text style={styles.buttonText}> Skills </Text>
                 </TouchableOpacity>
                 </View>
-
                 <View style={{ flexDirection: 'column', alignSelf: 'center' }}>
-                    <ScrollView horizontal={true} containerStyle={{ flexDirection: "column", flexWrap: "wrap", alignItems: "flex-start" }}>
-                        {this.state.hobbies.length != 0 ? this.state.hobbies.split(', ').map((d, i) => this.renderElement(d, i)) : null}
-                    </ScrollView>
+                    <ImageGrid />
                 </View>
-
-
                 {/* MODAL  */}
                 <View style={{ flex: 1 }}>
 
@@ -250,7 +261,7 @@ const styles = StyleSheet.create({
         marginRight: 25,
         marginTop: 10,
         marginBottom: 10,
-        fontFamily: 'Helvetica',
+        fontFamily: 'Roboto',
     },
     header: {
         backgroundColor: "#00BFFF",
@@ -351,13 +362,13 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: 'black',
         fontWeight: 'bold',
-        fontFamily: 'Helvetica',
+        fontFamily: 'Roboto',
     },
     major: {
         fontSize: 14,
         color: 'black',
         fontStyle: 'italic',
-        fontFamily: 'Helvetica',
+        fontFamily: 'Roboto',
     },
 
     // CSS for Bar

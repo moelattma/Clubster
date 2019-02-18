@@ -11,26 +11,12 @@ const Img = require('../Images/model');
 const fs = require('fs');
 
 exports.changeProfile = (req, res) => {
-  const { imageUrl } = req.body;
-  let image = new Img({
-    avatar: imageUrl
-  })
-  image.save().then((image) => {
-    Profile.findOne({ user: req.user._id }).then((profile) => {
-      if (!profile) {
-        return res.status(400).json({ 'err': 'err' });
-      } else {
-        Profile.findOneAndUpdate(
-          { user: req.user._id },
-          { $set: { "image": mongoose.Types.ObjectId(image._id) } }
-        ).then((profile) => {
-          User.findOneAndUpdate({ _id: req.user._id },
-            { $set: { "avatar": mongoose.Types.ObjectId(image._id) } }).then(() => {
-              return res.status(201).json({ 'profile': profile, 'image': new_img });
-            });
-        });
-      }
-    });
+  Profile.findOneAndUpdate({ user: req.user._id },{ $set: {"image": req.body.imageURL} }).then((profile) => {
+    if(!profile) {
+      return res.status(404).json({ 'Error': 'error' });
+    } else {
+      return res.status(201).json({'profile': profile});
+    }
   });
 };
 
@@ -71,7 +57,7 @@ exports.profileSubmission = (req, res) => {
 };
 
 exports.retrieveProfile = (req, res) => {
-  Profile.findOne({ user: req.user._id }).populate('image').then((profile) => {
+  Profile.findOne({ user: req.user._id }).then((profile) => {
     return res.status(201).json({ 'profile': profile, 'name': req.user.name });
   });
 };

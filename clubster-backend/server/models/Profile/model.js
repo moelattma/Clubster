@@ -23,8 +23,7 @@ const Profile = new Schema({
     type: String,
   },
   image: {
-    type: Schema.Types.ObjectId,
-    ref: 'images'
+    type: String
   },
   hobbies: {
     type: [String],
