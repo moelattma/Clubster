@@ -20,12 +20,22 @@ const Events = new Schema({
     type: String
   },
   date: {
+    type: Date
+  },
+  location: {
     type: String
+  },
+  time: {
+    type:String
   },
   description: {
     type: String,
     trim: true,
     unique: true
+  },
+  host: {
+    type: Schema.Types.ObjectId,   //Specifiers
+    ref: 'users'
   },
   image: {
     type: Schema.Types.ObjectId,   //Specifiers
@@ -35,7 +45,7 @@ const Events = new Schema({
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'users'
   }],
-  likes: [{
+  likers: [{
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'users'
   }],

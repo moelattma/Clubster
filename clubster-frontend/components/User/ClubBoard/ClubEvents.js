@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Dimensions, FlatList, TouchableWithoutFeedback, StyleSheet, Image } from 'react-native';
+import { View, Dimensions, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import axios from 'axios';
 import t from 'tcomb-form-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -11,6 +11,7 @@ import { Font, AppLoading } from "expo";
 const Form = t.form.Form;
 import converter from 'base64-arraybuffer';
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
+import EventProfile from './EventProfile';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const EVENT_WIDTH = WIDTH * 9 / 10;
@@ -19,8 +20,8 @@ const EVENT_HEIGHT = HEIGHT * 3 / 7;
 const Event = t.struct({
   name: t.String,
   description: t.String,
-  date: t.String,
-  expense: tx.Number.Decimal
+  location: t.String,
+  time: t.String
 });
 
 export default class ClubEvents extends Component {
@@ -78,6 +79,7 @@ class ShowEvents extends Component {
   }
 
   async componentDidMount() {
+    console.log('hi');
     await Font.loadAsync({
       Roboto: require("native-base/Fonts/Roboto.ttf"),
       Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
@@ -85,6 +87,7 @@ class ShowEvents extends Component {
     this.willFocus = this.props.navigation.addListener('willFocus', () => {
       this.getClubEvents();
     });
+    this.getClubEvents();
   }
 
   getClubEvents() {
@@ -98,57 +101,54 @@ class ShowEvents extends Component {
   }
 
   _handleGoing = (item) => {
-    for(var i = 0;i<this.state.clubEvents.length;i++) {
-      if(this.state.clubEvents[i]._id === item._id)
+    for (var i = 0; i < this.state.clubEvents.length; i++) {
+      if (this.state.clubEvents[i]._id === item._id)
         break;
     }
     var clubEvents = this.state.clubEvents;
     var id = this.state.idOfUser;
     axios.post(`http://localhost:3000/api/events/${item._id}`).then((response) => {
       clubEvents[i].going = response.data.event.going;
-      this.setState({clubEvents: clubEvents});
+      this.setState({ clubEvents: clubEvents });
     })
   }
 
-  goToEventProfile = () => {
-    console.log("here"); // Mo: handle navigation
-  }
 
-  renderGoing = (item) => {
-    if(item.going && item.going.indexOf(this.state.idOfUser) > -1) {
-      return (
-        <Button transparent>
-          <Icon active name="star" />
-          <Text>{item.going.length} going</Text>
-        </Button>
-      )
-    } else {
-      <Button transparent>
-          <Icon name="star" />
-          <Text>{item.going.length} going</Text>
-        </Button>
-    }
-  }
+  // renderGoing = (item) => {
+  //   if (item.going && item.going.indexOf(this.state.idOfUser) > -1) {
+  //     return (
+  //       <Button transparent>
+  //         <Icon active name="star" />
+  //         <Text>{item.going.length} going</Text>
+  //       </Button>
+  //     )
+  //   } else {
+  //     <Button transparent>
+  //       <Icon name="star" />
+  //       <Text>{item.going.length} going</Text>
+  //     </Button>
+  //   }
+  // }
 
-  renderLikes = ({ item }) => {
-    if(item.likers && item.likers.indexOf(this.state.idOfUser) > -1) {
-      return (
-        <Button transparent>
-          <Icon active name="thumbs-up" />
-          <Text>{item.likers.length} likes</Text>
-        </Button>
-      ) 
-    } else {
-      <Button transparent>
-        <Icon name="thumbs-up" />
-        <Text>{item.likes.length} likes</Text>
-      </Button>
-    }
-  }
+  // renderLikes(item) {
+  //   if (item.likers && item.likers.indexOf(this.state.idOfUser) > -1) {
+  //     return (
+  //       <Button transparent>
+  //         <Icon active name="thumbs-up" />
+  //         <Text>{item.likers.length} likes</Text>
+  //       </Button>
+  //     )
+  //   } else {
+  //     <Button transparent>
+  //       <Icon name="thumbs-up" />
+  //       <Text>{item.likers.length} likes</Text>
+  //     </Button>
+  //   }
+  // }
 
   _renderItem = ({ item }) => {
     var url;
-    if(item.image)
+    if (item.image)
       url = 'data:image/jpeg;base64,' + converter.encode(item.image.img.data.data);
     else
       url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC';
@@ -157,7 +157,7 @@ class ShowEvents extends Component {
       <Card>
         <CardItem>
           <Left>
-            <Thumbnail source={{uri:url}} />
+            <Thumbnail source={{ uri: url }} />
             <Body>
               <Text>NativeBase</Text>
               <Text note>GeekyAnts</Text>
@@ -165,7 +165,7 @@ class ShowEvents extends Component {
           </Left>
         </CardItem>
         <CardItem cardBody>
-          <Image source={{uri: url}} style={{height: 200, width: null, flex: 1}}/>
+          <Image source={{ uri: url }} style={{ height: 200, width: null, flex: 1 }} />
         </CardItem>
         <CardItem>
           <Left>
@@ -174,14 +174,24 @@ class ShowEvents extends Component {
             <Text>Location: {item.location}</Text>
           </Left>
           <Right>
-            <Button bordered onPress = {()=>{goToEventProfile()}}>
+            <Button bordered onPress={() => this.props.navigation.navigate('EventProfile', { eventID: item._id })}>
               <Text>Know More</Text>
             </Button>
           </Right>
         </CardItem>
         <CardItem>
           <Left>
-            {renderLikes()}
+            {
+              item.likers && item.likers.indexOf(this.state.idOfUser) > -1 ?
+                <Button transparent>
+                  <Icon active name="thumbs-up" />
+                  <Text>{item.likers.length} likes</Text>
+                </Button> :
+                <Button transparent>
+                  <Icon name="thumbs-up" />
+                  <Text>{item.likers.length} likes</Text>
+                </Button>
+            }
           </Left>
           <Body>
             <Button transparent>
@@ -190,7 +200,17 @@ class ShowEvents extends Component {
             </Button>
           </Body>
           <Right>
-            {renderGoing()}
+            {
+              item.going && item.going.indexOf(this.state.idOfUser) > -1 ?
+                <Button transparent>
+                  <Icon active name="star" />
+                  <Text>{item.going.length} going</Text>
+                </Button> :
+                <Button transparent>
+                  <Icon name="star" />
+                  <Text>{item.going.length} going</Text>
+                </Button>
+            }
           </Right>
         </CardItem>
       </Card>
@@ -226,13 +246,13 @@ class CreateClubEvent extends Component {
       aspect: [4, 3],
       base64: false,
     });
-    if(result.cancelled)
+    if (result.cancelled)
       return;
     const data = new FormData();
     data.append('name', this._formRef.getValue().name);
-    data.append('date', this._formRef.getValue().date);
+    data.append('time', this._formRef.getValue().time);
     data.append('description', this._formRef.getValue().description);
-    data.append('expense', this._formRef.getValue().expense);
+    data.append('location', this._formRef.getValue().location);
     data.append('fileData', {
       uri: result.uri,
       type: 'multipart/form-data',
@@ -246,7 +266,9 @@ class CreateClubEvent extends Component {
     return (
       <View style={{ flex: 1 }}>
         <Form type={Event} ref={(ref) => this._formRef = ref} />
-        <Button title="Create this Event!" onPress={() => this.createEvent()} />
+        <TouchableOpacity onPress={() => this.createEvent()} style={{ height: 10, width: 60, backgroundColor: 'blue' }}>
+
+        </TouchableOpacity>
       </View>
     );
   }
@@ -255,7 +277,8 @@ class CreateClubEvent extends Component {
 const ClubEventNavigator = createStackNavigator(
   {
     ShowEvents: { screen: ShowEvents },
-    CreateClubEvent: { screen: CreateClubEvent }
+    CreateClubEvent: { screen: CreateClubEvent },
+    EventProfile: { screen: EventProfile }
   },
   {
     navigationOptions: {
