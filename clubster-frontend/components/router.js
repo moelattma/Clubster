@@ -129,22 +129,6 @@ export const AdminNavigator = createBottomTabNavigator(
                 )
             }
         },
-        MemberList: {
-            screen: MemberList,
-            navigationOptions: {
-                tabBarIcon: ({ tintColor }) => (
-                    <Ionicons name="ios-people" size={46} color={tintColor} />
-                )
-            }
-        },
-        // Settings: {
-        //     screen: Settings,
-        //     navigationOptions: {
-        //         tabBarIcon: ({ tintColor }) => (
-        //             <Ionicons name="ios-settings" size={46} color={tintColor}/>
-        //         )
-        //     }
-        // }
     },
     {
         initialRouteName: 'Dashboard',
