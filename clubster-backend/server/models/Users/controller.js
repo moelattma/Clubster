@@ -9,7 +9,7 @@ const User = require('./model');              //import User Schema
 // const gravatar = require('gravatar');         //import gravatar, helps with profile
 const bcrypt = require('bcrypt');             //bcrypt library is useful for salting, hashing passwords
 const jwt = require('jsonwebtoken');          //jwt is used for making a token for logged in users
-const { secret } = require('../../../config');  //get secret fields for doing CRUD opertions on our database
+const { secret } = require('../../../keys/keys');  //get secret fields for doing CRUD opertions on our database
 
 var numberOfSaltIterations = 12;
 

@@ -12,7 +12,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const passport = require('passport');
-const {databasePassword, databaseUsername} = require('../config')
+const {databasePassword, databaseUsername} = require('../keys/keys');
 const multer = require('multer');
 
 

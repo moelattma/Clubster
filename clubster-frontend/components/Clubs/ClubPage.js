@@ -6,9 +6,10 @@ import axios from 'axios';
 import t from 'tcomb-form-native';
 import { ImagePicker, Permissions, Font } from 'expo';
 import converter from 'base64-arraybuffer';
-
-
+import v1 from 'uuid/v1';
+import {accessKeyId, secretAccessKey} from '../../keys/keys';
 import { createStackNavigator } from 'react-navigation';
+import { RNS3 } from 'react-native-aws3';
 
 const Form = t.form.Form;
 const Organization = t.struct({
@@ -90,20 +91,18 @@ class ShowClubs extends Component {
     axios.get("http://localhost:3000/api/organizations").then((response) => {
       const { arrayClubsAdmin, arrayClubsMember } = response.data;
       getClubsAdmin = arrayClubsAdmin;
-      console.log(getClubsAdmin);
       for (var i = 0; i < arrayClubsAdmin.length; i++) {
-        console.log(getClubsAdmin[i]);
         if (getClubsAdmin[i].image)
-          url = 'https://s3-us-west-1.amazonaws.com/qwerty-bucket/' + item.image;
+          url = 'https://s3.amazonaws.com/clubster-123/' + getClubsAdmin[i].image;
         else
           url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC';
-        getClubsAdmin[i].imageUrl = url;
+        getClubsAdmin[i].image = url;
         getClubsAdmin[i].isAdmin = true;
       };
 
       for (var i = 0; i < arrayClubsMember.length; i++) {
         var club = arrayClubsMember[i];
-        club.imageUrl = url;
+        club.image = url;
         club.isAdmin = false;
         getClubsMember.push(club);
       };
@@ -129,7 +128,7 @@ class ShowClubs extends Component {
     return (
       <TouchableWithoutFeedback onPressIn={() => this.navigateUser(item)} style={{ flex: 1, flexDirection: 'row' }}>
         <View style={styles.eventContainer} >
-          <Image style={styles.imageHeight} source={{ uri: item.imageUrl }} />
+          <Image style={styles.imageHeight} source={{ uri: item.image }} />
           <Text allowFontScaling numberOfLines={1} style={styles.eventTitle}> {item.name} </Text>
           <Text style={{ position: 'absolute', right: 0, bottom: 0, fontSize: 12, fontWeight: 'bold' }}> {(item.isAdmin ? 'A' : 'M')} </Text>
           <Text style={{ position: 'absolute', left: 0, bottom: 0, fontSize: 12, fontWeight: 'bold' }}> {item.acronym} </Text>
@@ -193,6 +192,12 @@ class ShowClubs extends Component {
 }
 
 class CreateClub extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      img: 'https://facebook.github.io/react/logo-og.png',
+    }
+  }
   askPermissionsAsync = async () => {
     await Permissions.askAsync(Permissions.CAMERA);
     await Permissions.askAsync(Permissions.CAMERA_ROLL);
@@ -200,25 +205,48 @@ class CreateClub extends Component {
 
   useLibraryHandler = async () => {
     await this.askPermissionsAsync();
-    let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
-      base64: false,
-    });
-    if (result.cancelled)
-      return;
-    const data = new FormData();
-    data.append('name', this._formRef.getValue().Name);
-    data.append('acronym', this._formRef.getValue().Abbreviation);
-    data.append('purpose', this._formRef.getValue().Purpose);
-    data.append('description', this._formRef.getValue().Description);
-    data.append('fileData', {
-      uri: result.uri,
-      type: 'multipart/form-data',
-      name: "image1.jpg"
-    });
-    await axios.post('http://localhost:3000/api/organizations/new', data);
-    this.props.navigation.navigate('ShowClubs');
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+          allowsEditing: true,
+          aspect: [4, 3],
+          base64: false,
+      });
+      if(result.cancelled)
+        return;
+      const key = `${v1()}.jpeg`;
+      const file = {
+          uri: result.uri,
+          type: 'image/jpeg',
+          name: key
+      };
+      const options = {
+        keyPrefix: 's3/',
+        bucket: 'clubster-123',
+        region: 'us-east-1',
+        accessKey:accessKeyId,
+        secretKey: secretAccessKey,
+        successActionStatus:201
+      }
+      var imageURL;
+      const fileUpload = await RNS3.put(file,options).then((response)=> {
+         console.log(response.body.postResponse.key);
+         imageURL = response.body.postResponse.key;
+      }).catch((err) => {console.log(err)});
+      const data = new FormData();
+      console.log(fileUpload);
+      data.append('name', this._formRef.getValue().Name);
+      data.append('acronym', this._formRef.getValue().Abbreviation);
+      data.append('purpose', this._formRef.getValue().Purpose);
+      data.append('description', this._formRef.getValue().Description);
+      data.append('imageURL', imageURL);
+      axios.post('http://localhost:3000/api/organizations/new', data).then((response) => {
+          this.setState({img: 'https://s3.console.aws.amazon.com/s3/buckets/clubster-123/' + response.data.image});
+          console.log(this.state.img);
+      });
+      this.props.navigation.navigate('ShowClubs');
+    } catch(error) {
+      console.log(error);
+    };
   };
 
   render() {

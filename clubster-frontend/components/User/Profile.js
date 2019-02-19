@@ -7,6 +7,7 @@ import converter from 'base64-arraybuffer';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { SocialIcon } from 'react-native-elements'
 import ImageGrid from './Cards/ImageGrid';
+import {accessKeyId, secretAccessKey} from '../../keys/keys';
 export default class Profile extends Component {
     constructor() {
         super();
