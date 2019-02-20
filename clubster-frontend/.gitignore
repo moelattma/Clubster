@@ -3,4 +3,5 @@ node_modules/**/*
 npm-debug.*
 package-lock.json
 package.json
+keys
 config.js

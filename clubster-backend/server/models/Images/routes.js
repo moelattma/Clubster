@@ -8,7 +8,7 @@ const router = require('express').Router();
 var upload = multer({ dest: 'uploads/' });
 const Img = require('./model');
 const AWS = require('aws-sdk');
-const {accessKeyId,secretAccessKey} = require('../../../config');
+const {accessKeyId,secretAccessKey} = require('../../../keys/keys');
 const uuid = require('uuid/v1');
 const s3 = new AWS.S3({
   accessKeyId: accessKeyId,

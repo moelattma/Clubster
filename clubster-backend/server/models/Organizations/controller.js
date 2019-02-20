@@ -12,8 +12,8 @@ const mongoose = require('mongoose');
 
 
 exports.getUserClubs = (req, res) => {
-	User.findOne({ _id: req.user._id }).select("arrayClubsAdmin arrayClubsMember").populate({ path: 'arrayClubsAdmin', populate: { path: 'imageId' }, select: "imageId name _id acronym" })
-		.populate({ path: 'arrayClubsMember', populate: { path: 'imageId' }, select: 'imageId name _id acronym' }).then((user) => {
+	User.findOne({ _id: req.user._id }).select("arrayClubsAdmin arrayClubsMember").populate({ path: 'arrayClubsAdmin', select: "image name _id acronym" })
+		.populate({ path: 'arrayClubsMember', select: 'image name _id acronym' }).then((user) => {
 			return res.status(201).json({ 'arrayClubsAdmin': user.arrayClubsAdmin, 'arrayClubsMember': user.arrayClubsMember });	//populates array that user is admin of
 		}).catch((err) => console.log(err));
 };
@@ -82,7 +82,8 @@ exports.addOrg = (req, res) => {
 	// Code to add a new organization to the Mongo Collection
 
 	// Destruct req body
-	const { name, acronym, purpose, description } = req.body;
+	const { name, acronym, purpose, description, imageURL } = req.body;
+	console.log(imageURL);
 	User.findByIdAndUpdate(req.user._id).then((user) => {
 		const president = user.name;
 
@@ -92,10 +93,6 @@ exports.addOrg = (req, res) => {
 				if (organization) {
 					return res.status(400).json({ 'Error': 'Organization already exists' });
 				} else {
-					var new_img = new Img;
-					new_img.img.data = fs.readFileSync(req.file.path)
-					new_img.img.contentType = 'image/jpeg';
-					new_img.save().then((image) => {
 						// Make new organization and save into the Organizations Collection
 						let newOrg = new Organization({
 							name: name,
@@ -104,14 +101,14 @@ exports.addOrg = (req, res) => {
 							admins: [],
 							purpose: purpose,
 							description: description,
-							imageId: image._id
+							image: imageURL
 						});
 
 						newOrg.save().then((organization) => {
 							User.clubAdminPushing(organization._id, user._id);
 							Organization.addAdminToClub(organization._id, req.user._id);
 							if (organization) {
-								Organization.findOne({ _id: organization._id }).populate('imageId').then((newOrganization) => {
+								Organization.findOne({ _id: organization._id }).then((newOrganization) => {
 									if (!newOrganization) {
 										return res.status(400).json({ 'Error': 'No organizations found' });
 									} else {
@@ -120,9 +117,6 @@ exports.addOrg = (req, res) => {
 								});
 							}
 						}).catch((err) => { console.log(err); return res.status(400).json({ 'Error': err }) });
-					}).catch((err) => {
-						console.log(err);
-					});
 					// Push the new user onto the db if successful, else display error
 				}
 			}).catch(err => console.log(err));
