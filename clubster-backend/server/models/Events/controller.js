@@ -17,7 +17,7 @@ const Comments = require('../Comments/model');
 exports.getEvents = (req, res) => {
 	const { organizationID } = req.params;	// grabs id of organization in route URL.
 	//Find the orgnaization with id = organizationID and populate it's array of events along with each event's image.
-	Organization.findByIdAndUpdate(organizationID).populate({ path: 'events', populate: { path: 'image' } }).then((organization) => {
+	Organization.findByIdAndUpdate(organizationID).populate({ path: 'events', populate: { path: 'host' } }).then((organization) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No events found' });	//organization is null, DNE
 		} else {
@@ -76,16 +76,12 @@ exports.addMemberToEvent = (req, res) => {
 */
 exports.addEvent = (req, res) => {
 	const { organizationID } = req.params;	//grab the idOfOrganization whose id = idOfOrganization
-	var { name, date, description, location, time } = req.body;	//grab data from req.body
+	var { name, date, description, location, time, imageURL } = req.body;	//grab data from req.body
 	//Next 4 lines are how to write image info to db. We are going to change this soon. Code is more to memorize
-	var new_img = new Img;
-	new_img.img.data = fs.readFileSync(req.file.path)
-	new_img.img.contentType = 'image/jpeg';
-	//Save image
-	new_img.save().then((image) => {
 		//Find Organization whose id = organizationID
 		Organization.findByIdAndUpdate(organizationID).then((organization) => {
 			if (!organization) {
+				console.log('Hi');
 				return res.status(400).json({ 'Error': 'No such organization exists' }); //DNE, doesnt exist
 			} else {
 				//Create clubEvent document and expense document
@@ -100,14 +96,14 @@ exports.addEvent = (req, res) => {
 					going: [req.user._id],
 					likers: [],
 					comments: [],
-					image: image._id
+					image: imageURL
 				});
 				//write clubEvent to db
 				clubEvent.save().then((event) => {
 					// Add event's id to organization's events array
 					Organization.addEventToClub(organizationID, event._id);
 					// Find the Event whose id = event's id and populate it's image
-					Events.findOne({ _id: event._id }).populate('image').then((event) => {
+					Events.findOne({ _id: event._id }).populate('host').then((event) => {
 						return res.status(201).json({ 'event': event }); //return 201, all good
 					}).catch(err => {
 						return res.status(400).json({ 'Error': err });
@@ -117,7 +113,7 @@ exports.addEvent = (req, res) => {
 				});
 			}
 		});
-	});
+
 }
 
 exports.getLikes = (req, res) => {

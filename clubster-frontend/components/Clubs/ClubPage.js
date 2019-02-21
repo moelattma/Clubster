@@ -112,7 +112,6 @@ class ShowClubs extends Component {
         getClubsMember.push({ empty: true });
       this.setState({ clubsAdmin: getClubsAdmin, clubsMember: getClubsMember, loading: false }); // Setting up state variable
     }).catch((err) => {
-      console.log(err);
       this.setState({ loading: false });
     });
   };
