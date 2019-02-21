@@ -21,12 +21,21 @@ router.get('/events/:eventID/like', passport.authenticate('jwt', {session:false}
 	controller.getLikes(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
+router.get('/events/:eventID/photo', passport.authenticate('jwt', {session:false}), (req, res) => {
+	controller.getPhotos(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
+});
+
+
 router.post('/events/:organizationID/new',upload.single('fileData'), passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.addEvent(req, res); // If url is of the form ../events/jewiofheifjwof/new the addEvent method will run
 });
 
 router.post('/events/:eventID', passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.addMemberToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
+});
+
+router.post('/events/:eventID/photo', passport.authenticate('jwt', {session:false}), (req, res) => {
+	controller.addPhotoToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
 router.post('/events/:eventID/like', passport.authenticate('jwt', {session:false}), (req, res) => {

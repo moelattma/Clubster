@@ -14,6 +14,7 @@ import { RNS3 } from 'react-native-aws3';
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 import CommentCard from '../Cards/CommentCard';
 import InformationCard from '../Cards/InformationCard';
+import ImageGrid from '../Cards/ImageGrid';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 
@@ -81,6 +82,7 @@ export default class EventProfile extends Component {
                 </TouchableWithoutFeedback>
                 <InformationCard eventInfo={eventInfo} />
                 <CommentCard eventID={this.event._id} />
+                <ImageGrid />
             </Container>
         );
     }

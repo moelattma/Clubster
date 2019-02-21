@@ -192,6 +192,18 @@ exports.getComments = (req, res) => {
 	}).catch((err) => console.log(err));
 }
 
+exports.getPhotos = (req, res) => {
+	const { eventID } = req.params;	// grabs id of organization in route URL.
+	//Find the orgnaization with id = organizationID and populate it's array of events along with each event's image.
+	Events.findByIdAndUpdate(eventID).then((event) => {
+		if (!organization) {
+			return res.status(400).json({ 'Error': 'No events found' });	//organization is null, DNE
+		} else {
+			return res.status(201).json({ 'photos': event.photos, idOfUser: req.user._id }); //returns organization's events along with idOfUser
+		}
+	}).catch((err) => console.log(err));
+}
+
 exports.addCommentToEvent = (req, res) => {
 	const { eventID } = req.params;
 	const { text } = req.body;
@@ -217,5 +229,19 @@ exports.addCommentToEvent = (req, res) => {
 				return res.status(400).json({ 'Error': 'No comments found' });
 			}
 	})
+}
 
+exports.addPhotoToEvent = (req, res) => {
+	const { imageURL } = req.body;
+	const { eventID } = req.params;
+	Events.findOneAndUpdate(
+		{ _id: eventID },
+		{ $push: { photos: imageURL } },
+		function (error, event) {
+			if (error) {
+				console.log(error);
+			} else {
+				return res.status(201).json({ 'photos':event.photos });
+			}
+		});
 }

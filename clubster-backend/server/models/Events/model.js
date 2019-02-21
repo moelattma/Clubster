@@ -40,6 +40,9 @@ const Events = new Schema({
   image: {
     type: String
   },
+  photos: [{
+    type:String
+  }],
   going: [{
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'users'

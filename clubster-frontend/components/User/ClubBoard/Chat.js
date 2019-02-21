@@ -23,7 +23,7 @@ export default class Chat extends Component {
         this.setState({ messages: [...this.state.messages, msg]});
       });
       axios.get(`http://localhost:3000/api/conversations/${screenProps._id}`).then((response) => {
-        console.log(this.state.userId);
+        console.log('Hiiii' + response.data);
         this.setState({ messages: response.data.conversation.messages });
         this.setState({ userId: response.data.userId });
         console.log(this.state.userId);

@@ -8,7 +8,7 @@ export default class InformationCard extends Component {
     super(props);
 
     this.state = {
-      
+
     };
   }
 
@@ -17,10 +17,10 @@ export default class InformationCard extends Component {
 
     return (
       <Container>
-        <Content >
+        <Content padder>
           <Card>
             <CardItem header bordered>
-              <Text>Name: {event.name}</Text>             
+              <Text>Name: {event.name}</Text>
             </CardItem>
             <CardItem bordered>
               <Text>Description: {event.description}</Text>
@@ -29,7 +29,7 @@ export default class InformationCard extends Component {
               <Text>Location: {event.location}</Text>
             </CardItem>
             <CardItem bordered>
-              <Text>Date: {event.date}</Text> 
+              <Text>Date: {event.date}</Text>
             </CardItem>
           </Card>
         </Content>
