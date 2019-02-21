@@ -1,6 +1,5 @@
 import React from 'react';
-import { createStackNavigator, createSwitchNavigator } from 'react-navigation';
-import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
+import { createStackNavigator, createSwitchNavigator, createMaterialTopTabNavigator } from 'react-navigation';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -45,13 +44,13 @@ export const ClubsterNavigator = createStackNavigator(
     }
 )
 
-export const HomeNavigator = createMaterialBottomTabNavigator(
+export const HomeNavigator = createMaterialTopTabNavigator(
     {
         Notifications: {
             screen: Notifications,
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }) => (
-                    <MaterialIcons name={focused ? 'notifications' : 'notifications-none'} size={25} color={tintColor} />
+                    <MaterialIcons name={focused ? 'notifications' : 'notifications-none'} size={30} color={tintColor} />
                 )
             }
         },
@@ -59,7 +58,7 @@ export const HomeNavigator = createMaterialBottomTabNavigator(
             screen: ClubsNavigation,
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }) => (
-                    <MaterialCommunityIcons name={focused ? 'home' : 'home-outline'} size={focused ? 27 : 25} color={tintColor} />
+                    <MaterialCommunityIcons name={focused ? 'home' : 'home-outline'} size={30} color={tintColor} />
                 )
             }
         },
@@ -67,24 +66,22 @@ export const HomeNavigator = createMaterialBottomTabNavigator(
             screen: Profile,
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }) => (
-                    <MaterialIcons name={focused ? 'person' : 'person-outline'} size={25} color={tintColor} />
+                    <MaterialIcons name={focused ? 'person' : 'person-outline'} size={30} color={tintColor} />
                 )
             }
         }
     },
-
     {
-        shifting: true,
-        labeled: false,
+        initialRouteName: 'ClubsNavigation',
         swipeEnabled: true,
         animationEnabled: true,
-        activeTintColor: '#59cbbd',
-        inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
-        initialRouteName: 'ClubsNavigation',
+        tabBarPosition: 'bottom',
         backBehavior: 'initialRoute',
-        barStyle: {
-            backgroundColor: 'white',
-            borderStartColor: 'grey',
+        tabBarOptions: {
+            activeTintColor: '#59cbbd',
+            inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
+            showIcon: true,
+            showLabel: false
         }
     }
 );
@@ -103,13 +100,13 @@ export const ClubsNavigator = createStackNavigator(
     }
 );
 
-export const AdminNavigator = createMaterialBottomTabNavigator(
+export const AdminNavigator = createMaterialTopTabNavigator(
     {
         ClubEvents: {
             screen: ClubEvents,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <MaterialIcons name='event' size={25} color={tintColor} />
+                    <MaterialIcons name='event' size={30} color={tintColor} />
                 ),
             }
         },
@@ -117,7 +114,7 @@ export const AdminNavigator = createMaterialBottomTabNavigator(
             screen: Chat,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <MaterialCommunityIcons name='wechat' size={25} color={tintColor} />
+                    <MaterialCommunityIcons name='wechat' size={30} color={tintColor} />
                 ),
             }
         },
@@ -125,34 +122,33 @@ export const AdminNavigator = createMaterialBottomTabNavigator(
             screen: Dashboard,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <MaterialCommunityIcons name='information-variant' size={25} color={tintColor} />
+                    <MaterialCommunityIcons name='information-variant' size={30} color={tintColor} />
                 ),
             }
         },
     },
     {
-        shifting: true,
-        labeled: false,
-        swipeEnabled: true,
-        animationEnabled: false,
-        activeTintColor: '#59cbbd',
-        inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
         initialRouteName: 'ClubEvents',
+        swipeEnabled: true,
+        animationEnabled: true,
+        tabBarPosition: 'bottom',
         backBehavior: 'initialRoute',
-        barStyle: {
-            backgroundColor: 'white',
-            borderStartColor: 'grey',
+        tabBarOptions: {
+            activeTintColor: '#59cbbd',
+            inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
+            showIcon: true,
+            showLabel: false
         }
     }
 );
 
-export const MemberNavigator = createMaterialBottomTabNavigator(
+export const MemberNavigator = createMaterialTopTabNavigator(
     {
         ClubEvents: {
             screen: ClubEvents,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <MaterialIcons name="event" size={25} color={tintColor} />
+                    <MaterialIcons name="event" size={30} color={tintColor} />
                 ),
             }
         },
@@ -160,23 +156,22 @@ export const MemberNavigator = createMaterialBottomTabNavigator(
             screen: Dashboard,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <FontAwesome name="home" size={25} color={tintColor} />
+                    <FontAwesome name="home" size={30} color={tintColor} />
                 )
             }
         }
     },
     {
-        shifting: true,
-        labeled: false,
+        initialRouteName: 'ClubEvents',
         swipeEnabled: true,
         animationEnabled: true,
-        activeTintColor: '#59cbbd',
-        inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
-        initialRouteName: 'ClubEvents',
+        tabBarPosition: 'bottom',
         backBehavior: 'initialRoute',
-        barStyle: {
-            backgroundColor: 'white',
-            borderStartColor: 'grey',
+        tabBarOptions: {
+            activeTintColor: '#59cbbd',
+            inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
+            showIcon: true,
+            showLabel: false
         }
     }
 )

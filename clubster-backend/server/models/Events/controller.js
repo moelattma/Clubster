@@ -26,6 +26,18 @@ exports.getEvents = (req, res) => {
 	}).catch((err) => console.log(err));
 };
 
+exports.changeEventPicture = (req, res) => {
+	const { eventID } = req.params;
+
+	Events.findOneAndUpdate({ _id: eventID },{ $set: {"image": req.body.imageURL} }).then((event) => {
+		if(!event) {
+		  return res.status(404).json({ 'Error': 'error' });
+		} else {
+		  return res.status(201).json({'image': event.image});
+		}
+	  });
+};
+
 /*
 * Method to add a member to an event. This function is called when you tap the star on the event.
 */

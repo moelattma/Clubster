@@ -107,7 +107,7 @@ class ShowEvents extends Component {
       .then((response) => {
         if (this._mounted) {
           this.setState({ clubEvents: response.data.events, idOfUser: response.data.idOfUser });
-          this.setState({ loading: false });
+          this.setState({ loading: false })
         }
       });
   }
@@ -155,7 +155,7 @@ class ShowEvents extends Component {
             </Body>
           </Left>
           <Right>
-            <Button bordered onPress={() => this.props.navigation.navigate('EventProfile', { event })}>
+            <Button bordered onPress={() => this.props.navigation.navigate('EventProfile', { event: item })}>
               <Text>Know More</Text>
             </Button>
           </Right>
@@ -224,17 +224,17 @@ class CreateClubEvent extends Component {
     await this.askPermissionsAsync();
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: true,
-        aspect: [4, 3],
-        base64: false,
+          allowsEditing: true,
+          aspect: [4, 3],
+          base64: false,
       });
-      if (result.cancelled)
+      if(result.cancelled)
         return;
       const key = `${v1()}.jpeg`;
       const file = {
-        uri: result.uri,
-        type: 'image/jpeg',
-        name: key
+          uri: result.uri,
+          type: 'image/jpeg',
+          name: key
       };
       const options = {
         keyPrefix: 's3/',
@@ -242,7 +242,7 @@ class CreateClubEvent extends Component {
         region: 'us-east-1',
         accessKey:accessKeyId,
         secretKey: secretAccessKey,
-        successActionStatus: 201
+        successActionStatus:201
       }
       var imageURL;
       await RNS3.put(file,options).then((response)=> {

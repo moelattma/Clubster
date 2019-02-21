@@ -37,6 +37,9 @@ router.post('/events/:eventID/comment', passport.authenticate('jwt', {session:fa
 	controller.addCommentToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
+router.post('/events/:eventID/changeEventPicture', passport.authenticate('jwt', {session:false}), (req, res) => {
+	controller.changeEventPicture(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
+});
 
 //Export
 module.exports = router;
