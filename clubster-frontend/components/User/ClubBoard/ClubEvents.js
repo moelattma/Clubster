@@ -51,6 +51,8 @@ class ShowEvents extends Component {
   constructor(props) {
     super(props);
 
+    this._mounted = false;
+
     this.state = {
       clubEvents: [],
       loading: false,
@@ -79,14 +81,19 @@ class ShowEvents extends Component {
   }
 
   async componentDidMount() {
+    this._mounted = true;
     await Font.loadAsync({
       Roboto: require("native-base/Fonts/Roboto.ttf"),
       Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
     });
     this.willFocus = this.props.navigation.addListener('willFocus', () => {
-      this.getClubEvents();
+      if (this._mounted)
+        this.getClubEvents();
     });
-    this.getClubEvents();
+  }
+
+  componentWillUnmount() {
+    this._mounted = false;
   }
 
   getClubEvents() {
@@ -94,9 +101,11 @@ class ShowEvents extends Component {
     this.setState({ loading: true })
     axios.get(`http://localhost:3000/api/events/${_id}`)
       .then((response) => {
-        this.setState({ clubEvents: response.data.events, idOfUser: response.data.idOfUser });
+        if (this._mounted) {
+          this.setState({ clubEvents: response.data.events, idOfUser: response.data.idOfUser });
+          this.setState({ loading: false });
+        }
       });
-    this.setState({ loading: false })
   }
 
   _handleGoing = (item) => {
@@ -111,39 +120,6 @@ class ShowEvents extends Component {
       this.setState({ clubEvents: clubEvents });
     })
   }
-
-
-  // renderGoing = (item) => {
-  //   if (item.going && item.going.indexOf(this.state.idOfUser) > -1) {
-  //     return (
-  //       <Button transparent>
-  //         <Icon active name="star" />
-  //         <Text>{item.going.length} going</Text>
-  //       </Button>
-  //     )
-  //   } else {
-  //     <Button transparent>
-  //       <Icon name="star" />
-  //       <Text>{item.going.length} going</Text>
-  //     </Button>
-  //   }
-  // }
-
-  // renderLikes(item) {
-  //   if (item.likers && item.likers.indexOf(this.state.idOfUser) > -1) {
-  //     return (
-  //       <Button transparent>
-  //         <Icon active name="thumbs-up" />
-  //         <Text>{item.likers.length} likes</Text>
-  //       </Button>
-  //     )
-  //   } else {
-  //     <Button transparent>
-  //       <Icon name="thumbs-up" />
-  //       <Text>{item.likers.length} likes</Text>
-  //     </Button>
-  //   }
-  // }
 
   _renderItem = ({ item }) => {
     var url;
@@ -173,7 +149,7 @@ class ShowEvents extends Component {
             <Text>Location: {item.location}</Text>
           </Left>
           <Right>
-            <Button bordered onPress={() => this.props.navigation.navigate('EventProfile', { eventID: item._id })}>
+            <Button bordered onPress={() => this.props.navigation.navigate('EventProfile', { event })}>
               <Text>Know More</Text>
             </Button>
           </Right>
@@ -242,32 +218,32 @@ class CreateClubEvent extends Component {
     await this.askPermissionsAsync();
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
-          allowsEditing: true,
-          aspect: [4, 3],
-          base64: false,
+        allowsEditing: true,
+        aspect: [4, 3],
+        base64: false,
       });
-      if(result.cancelled)
+      if (result.cancelled)
         return;
       const data = new FormData();
       const key = `${v1()}.jpeg`;
       const file = {
-          uri: result.uri,
-          type: 'image/jpeg',
-          name: key
+        uri: result.uri,
+        type: 'image/jpeg',
+        name: key
       };
       const options = {
         keyPrefix: '5c4d565f7b98cc025466c7ed/',
         bucket: 'qwerty-bucket',
         region: 'us-west-1',
-        accessKey:accessKeyId,
+        accessKey: accessKeyId,
         secretKey: secretAccessKey,
-        successActionStatus:201
+        successActionStatus: 201
       }
       var imageURL;
-      const fileUpload = await RNS3.put(file,options).then((response)=> {
-         console.log(response.body.postResponse.key);
-         imageURL = response.body.postResponse.key;
-      }).catch((err) => {console.log(err)});
+      const fileUpload = await RNS3.put(file, options).then((response) => {
+        console.log(response.body.postResponse.key);
+        imageURL = response.body.postResponse.key;
+      }).catch((err) => { console.log(err) });
       data.append('name', this._formRef.getValue().name);
       data.append('time', this._formRef.getValue().time);
       data.append('description', this._formRef.getValue().description);
@@ -276,7 +252,7 @@ class CreateClubEvent extends Component {
       console.log(fileUpload);
       await axios.post(`http://localhost:3000/api/events/${_id}/new`, data);
       this.props.navigation.navigate('ShowEvents');
-    } catch(error) {
+    } catch (error) {
       console.log(error);
     }
   }

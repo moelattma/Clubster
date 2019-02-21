@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.404.0",
+    "aws-sdk": "^2.407.0",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0",
     "bcrypt": "^3.0.4",

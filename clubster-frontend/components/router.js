@@ -1,6 +1,6 @@
-import React from 'react'
-import { createStackNavigator, createBottomTabNavigator, createSwitchNavigator } from 'react-navigation';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import React from 'react';
+import { createStackNavigator, createSwitchNavigator } from 'react-navigation';
+import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -45,46 +45,46 @@ export const ClubsterNavigator = createStackNavigator(
     }
 )
 
-export const HomeNavigator = createBottomTabNavigator(
+export const HomeNavigator = createMaterialBottomTabNavigator(
     {
         Notifications: {
             screen: Notifications,
             navigationOptions: {
-                tabBarIcon: ({ tintColor }) => (
-                    <MaterialIcons name="notifications-none" size={46} color={tintColor} />
+                tabBarIcon: ({ tintColor, focused }) => (
+                    <MaterialIcons name={focused ? 'notifications' : 'notifications-none'} size={25} color={tintColor} />
                 )
             }
         },
         ClubsNavigation: {
             screen: ClubsNavigation,
             navigationOptions: {
-                tabBarIcon: ({ tintColor }) => (
-                    <MaterialCommunityIcons name="home-outline" size={48} color={tintColor} />
+                tabBarIcon: ({ tintColor, focused }) => (
+                    <MaterialCommunityIcons name={focused ? 'home' : 'home-outline'} size={focused ? 27 : 25} color={tintColor} />
                 )
             }
         },
         Profile: {
             screen: Profile,
             navigationOptions: {
-                tabBarIcon: ({ tintColor }) => (
-                    <Ionicons name="ios-person" size={46} color={tintColor} />
+                tabBarIcon: ({ tintColor, focused }) => (
+                    <MaterialIcons name={focused ? 'person' : 'person-outline'} size={25} color={tintColor} />
                 )
             }
         }
     },
 
     {
-        animationEnabled: true,
+        shifting: true,
+        labeled: false,
         swipeEnabled: true,
-        initialRouteName: "ClubsNavigation",
+        animationEnabled: true,
+        activeTintColor: '#59cbbd',
+        inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
+        initialRouteName: 'ClubsNavigation',
         backBehavior: 'initialRoute',
-        tabBarOptions: {
-            activeBackgroundColor: '#03A9F4',
-            inactiveBackgroundColor: '#03A9F4',
-            inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
-            activeTintColor: '#59cbbd',
-            showLabel: false,
-            showIcon: true
+        barStyle: {
+            backgroundColor: 'white',
+            borderStartColor: 'grey',
         }
     }
 );
@@ -103,78 +103,80 @@ export const ClubsNavigator = createStackNavigator(
     }
 );
 
-export const AdminNavigator = createBottomTabNavigator(
+export const AdminNavigator = createMaterialBottomTabNavigator(
     {
+        ClubEvents: {
+            screen: ClubEvents,
+            navigationOptions: {
+                tabBarIcon: ({ tintColor }) => (
+                    <MaterialIcons name='event' size={25} color={tintColor} />
+                ),
+            }
+        },
+        Chat: {
+            screen: Chat,
+            navigationOptions: {
+                tabBarIcon: ({ tintColor }) => (
+                    <MaterialCommunityIcons name='wechat' size={25} color={tintColor} />
+                ),
+            }
+        },
         Dashboard: {
             screen: Dashboard,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <FontAwesome name="home" size={42} color={tintColor} />
-                )
-            }
-        },
-        ClubEvents: {
-            screen: ClubEvents,
-            navigationOptions: {
-                tabBarIcon: ({ tintColor }) => (
-                    <MaterialIcons name="event" size={40} color={tintColor} />
+                    <MaterialCommunityIcons name='information-variant' size={25} color={tintColor} />
                 ),
-            }
-        },
-        Expenses: {
-            screen: Chat,
-            navigationOptions: {
-                tabBarIcon: ({ tintColor }) => (
-                    <FontAwesome name="money" size={38} color={tintColor} />
-                )
             }
         },
     },
     {
-        initialRouteName: 'Dashboard',
-        animationEnabled: true,
+        shifting: true,
+        labeled: false,
         swipeEnabled: true,
-        tabBarOptions: {
-            activeBackgroundColor: '#03A9F4',
-            inactiveBackgroundColor: '#03A9F4',
-            inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
-            activeTintColor: '#59cbbd',
-            showLabel: false,
-            showIcon: true
+        animationEnabled: false,
+        activeTintColor: '#59cbbd',
+        inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
+        initialRouteName: 'ClubEvents',
+        backBehavior: 'initialRoute',
+        barStyle: {
+            backgroundColor: 'white',
+            borderStartColor: 'grey',
         }
     }
 );
 
-export const MemberNavigator = createBottomTabNavigator(
+export const MemberNavigator = createMaterialBottomTabNavigator(
     {
         ClubEvents: {
             screen: ClubEvents,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <MaterialIcons name="event" size={40} color={tintColor} />
+                    <MaterialIcons name="event" size={25} color={tintColor} />
                 ),
             }
         },
-        MemberList: {
-            screen: MemberList,
+        Dashboard: {
+            screen: Dashboard,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <Ionicons name="ios-people" size={46} color={tintColor} />
+                    <FontAwesome name="home" size={25} color={tintColor} />
                 )
             }
         }
     },
     {
-        initialRouteName: 'ClubEvents',
-        animationEnabled: true,
+        shifting: true,
+        labeled: false,
         swipeEnabled: true,
-        tabBarOptions: {
-            activeBackgroundColor: '#03A9F4',
-            inactiveBackgroundColor: '#03A9F4',
-            inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
-            activeTintColor: '#59cbbd',
-            showLabel: false,
-            showIcon: true
+        animationEnabled: true,
+        activeTintColor: '#59cbbd',
+        inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
+        initialRouteName: 'ClubEvents',
+        backBehavior: 'initialRoute',
+        barStyle: {
+            backgroundColor: 'white',
+            borderStartColor: 'grey',
         }
     }
 )

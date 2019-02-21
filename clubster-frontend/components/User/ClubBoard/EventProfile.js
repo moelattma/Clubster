@@ -12,6 +12,7 @@ const Form = t.form.Form;
 import converter from 'base64-arraybuffer';
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 import CommentCard from '../Cards/CommentCard';
+import InformationCard from '../Cards/InformationCard';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 
@@ -19,7 +20,7 @@ export default class EventProfile extends Component {
     constructor(props) {
         super(props);
 
-        this.eventID = this.props.navigation.getParam('eventID', null);
+        this.event = this.props.navigation.getParam('event', null);
         console.log(this.eventID);
     }
 
@@ -29,7 +30,10 @@ export default class EventProfile extends Component {
 
     render() {
         return (
-            <CommentCard eventID={this.eventID} />
+            <Container>
+                <InformationCard event={this.event} />
+                <CommentCard eventID={this.event._id} />
+            </Container>
         );
     }
 }

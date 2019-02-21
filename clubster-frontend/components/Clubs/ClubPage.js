@@ -80,7 +80,7 @@ class ShowClubs extends Component {
     };
   };
 
-  async componentWillMount() {
+  componentWillMount() {
     this.willFocus = this.props.navigation.addListener('willFocus', () => { this.getUserClubs(); });
   };
 
@@ -228,21 +228,16 @@ class CreateClub extends Component {
         successActionStatus:201
       }
       var imageURL;
-      const fileUpload = await RNS3.put(file,options).then((response)=> {
-         console.log(response.body.postResponse.key);
+      await RNS3.put(file,options).then((response)=> {
          imageURL = response.body.postResponse.key;
       }).catch((err) => {console.log(err)});
       const data = new FormData();
-      console.log(fileUpload);
       data.append('name', this._formRef.getValue().Name);
       data.append('acronym', this._formRef.getValue().Abbreviation);
       data.append('purpose', this._formRef.getValue().Purpose);
       data.append('description', this._formRef.getValue().Description);
       data.append('imageURL', imageURL);
-      axios.post('http://localhost:3000/api/organizations/new', data).then((response) => {
-          this.setState({img: 'https://s3.console.aws.amazon.com/s3/buckets/clubster-123/' + response.data.image});
-          console.log(this.state.img);
-      });
+      axios.post('http://localhost:3000/api/organizations/new', data);
       this.props.navigation.navigate('ShowClubs');
     } catch(error) {
       console.log(error);
