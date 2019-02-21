@@ -8,6 +8,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { SocialIcon } from 'react-native-elements'
 import ImageGrid from './Cards/ImageGrid';
 import {accessKeyId, secretAccessKey} from '../../keys/keys';
+import v1 from 'uuid/v1';
+import { RNS3 } from 'react-native-aws3';
 export default class Profile extends Component {
     constructor() {
         super();
@@ -97,9 +99,9 @@ export default class Profile extends Component {
             name: key
         };
         const options = {
-          keyPrefix: '5c4d565f7b98cc025466c7ed/',
-          bucket: 'qwerty-bucket',
-          region: 'us-west-1',
+          keyPrefix: 's3/',
+          bucket: 'clubster-123',
+          region: 'us-east-1',
           accessKey:accessKeyId,
           secretKey: secretAccessKey,
           successActionStatus:201
@@ -112,10 +114,10 @@ export default class Profile extends Component {
         const data = {
           imageURL: imageURL
         }
-        console.log(fileUpload);
+        console.log('heh' + imageURL);
         axios.post('http://localhost:3000/api/profilePhoto', data).then((response) => {
-            console.log(response);
-            this.setState({img: 'https://s3-us-west-1.amazonaws.com/qwerty-bucket/' + response.data.profile.image});
+            console.log(response.data);
+            this.setState({img: 'https://s3.amazonaws.com/clubster-123/' + response.data.image});
             console.log(this.state.img);
         });
       } catch(error) {
@@ -130,11 +132,13 @@ export default class Profile extends Component {
       });
         axios.get('http://localhost:3000/api/profile').then((response) => {
             const _data = response.data;
+            console.log(_data);
             const _profile = _data.profile;
+            const image=_profile.image;
             if (_profile) {
                 var _hobbies = (_profile.hobbies == null ? [] : _profile.hobbies);
             }
-            this.setState({ name: _data.name });
+            this.setState({ name: _data.name, img:'https://s3.amazonaws.com/clubster-123/' + image });
         });
     };
 

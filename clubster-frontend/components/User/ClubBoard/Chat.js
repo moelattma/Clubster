@@ -12,45 +12,37 @@ export default class Chat extends Component {
       this.state = {
         chatMessage: '',
         messages: [],
-        id:'1'
+        userId: ''
       };
     }
 
     componentDidMount() {
       const { screenProps } = this.props;
-      this.socket = io(`http://localhost:3000/?id=' + ${this.state.id}`);
+      this.socket = io(`http://localhost:3000/?id=' + ${screenProps._id}`);
       this.socket.on('chat message', msg => {
         this.setState({ messages: [...this.state.messages, msg]});
       });
       axios.get(`http://localhost:3000/api/conversations/${screenProps._id}`).then((response) => {
+        console.log(this.state.userId);
         this.setState({ messages: response.data.conversation.messages });
-        this.setState({ userId: response.data.userId })
+        this.setState({ userId: response.data.userId });
+        console.log(this.state.userId);
       }).catch((err) => console.log(err));
     }
 
-  onSend(messages = []) {
-    const { screenProps } = this.props;
-    console.log(screenProps);
-    var text = messages[messages.length - 1].text;
-    axios.post(`http://localhost:3000/api/messages/${screenProps._id}`, {
-      text: text
-    }).then((message) => {
-      console.log(message.data.message);
-      this.setState(previousState => ({
-        messages: GiftedChat.append(previousState.messages, message.data.message)
-      }))
-    }).catch((err) => console.log(err));
-  }
-
-
-
-
-    componentDidMount() {
-      const { _id } = this.props.screenProps;
-      axios.get(`http://localhost:3000/api/conversations/${_id}`).then((messages) => {
-        this.setState({messages});
-      })
-
+    onSend(messages = []) {
+      const { screenProps } = this.props;
+      console.log(screenProps);
+      var text = messages[messages.length - 1].text;
+      this.socket.emit("chat message", {text:text, user:this.state.userId, createdAt:Date.now()});
+      axios.post(`http://localhost:3000/api/messages/${screenProps._id}`, {
+        text: text
+      }).then((message) => {
+        console.log(message.data.message);
+        this.setState(previousState => ({
+          messages: GiftedChat.append(previousState.messages, messages)
+        }))
+      }).catch((err) => console.log(err));
     }
 
     submitChatMessage(messages = []) {
@@ -65,6 +57,7 @@ export default class Chat extends Component {
         this.setState(previousState => ({
           messages: GiftedChat.append(previousState.messages, message.data.message)
         }))
+        console.log(this.state.messages);
       }).catch((err) => console.log(err));
     }
 
