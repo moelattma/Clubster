@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Image, StyleSheet, Button, Text, TouchableOpacity, View, Dimensions, TouchableWithoutFeedback, FlatList } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View,
+   Dimensions, TouchableWithoutFeedback, FlatList } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
@@ -8,7 +9,7 @@ import converter from 'base64-arraybuffer';
 import v1 from 'uuid/v1';
 import { accessKeyId, secretAccessKey } from '../../keys/keys';
 import { createStackNavigator } from 'react-navigation';
-import { Content, Container, Icon, Form, Item, Input } from 'native-base';
+import { Content, Container, Icon, Form, Item, Input, Button } from 'native-base';
 import { RNS3 } from 'react-native-aws3';
 
 const window = Dimensions.get('window');
@@ -132,13 +133,17 @@ class ShowClubs extends Component {
 
   _renderBanner = () => {
     return (
-      <View style={{ flex: 1, flexDirection: 'row', position: 'absolute', top: 0, alignSelf: 'center', justifyContent: 'space-evenly', backgroundColor: 'darkblue', width: WIDTH }}>
-        <TouchableOpacity onPressIn={() => this.toggleAdmin(false)} style={styles.button} >
-          <Text style={styles.itemText}> Member </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPressIn={() => this.toggleAdmin(true)} style={styles.button} >
-          <Text style={styles.itemText}> Admin </Text>
-        </TouchableOpacity>
+      <View style={{ flex: 1, flexDirection: 'row', position: 'absolute',
+        top: 0, alignSelf: 'center', justifyContent: 'space-evenly',
+        backgroundColor: '#62B1F6', width: WIDTH }}>
+        <Button bordered onPressIn={() => this.toggleAdmin(false)} 
+          style={styles.topButtons}>
+            <Text>Member</Text>
+          </Button>
+          <Button bordered onPressIn={() => this.toggleAdmin(true)} 
+            style={styles.topButtons} >
+            <Text>Admin</Text>
+          </Button>
       </View>
     );
   }
@@ -272,11 +277,16 @@ class CreateClub extends Component {
         <Content>
           <TouchableOpacity onPress={this.useLibraryHandler}>
             <Icon name="ios-camera"
-              style={{ color: 'black' }} />
+              style={styles.cameraIcon} />
           </TouchableOpacity>
-        </Content>
+        </Content>  
 
-        <Button title="Submit" onPress={this.submit} />
+        <Button bordered 
+              onPress={this.submit} 
+              style={{ margin:20, width:100,
+             justifyContent:'center', alignSelf:'center'}}>
+            <Text>Create Club!</Text>
+          </Button>
 
       </Container>
     );
@@ -316,13 +326,11 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row'
   },
-  button: {
+  topButtons: {
     backgroundColor: '#E0E0E0',
-    borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: '#338293',
-    margin: 10,
-    width: '27%'
+    width: 100,
+    justifyContent:'center', 
+    alignSelf:'center'
   },
   modalContent: {
     backgroundColor: 'white',
@@ -339,6 +347,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginVertical: 20,
+  },
+  cameraIcon:{
+    fontSize: 40,
+    margin:20
   },
   btn: {
     position: 'absolute',
