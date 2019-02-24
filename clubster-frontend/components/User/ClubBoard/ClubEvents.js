@@ -15,6 +15,7 @@ import EventProfile from './EventProfile';
 import v1 from 'uuid/v1';
 import {accessKeyId, secretAccessKey} from '../../../keys/keys';
 import { RNS3 } from 'react-native-aws3';
+//import { addLikerToEvent } from '../../../../clubster-backend/server/models/Events/controller';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const EVENT_WIDTH = WIDTH * 9 / 10;
@@ -151,7 +152,7 @@ class ShowEvents extends Component {
           <Left>
             <Thumbnail source={{ uri: url }} />
             <Body>
-              <Text>is hotsing an event: {item.name}</Text>
+              <Text>is hosting an event: {item.name}</Text>
               <Text note>GeekyAnts</Text>
               <Text note>GeekyAnts</Text>
             </Body>

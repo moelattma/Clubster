@@ -6,7 +6,7 @@ const fs = require('fs');
 const multer = require('multer');
 const router = require('express').Router();
 var upload = multer({ dest: 'uploads/' });
-const Organization = require('./Organization/model');
+const Organization = require('../Organizations/model');
 
 router.get(':orgID/SideGraphs', function(req, res) {
     controller.getSideGraphs(req, res);
