@@ -14,7 +14,7 @@ const morgan = require('morgan');
 const passport = require('passport');
 const {databasePassword, databaseUsername} = require('../keys/keys');
 const multer = require('multer');
-
+const graphRoutes = require('./models/Graphs/routes');
 
 mongoose.Promise = global.Promise; // let's us use then catch
 mongoose.set('useCreateIndex', true);
@@ -34,7 +34,7 @@ app.use(passport.initialize());
 // Passport Config
 require('./utils/passport')(passport);
 
-app.use('/api', [loginRoutes, organizationRoutes, profileRoutes, notificationRoutes, eventRoutes,  imageRoutes,conversationRoutes,messageRoutes]);
+app.use('/api', [loginRoutes, organizationRoutes, profileRoutes, notificationRoutes, eventRoutes,  imageRoutes, conversationRoutes, messageRoutes, graphRoutes]);
 
 const PORT = process.env.PORT || 3000;
 const server = require("http").createServer(app);

@@ -125,6 +125,19 @@ class ShowEvents extends Component {
     })
   }
 
+  _handleLikers = (item) => {
+    for (var i = 0; i < this.state.clubEvents.length; i++) {
+      if (this.state.clubEvents[i]._id === item._id)
+        break;
+    }
+    var clubEvents = this.state.clubEvents;
+    var id = this.state.idOfUser;
+    axios.post(`http://localhost:3000/api/events/${item._id}`).then((response) => {
+      clubEvents[i].likers = response.data.event.likers;
+      this.setState({ clubEvents: clubEvents });
+    })
+  }
+
   _renderItem = ({ item }) => {
     var url;
     if (item.image)
