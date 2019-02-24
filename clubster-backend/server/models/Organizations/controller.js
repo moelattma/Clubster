@@ -12,8 +12,8 @@ const mongoose = require('mongoose');
 
 
 exports.getUserClubs = (req, res) => {
-	User.findOne({ _id: req.user._id }).select("arrayClubsAdmin arrayClubsMember").populate({ path: 'arrayClubsAdmin', select: "image name _id acronym" })
-		.populate({ path: 'arrayClubsMember', select: 'image name _id acronym' }).then((user) => {
+	User.findOne({ _id: req.user._id }).select("arrayClubsAdmin arrayClubsMember").populate({ path: 'arrayClubsAdmin', select: "image name _id" })
+		.populate({ path: 'arrayClubsMember', select: 'image name _id' }).then((user) => {
 			return res.status(201).json({ 'arrayClubsAdmin': user.arrayClubsAdmin, 'arrayClubsMember': user.arrayClubsMember });	//populates array that user is admin of
 		}).catch((err) => console.log(err));
 };
@@ -21,7 +21,7 @@ exports.getUserClubs = (req, res) => {
 
 // Display all the clubs in our Mongo Collection
 exports.getAllClubs = (req, res) => {
-	Organization.find().select("_id name purpose description president").then((organizations) => {
+	Organization.find().select("_id name description president").then((organizations) => {
 		if (!organizations) {
 			return res.status(400).json({ 'Error': 'No organizations found' });
 		} else {
@@ -82,13 +82,13 @@ exports.addOrg = (req, res) => {
 	// Code to add a new organization to the Mongo Collection
 
 	// Destruct req body
-	const { name, acronym, purpose, description, imageURL } = req.body;
+	const { name, description, imageURL } = req.body;
 	console.log(imageURL);
 	User.findByIdAndUpdate(req.user._id).then((user) => {
 		const president = user.name;
 
 		// Check if organization with these key-value pairs already exists
-		if (name && acronym && purpose && description) {
+		if (name && description) {
 			Organization.findOne({ name: name }).then((organization) => {
 				if (organization) {
 					return res.status(400).json({ 'Error': 'Organization already exists' });
@@ -97,9 +97,7 @@ exports.addOrg = (req, res) => {
 						let newOrg = new Organization({
 							name: name,
 							president: president,
-							acronym: acronym,
 							admins: [],
-							purpose: purpose,
 							description: description,
 							image: imageURL
 						});
@@ -142,7 +140,7 @@ exports.updateOrg = (req, res) => {
 	const { orgID } = req.params;
 	//console.log(orgID);
 
-	const { name, acronym, purpose, description } = req.body;
+	const { name, description } = req.body;
 
 	Organization.findById(orgID).then((organization) => {
 		if (organization) {
@@ -150,12 +148,10 @@ exports.updateOrg = (req, res) => {
 			let updatedOrg = {
 				name: name,
 				president: organization.president,
-				acronym: acronym,
-				purpose: purpose,
 				description: description
 			};
 
-			console.log('Check this out');
+			console.log('updateOrg...');
 			console.log(updatedOrg);
 			console.log(orgID);
 
@@ -177,37 +173,6 @@ exports.updateOrg = (req, res) => {
 		}
 
 	}).catch(err => console.log(err));
-};
-
-exports.changePicture = (req, res) => {
-	const { orgID } = req.body;
-	console.log('entered', orgID);
-	var new_img = new Img;
-	new_img.img.data = fs.readFileSync(req.file.path)
-	new_img.img.contentType = 'image/jpeg';
-	new_img.save().then((image) => {
-		Organization.findOne({ _id: orgID }).then((organization) => {
-			if (!organization) {
-				return res.status(400).json({ 'err': 'err' });
-			} else {
-				var url = image._id;
-				console.log('heeee ', image._id);
-				Organization.findOneAndUpdate(
-					{ orgID },
-					{ $set: { "imageId": mongoose.Types.ObjectId(url) } },    // overwrites the previous profile with new one
-					{ new: true }
-				).then((org) => {
-					Organization.findOne({ _id: orgID }).populate('imageId').then((org) => {
-						if (!org) {
-							return res.status(400).json({ 'err': 'err' });
-						} else {
-							return res.status(201).json(org);
-						}
-					});
-				});
-			};
-		});
-	});
 };
 
 exports.changeClubPicture = (req, res) => {

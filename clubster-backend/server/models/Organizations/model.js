@@ -23,9 +23,6 @@ const Organization = new Schema({
   name: {
     type: String
   },
-  acronym: {
-    type: String
-  },
   description: {
       type: String,
       trim: true,
@@ -33,11 +30,6 @@ const Organization = new Schema({
   },
   image: {
     type: String
-  },
-  purpose: {
-    type: String,
-    trim: true,
-    unique: true
   },
   social: {
     facebook: {

@@ -4,6 +4,7 @@ const loginRoutes = require('./models/Users/routes');
 const organizationRoutes = require('./models/Organizations/routes');
 const profileRoutes = require('./models/Profile/routes');
 const eventRoutes = require('./models/Events/routes');
+const ridesRoutes = require('./models/Rides/routes');
 const imageRoutes = require('./models/Images/routes');
 const conversationRoutes = require('./models/Conversations/routes');
 const messageRoutes = require('./models/Messages/routes');
@@ -34,7 +35,10 @@ app.use(passport.initialize());
 // Passport Config
 require('./utils/passport')(passport);
 
-app.use('/api', [loginRoutes, organizationRoutes, profileRoutes, notificationRoutes, eventRoutes,  imageRoutes,conversationRoutes,messageRoutes]);
+app.use('/api', [loginRoutes, organizationRoutes,
+  profileRoutes, notificationRoutes, 
+  eventRoutes, ridesRoutes, imageRoutes,
+  conversationRoutes,messageRoutes]);
 
 const PORT = process.env.PORT || 3000;
 const server = require("http").createServer(app);
