@@ -78,7 +78,7 @@ export const HomeNavigator = createMaterialTopTabNavigator(
         tabBarPosition: 'bottom',
         backBehavior: 'initialRoute',
         tabBarOptions: {
-            activeTintColor: '#59cbbd',
+            activeTintColor: '#fff',
             inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
             showIcon: true,
             showLabel: false
@@ -134,7 +134,7 @@ export const AdminNavigator = createMaterialTopTabNavigator(
         tabBarPosition: 'bottom',
         backBehavior: 'initialRoute',
         tabBarOptions: {
-            activeTintColor: '#59cbbd',
+            activeTintColor: '#fff',
             inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
             showIcon: true,
             showLabel: false
@@ -168,7 +168,7 @@ export const MemberNavigator = createMaterialTopTabNavigator(
         tabBarPosition: 'bottom',
         backBehavior: 'initialRoute',
         tabBarOptions: {
-            activeTintColor: '#59cbbd',
+            activeTintColor: '#fff',
             inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
             showIcon: true,
             showLabel: false

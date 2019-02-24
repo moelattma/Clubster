@@ -18,7 +18,7 @@ const imageHeight = window.width / 3;
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const CLUB_WIDTH = WIDTH * 4 / 10;
-const CLUB_HEIGHT = HEIGHT * 1 / 4;
+const CLUB_HEIGHT = HEIGHT / 4;
 
 export default class ClubsPage extends Component {
   static navigationOptions = ({ }) => {
@@ -120,12 +120,19 @@ class ShowClubs extends Component {
       return <View style={[styles.eventContainer, { backgroundColor: 'transparent' }]} />;
     }
     return (
-      <TouchableWithoutFeedback onPressIn={() => this.navigateUser(item)} style={{ flex: 1, flexDirection: 'row' }}>
+      <TouchableWithoutFeedback onPressIn={() => this.navigateUser(item)} 
+        style={{ flexDirection: 'row' }}>
         <View style={styles.eventContainer} >
-          <Image style={styles.imageHeight} source={{ uri: item.image }} />
-          <Text allowFontScaling numberOfLines={1} style={styles.eventTitle}> {item.name} </Text>
-          <Text style={{ position: 'absolute', right: 0, bottom: 0, fontSize: 12, fontWeight: 'bold' }}> {(item.isAdmin ? 'A' : 'M')} </Text>
-          <Text style={{ position: 'absolute', left: 0, bottom: 0, fontSize: 12, fontWeight: 'bold' }}> {item.acronym} </Text>
+          <Image style={styles.containerImage} source={{ uri: item.image }} />
+          <View style={{margin:10}}>
+          <Text allowFontScaling numberOfLines={1} 
+            style={styles.eventTitle}> {item.name} 
+          </Text>
+          </View>
+          <Text style={{ position: 'absolute', right: 2, bottom: 2, fontSize: 12,
+           fontWeight: 'bold' }}>
+             {(item.isAdmin ? 'A' : 'M')} 
+          </Text>
         </View>
       </TouchableWithoutFeedback>
     );
@@ -135,7 +142,7 @@ class ShowClubs extends Component {
     return (
       <View style={{ flex: 1, flexDirection: 'row', position: 'absolute',
         top: 0, alignSelf: 'center', justifyContent: 'space-evenly',
-        backgroundColor: '#62B1F6', width: WIDTH }}>
+        backgroundColor: '#0064c8', width: WIDTH }}>
         <Button bordered onPressIn={() => this.toggleAdmin(false)} 
           style={styles.topButtons}>
             <Text>Member</Text>
@@ -311,9 +318,16 @@ const styles = StyleSheet.create({
     height: CLUB_HEIGHT,
     position: 'relative',
     backgroundColor: '#59cbbd',
-    marginTop: 90,
-    marginRight: 4,
-    marginLeft: 4
+    marginTop: 20,
+    marginRight: 5,
+    marginLeft: 5,
+    borderRadius: 5,
+  },
+  containerImage:{
+    alignItems: 'center',
+    borderColor: '#d6d7da',
+    flex: 1,
+    borderRadius: 5,
   },
   eventTitle: {
     color: 'black',
@@ -399,12 +413,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-  },
-  imageHeight: {
-    width: window.width / 2,
-    alignItems: 'center',
-    height: imageHeight,
-    borderColor: '#d6d7da'
   },
   meetupCard: {
     width: window.width / 2,
