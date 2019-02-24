@@ -3,21 +3,13 @@ import { Image, StyleSheet, Button, Text, TouchableOpacity, View, Dimensions, To
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
-import t from 'tcomb-form-native';
 import { ImagePicker, Permissions, Font } from 'expo';
 import converter from 'base64-arraybuffer';
 import v1 from 'uuid/v1';
-import {accessKeyId, secretAccessKey} from '../../keys/keys';
+import { accessKeyId, secretAccessKey } from '../../keys/keys';
 import { createStackNavigator } from 'react-navigation';
+import { Content, Container, Icon, Form, Item, Input } from 'native-base';
 import { RNS3 } from 'react-native-aws3';
-
-const Form = t.form.Form;
-const Organization = t.struct({
-  Name: t.String,
-  Abbreviation: t.String,
-  Purpose: t.String,
-  Description: t.String
-});
 
 const window = Dimensions.get('window');
 const imageWidth = (window.width / 3) + 30;
@@ -49,8 +41,10 @@ class ShowClubs extends Component {
       clubsMember: [],
       tappedAdmin: false,
       show: false,
-      img: 'https://facebook.github.io/react/logo-og.png',
-      loading: false
+      loading: false,
+      name: '',
+      description: '',
+      imageURL: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC',
     }
   }
 
@@ -137,18 +131,18 @@ class ShowClubs extends Component {
     );
   }
 
-   _renderBanner = () => {
-     return (
-       <View style={{ flex: 1, flexDirection: 'row', position: 'absolute', top: 0, alignSelf: 'center', justifyContent: 'space-evenly', backgroundColor: 'darkblue', width: WIDTH}}>
-           <TouchableOpacity onPressIn={() => this.toggleAdmin(false)} style={styles.button} >
-             <Text style={styles.itemText}> Member </Text>
-           </TouchableOpacity>
-           <TouchableOpacity onPressIn={() => this.toggleAdmin(true)} style={styles.button} >
-            <Text style={styles.itemText}> Admin </Text>
-           </TouchableOpacity>
-       </View>
-     );
-   }
+  _renderBanner = () => {
+    return (
+      <View style={{ flex: 1, flexDirection: 'row', position: 'absolute', top: 0, alignSelf: 'center', justifyContent: 'space-evenly', backgroundColor: 'darkblue', width: WIDTH }}>
+        <TouchableOpacity onPressIn={() => this.toggleAdmin(false)} style={styles.button} >
+          <Text style={styles.itemText}> Member </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPressIn={() => this.toggleAdmin(true)} style={styles.button} >
+          <Text style={styles.itemText}> Admin </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   toggleAdmin = (tapped) => {
     this.setState({ tappedAdmin: tapped });
@@ -204,57 +198,88 @@ class CreateClub extends Component {
   };
 
   useLibraryHandler = async () => {
+
+    console.log('library handle')
     await this.askPermissionsAsync();
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
-          allowsEditing: true,
-          aspect: [4, 3],
-          base64: false,
+        allowsEditing: true,
+        aspect: [4, 3],
+        base64: false,
       });
-      if(result.cancelled)
+      if (result.cancelled)
         return;
       const key = `${v1()}.jpeg`;
       const file = {
-          uri: result.uri,
-          type: 'image/jpeg',
-          name: key
+        uri: result.uri,
+        type: 'image/jpeg',
+        name: key
       };
       const options = {
         keyPrefix: 's3/',
         bucket: 'clubster-123',
         region: 'us-east-1',
-        accessKey:accessKeyId,
+        accessKey: accessKeyId,
         secretKey: secretAccessKey,
-        successActionStatus:201
+        successActionStatus: 201
       }
-      var imageURL;
-      const fileUpload = await RNS3.put(file,options).then((response)=> {
-         console.log(response.body.postResponse.key);
-         imageURL = response.body.postResponse.key;
-      }).catch((err) => {console.log(err)});
-      const data = new FormData();
-      console.log(fileUpload);
-      data.append('name', this._formRef.getValue().Name);
-      data.append('acronym', this._formRef.getValue().Abbreviation);
-      data.append('purpose', this._formRef.getValue().Purpose);
-      data.append('description', this._formRef.getValue().Description);
-      data.append('imageURL', imageURL);
-      axios.post('http://localhost:3000/api/organizations/new', data).then((response) => {
-          this.setState({img: 'https://s3.console.aws.amazon.com/s3/buckets/clubster-123/' + response.data.image});
-          console.log(this.state.img);
-      });
-      this.props.navigation.navigate('ShowClubs');
-    } catch(error) {
+      await RNS3.put(file, options).then((response) => {
+        console.log('image response', response.body.postResponse.key);
+        this.setState({
+          imageURL: response.body.postResponse.key
+        });
+        console.log('state image', this.state.imageURL)
+      }).catch((err) => { console.log(err) });
+    } catch (error) {
       console.log(error);
     };
   };
 
+  submit = () => {
+    const { name, description, imageURL } = this.state;
+    console.log('imageurl', imageURL)
+    axios.post('http://localhost:3000/api/organizations/new', {
+      name,
+      description,
+      imageURL
+    }).then((response) => {
+      console.log('response', response.status)
+      this.props.navigation.navigate('ShowClubs');
+    })
+    .catch((err) => { console.log(err) });
+  }
+
   render() {
+
+    const { name, description } = this.state;
     return (
-      <View>
-        <Form type={Organization} ref={(ref) => this._formRef = ref} />
-        <Button title="Sign Up!" onPress={this.useLibraryHandler} />
-      </View>
+      <Container>
+        <Form>
+          <Item>
+            <Input placeholder="Name"
+              label='name'
+              onChangeText={(name) => this.setState({ name })}
+              value={name}
+            />
+          </Item>
+          <Item>
+            <Input placeholder="Description"
+              label='description'
+              onChangeText={(description) => this.setState({ description })}
+              value={description}
+            />
+          </Item>
+        </Form>
+        <Content>
+          <TouchableOpacity onPress={this.useLibraryHandler}>
+            <Icon name="ios-camera"
+              style={{ color: 'black' }} />
+          </TouchableOpacity>
+        </Content>
+
+        <Button title="Submit" onPress={this.submit} />
+
+      </Container>
     );
   }
 }
