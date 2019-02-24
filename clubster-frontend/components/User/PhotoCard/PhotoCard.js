@@ -16,7 +16,7 @@ export default class PhotoCard extends Component {
             <CardItem>
               <Image source= {{uri: 'https://s3.amazonaws.com/clubster-123/s3/01915bc0-348c-11e9-a6d4-f9e3b1285470.jpeg'}} />
             </CardItem>
-          </Card>
+        </Card>
       </View>
     );
   }

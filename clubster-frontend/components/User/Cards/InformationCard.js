@@ -16,24 +16,22 @@ export default class InformationCard extends Component {
     const event = this.props.eventInfo;
 
     return (
-      <Container>
         <Content padder>
           <Card>
-            <CardItem header bordered>
+            <CardItem>
               <Text>Name: {event.name}</Text>
             </CardItem>
-            <CardItem bordered>
+            <CardItem>
               <Text>Description: {event.description}</Text>
             </CardItem>
-            <CardItem bordered>
+            <CardItem>
               <Text>Location: {event.location}</Text>
             </CardItem>
-            <CardItem bordered>
+            <CardItem>
               <Text>Date: {event.date}</Text>
             </CardItem>
           </Card>
         </Content>
-      </Container>
     );
   }
 }

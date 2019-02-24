@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Dimensions, FlatList, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, Image } from 'react-native';
+import { View, Dimensions, FlatList, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, Image, ScrollView } from 'react-native';
 import axios from 'axios';
 import t from 'tcomb-form-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -15,6 +15,7 @@ import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Ic
 import CommentCard from '../Cards/CommentCard';
 import InformationCard from '../Cards/InformationCard';
 import ImageGrid from '../Cards/ImageGrid';
+import Gallery from '../Cards/Gallery';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 
@@ -77,12 +78,14 @@ export default class EventProfile extends Component {
 
         return (
             <Container>
+              <ScrollView>
                 <TouchableWithoutFeedback onPress={() => this.changeEventPicture()}>
                     <Image source={{ uri: this.state.eventImage }} style={{ height: 200 }} />
                 </TouchableWithoutFeedback>
                 <InformationCard eventInfo={eventInfo} />
-                <CommentCard eventID={this.event._id} />
-                <ImageGrid />
+                <CommentCard />
+                <Gallery />
+              </ScrollView>
             </Container>
         );
     }

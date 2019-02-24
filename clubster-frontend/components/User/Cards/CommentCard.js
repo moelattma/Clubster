@@ -22,7 +22,6 @@ export default class CommentCard extends Component {
 
   render() {
     return (
-      <Container>
         <Content padder>
           <Card>
             <CardItem header bordered>
@@ -38,7 +37,6 @@ export default class CommentCard extends Component {
             </CardItem>
           </Card>
         </Content>
-      </Container>
     );
   }
 }

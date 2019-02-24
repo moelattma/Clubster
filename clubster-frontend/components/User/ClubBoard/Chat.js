@@ -19,8 +19,10 @@ export default class Chat extends Component {
     componentDidMount() {
       const { screenProps } = this.props;
       this.socket = io(`http://localhost:3000/?id=' + ${screenProps._id}`);
-      this.socket.on('chat message', msg => {
-        this.setState({ messages: [...this.state.messages, msg]});
+      this.socket.on('output', function(data) {
+        this.setState(previousState => ({
+          messages: GiftedChat.append(previousState.messages, messages)
+        }));
       });
       axios.get(`http://localhost:3000/api/conversations/${screenProps._id}`).then((response) => {
         console.log('Hiiii' + response.data);
@@ -34,7 +36,7 @@ export default class Chat extends Component {
       const { screenProps } = this.props;
       console.log(screenProps);
       var text = messages[messages.length - 1].text;
-      this.socket.emit("chat message", {text:text, user:this.state.userId, createdAt:Date.now()});
+
       axios.post(`http://localhost:3000/api/messages/${screenProps._id}`, {
         text: text
       }).then((message) => {
@@ -52,11 +54,7 @@ export default class Chat extends Component {
       axios.post(`http://localhost:3000/api/messages/${screenProps._id}`, {
         text: text
       }).then((message) => {
-        this.socket.emit("chat message", messages[0]);
-        console.log(message.data.message);
-        this.setState(previousState => ({
-          messages: GiftedChat.append(previousState.messages, message.data.message)
-        }))
+        this.socket.emit("input", messages[0]);
         console.log(this.state.messages);
       }).catch((err) => console.log(err));
     }
