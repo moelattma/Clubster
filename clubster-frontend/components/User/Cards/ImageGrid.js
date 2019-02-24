@@ -1,47 +1,96 @@
 import React, { Component }  from 'react';
 import PhotoGrid from 'react-native-image-grid';
-import { Dimensions,AsyncStorage, View, ScrollView, StyleSheet, Text, Image, TouchableOpacity, Button, TextInput, Linking } from 'react-native';
+import { Dimensions,AsyncStorage, View, ScrollView, StyleSheet, Image, TouchableOpacity, Button, TextInput, Linking } from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import axios from 'axios';
+import { Container, Header, Content, Card, CardItem, Text, Body,List } from "native-base";
+import PhotoCard from '../PhotoCard/PhotoCard';
+import { ImagePicker, Permissions, Constants } from 'expo';
 
 class ImageGrid extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { items: [] };
+    this.state = { photos: [] };
   }
 
   componentDidMount() {
-    // Build an array of 60 photos
-    let items = Array.apply(null, Array(6)).map((v, i) => {
-      return { id: i, src: 'http://placehold.it/200x200?text='+(i+1) }
+    const eventID = this.props.eventID;
+    axios.get(`http://localhost:3000/api/${eventID}/photos`).then((data) => {
+      this.setState({photos: data.photos});
     });
-    this.setState({ items });
+    this.setState({photos:[{id:1},{id:2}]});
+  }
+
+  askPermissionsAsync = async () => {
+    await Permissions.askAsync(Permissions.CAMERA);
+    await Permissions.askAsync(Permissions.CAMERA_ROLL);
+  };
+
+  async photoSubmit() {
+    const eventID = this.props.eventID;
+    await this.askPermissionsAsync();
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+          allowsEditing: true,
+          aspect: [4, 3],
+          base64: false,
+      });
+      if(result.cancelled)
+        return;
+      const key = `${v1()}.jpeg`;
+      const file = {
+          uri: result.uri,
+          type: 'image/jpeg',
+          name: key
+      };
+      const options = {
+        keyPrefix: 's3/',
+        bucket: 'clubster-123',
+        region: 'us-east-1',
+        accessKey:accessKeyId,
+        secretKey: secretAccessKey,
+        successActionStatus:201
+      }
+      var imageURL;
+      const fileUpload = await RNS3.put(file,options).then((response)=> {
+         console.log(response.body.postResponse.key);
+         imageURL = response.body.postResponse.key;
+      }).catch((err) => {console.log(err)});
+      const data = new FormData();
+      data.append('imageURL', imageURL);
+      await axios.post(`http://localhost:3000/api/${eventID}/photos`).then((data) => {
+        this.setState({photos: data.photos});
+      });
+    } catch(error) {
+      console.log(error);
+    }
   }
 
   render() {
     return(
-      <ScrollView vertical >
-          <View style={styles.container}>
-            {
-              this.state.items.map((image, index) => {
-                return (
-                  <TouchableOpacity
-                    key={index}
-                    style={styles.item}
-                    onPress={() => {}}
-                  >
-                    <Image
-                      style={styles.itemIcon}
-                      source={{uri: image.src}}
-                    />
-                    <Text style={styles.itemTitle}>
-                      Hello!
-                    </Text>
-                  </TouchableOpacity>
-                )
-              })
-            }
-          </View>
-        </ScrollView>
+      <Container>
+        <Content padder>
+          <Card>
+            <CardItem header bordered>
+              <Text>Photos: <FontAwesome name="plus" size={18} color={'black'} onPress = {() => {this.photoSubmit()}} /></Text>
+            </CardItem>
+            <List
+              dataArray={this.state.photos}
+              renderRow={(rowData) =>
+              <PhotoCard
+                key={rowData.id}
+              />}
+              contentContainerStyle={{
+                flex: 1,
+                justifyContent: 'center',
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                alignItems: 'flex-start'}}
+              />
+          </Card>
+        </Content>
+      </Container>
     );
   }
 }

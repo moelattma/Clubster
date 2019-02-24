@@ -20,7 +20,7 @@ const Events = new Schema({
     type: String
   },
   date: {
-    type: Date
+    type: String
   },
   location: {
     type: String
@@ -40,6 +40,9 @@ const Events = new Schema({
   image: {
     type: String
   },
+  photos: [{
+    type:String
+  }],
   going: [{
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'users'

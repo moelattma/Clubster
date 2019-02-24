@@ -37,34 +37,30 @@ export default class Login extends React.Component {
   render() {
     return (
       <KeyboardAwareScrollView contentContainerStyle={styles.container} scrollEnabled={true} enableOnAndroid={true}
-      alwaysBounceVertical={true} extraScrollHeight={40} keyboardShouldPersistTaps="handled" >
+        alwaysBounceVertical={true} extraScrollHeight={40} keyboardShouldPersistTaps="handled" >
 
-      <Text style={styles.logoName}>Clubster</Text>
+        <Text style={styles.logoName}>Clubster</Text>
 
+        <TextField
+          inputContainerStyle={styles.inputUser}
+          label="Username"
+          baseColor="rgba(255, 255, 255, 0.75)"
+          tintColor='#59cbbd'
+          textColor="rgba(255, 255, 255, 1)"
+          onChangeText={username => this.setState({ username })}
+          returnKeyType='next'
+        />
 
-
-      <TextField
-        inputContainerStyle={styles.inputUser}
-        label="Username"
-        baseColor="rgba(255, 255, 255, 0.75)"
-        tintColor='#59cbbd'
-        textColor="rgba(255, 255, 255, 1)"
-        onChangeText={username => this.setState({ username })}
-        returnKeyType='next'
-      />
-
-
-
-      <TextField
-        inputContainerStyle={styles.inputUser}
-        label="Password"
-        baseColor="rgba(255, 255, 255, 0.75)"
-        tintColor='#59cbbd'
-        textColor="rgba(255, 255, 255, 1)"
-        onChangeText={password => this.setState({ password })}
-        secureTextEntry={true}
-        returnKeyType='none'
-      />
+        <TextField
+          inputContainerStyle={styles.inputUser}
+          label="Password"
+          baseColor="rgba(255, 255, 255, 0.75)"
+          tintColor='#59cbbd'
+          textColor="rgba(255, 255, 255, 1)"
+          onChangeText={password => this.setState({ password })}
+          secureTextEntry={true}
+          returnKeyType='none'
+        />
 
         <TouchableOpacity style={styles.login} onPress={this.handleLogin.bind(this)}>
           <Text style={styles.loginText}> Log In </Text>
@@ -101,13 +97,13 @@ const styles = StyleSheet.create({
   },
   loginText: {
     color: '#FFFFFF',
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: "bold",
     textAlign: 'center'
   },
   signupText: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 22,
     textAlign: 'center',
     marginTop: 5
   },
@@ -119,14 +115,12 @@ const styles = StyleSheet.create({
     color: '#fff'
   },
   inputUser: {
-    width: 300,
-    height: 60,
-    borderRadius: 8
+    borderBottomColor: 'rgba(255, 255, 255, 0.6)',
+    borderBottomWidth: 1
   },
   labelUser: {
     fontSize: 20,
     color: '#414E93',
     marginBottom: 8
   },
-
 });

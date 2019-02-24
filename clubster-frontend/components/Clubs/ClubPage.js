@@ -74,7 +74,7 @@ class ShowClubs extends Component {
     };
   };
 
-  async componentWillMount() {
+  componentWillMount() {
     this.willFocus = this.props.navigation.addListener('willFocus', () => { this.getUserClubs(); });
   };
 
@@ -106,7 +106,6 @@ class ShowClubs extends Component {
         getClubsMember.push({ empty: true });
       this.setState({ clubsAdmin: getClubsAdmin, clubsMember: getClubsMember, loading: false }); // Setting up state variable
     }).catch((err) => {
-      console.log(err);
       this.setState({ loading: false });
     });
   };
@@ -244,9 +243,9 @@ class CreateClub extends Component {
       imageURL
     }).then((response) => {
       console.log('response', response.status)
-      this.props.navigation.navigate('ShowClubs');
     })
     .catch((err) => { console.log(err) });
+    this.props.navigation.navigate('ShowClubs');
   }
 
   render() {

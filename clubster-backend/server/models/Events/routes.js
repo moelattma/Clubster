@@ -17,9 +17,14 @@ router.get('/events/:eventID/comments', passport.authenticate('jwt', {session:fa
 	controller.getComments(req, res); // If url is of the form ../events/jewiofheifjwof the getEvents method will run
 });
 
-router.get('/events/:eventID/like', passport.authenticate('jwt', {session:false}), (req, res) => {
-	controller.getLikes(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
+router.get('/events/:eventID/likers', passport.authenticate('jwt', {session:false}), (req, res) => {
+	controller.getLikers(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addLikers method will run
 });
+
+router.get('/events/:eventID/photo', passport.authenticate('jwt', {session:false}), (req, res) => {
+	controller.getPhotos(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
+});
+
 
 router.post('/events/:organizationID/new',upload.single('fileData'), passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.addEvent(req, res); // If url is of the form ../events/jewiofheifjwof/new the addEvent method will run
@@ -29,14 +34,21 @@ router.post('/events/:eventID', passport.authenticate('jwt', {session:false}), (
 	controller.addMemberToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
-router.post('/events/:eventID/like', passport.authenticate('jwt', {session:false}), (req, res) => {
-	controller.addLikeToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
+router.post('/events/:eventID/photo', passport.authenticate('jwt', {session:false}), (req, res) => {
+	controller.addPhotoToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
+});
+
+router.post('/events/:eventID', passport.authenticate('jwt', {session:false}), (req, res) => {
+	controller.addLikerToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
 router.post('/events/:eventID/comment', passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.addCommentToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
+router.post('/events/:eventID/changeEventPicture', passport.authenticate('jwt', {session:false}), (req, res) => {
+	controller.changeEventPicture(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
+});
 
 //Export
 module.exports = router;

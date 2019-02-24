@@ -76,7 +76,8 @@ exports.addMemberToEvent = (req, res) => {
 */
 exports.addEvent = (req, res) => {
 	const { organizationID } = req.params;	//grab the idOfOrganization whose id = idOfOrganization
-	var { name, date, description, location, time } = req.body;	//grab data from req.body
+	var { name, date, description, expense } = req.body;	//grab data from req.body
+	expense = parseFloat(expense);	//convert expense to floating point
 	//Next 4 lines are how to write image info to db. We are going to change this soon. Code is more to memorize
 	var new_img = new Img;
 	new_img.img.data = fs.readFileSync(req.file.path)
@@ -94,33 +95,42 @@ exports.addEvent = (req, res) => {
 					name: name,
 					date: date,
 					description: description,
-					host: req.user._id,
-					location: location,
-					time: time,
 					going: [req.user._id],
-					likers: [],
-					comments: [],
-					image: image._id
+					image: image._id,
+					likers: [req.user_id]
 				});
-				//write clubEvent to db
-				clubEvent.save().then((event) => {
-					// Add event's id to organization's events array
-					Organization.addEventToClub(organizationID, event._id);
-					// Find the Event whose id = event's id and populate it's image
-					Events.findOne({ _id: event._id }).populate('image').then((event) => {
-						return res.status(201).json({ 'event': event }); //return 201, all good
-					}).catch(err => {
-						return res.status(400).json({ 'Error': err });
-					});
+				let expenses = new Expenses({
+					idOfClub: organizationID,
+					idOfEvent: clubEvent._id,
+					amount: expense
+				});
+				//write expense to db
+				expenses.save().then((expense) => {
+					if (expense) {
+						//write clubEvent to db
+						clubEvent.save().then((event) => {
+							// Add event's id to organization's events array
+							Organization.addEventToClub(organizationID, event._id);
+							// Find the Event whose id = event's id and populate it's image
+							Events.findOne({ _id: event._id }).populate('image').then((event) => {
+								return res.status(201).json({ 'event': event }); //return 201, all good
+							}).catch(err => {
+								return res.status(400).json({ 'Error': err });
+							});
+						}).catch((err) => {
+							return res.status(400).json({ 'Error': err });
+						});
+					}
 				}).catch((err) => {
 					return res.status(400).json({ 'Error': err });
 				});
+
 			}
 		});
 	});
 }
 
-exports.getLikes = (req, res) => {
+exports.getLikers = (req, res) => {
 	const { eventID } = req.params;	// grabs the eventID from url
 	Events.findByIdAndUpdate(eventID).populate('likers').then((event) => {
 		if (!event) {
@@ -131,20 +141,20 @@ exports.getLikes = (req, res) => {
 	});
 }
 
-exports.addLikeToEvent = (req, res) => {
+exports.addLikerToEvent = (req, res) => {
 	const { eventID } = req.params;	// grabs the eventID from url
 	const idOfAttender = req.user._id;
 	Events.findByIdAndUpdate(eventID).then((event) => {
 		if (event) {
-			var currentLikes = event.likes;	//grabs current array of members(id form)
-			var isInArray = event.currentLikes.some(function (friend) {	//checks if the user is already in event's going array
+			var currentLikers = event.likers;	//grabs current array of members(id form)
+			var isInArray = event.currentLikers.some(function (friend) {	//checks if the user is already in event's going array
 				return friend.equals(idOfAttender);
 			});
 			//if user is in array, remove his/her id from the memeber array. Add him if otherwise.
-			if (currentLikes.length != 0 && isInArray) {
+			if (currentLikers.length != 0 && isInArray) {
 				Events.findOneAndUpdate(
 					{ _id: eventID },
-					{ $pull: { likes: mongoose.Types.ObjectId(idOfAttender) } },
+					{ $pull: { likers: mongoose.Types.ObjectId(idOfAttender) } },
 					{ new: true, upsert: true },
 					function (error, event) {
 						if (error) {
@@ -156,7 +166,7 @@ exports.addLikeToEvent = (req, res) => {
 			} else {
 				Events.findOneAndUpdate(
 					{ _id: eventID },
-					{ $push: { likes: mongoose.Types.ObjectId(idOfAttender) } },
+					{ $push: { likers: mongoose.Types.ObjectId(idOfAttender) } },
 					{ new: true, upsert: true },
 					function (error, event) {
 						if (error) {

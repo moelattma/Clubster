@@ -38,8 +38,8 @@ export default class Settings extends Component {
     };
 
     useLibraryHandler = async () => {
-        await this.askPermissionsAsync();
-        const { _id } = this.props.screenProps;
+      await this.askPermissionsAsync();
+      try {
         let result = await ImagePicker.launchImageLibraryAsync({
             allowsEditing: true,
             aspect: [4, 3],
@@ -47,16 +47,34 @@ export default class Settings extends Component {
         });
         if(result.cancelled)
           return;
-        const data = new FormData();
-        data.append('fileData', {
+        const key = `${v1()}.jpeg`;
+        const file = {
             uri: result.uri,
-            type: 'multipart/form-data',
-            name: "image1.jpg"
-        });
+            type: 'image/jpeg',
+            name: key
+        };
+        const options = {
+          keyPrefix: 's3/',
+          bucket: 'clubster-123',
+          region: 'us-east-1',
+          accessKey:accessKeyId,
+          secretKey: secretAccessKey,
+          successActionStatus:201
+        }
+        var imageURL;
+        await RNS3.put(file,options).then((response)=> {
+           imageURL = response.body.postResponse.key;
+        }).catch((err) => {console.log(err)});
+        const data = new FormData();
+        data.append('imageURL', imageURL);
         axios.post(`http://localhost:3000/api/organizations/modifyOrgPicture/${_id}`, data).then((response) => {
             var url = 'data:image/jpeg;base64,' + converter.encode(response.data.imageId.img.data.data);
             this.setState({ img: url });
         }).catch((err) => { return; });
+        this.props.navigation.navigate('ShowClubs');
+      } catch(error) {
+        console.log(error);
+      };
     };
 
     useCameraHandler = async () => {
@@ -106,7 +124,7 @@ export default class Settings extends Component {
         this.setState({
             about: true,
             photos: false,
-            members: false            
+            members: false
         })
     }
 
@@ -114,7 +132,7 @@ export default class Settings extends Component {
         this.setState({
             about: false,
             photos: true,
-            members: false            
+            members: false
         })
     }
 
@@ -122,7 +140,7 @@ export default class Settings extends Component {
         this.setState({
             about: false,
             photos: false,
-            members: true            
+            members: true
         })
     }
 
@@ -133,7 +151,7 @@ export default class Settings extends Component {
             <View>
                 <View>
                     <View>
-                        <TouchableOpacity style={ styles.editButton} 
+                        <TouchableOpacity style={ styles.editButton}
                             onPress={this._showModal} >
                             <FontAwesome
                                 name="edit"
@@ -142,12 +160,12 @@ export default class Settings extends Component {
                             />
                         </TouchableOpacity>
                         <TouchableOpacity onPressIn={() => this.useLibraryHandler()}>
-                            <Image style={{ height: 200, width: WIDTH }} 
+                            <Image style={{ height: 200, width: WIDTH }}
                                 source={{ uri: this.state.img }} />
                         </TouchableOpacity>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                        <TouchableOpacity style={styles.button} 
+                        <TouchableOpacity style={styles.button}
                             onPress={() => this.aboutClicked()}>
                             <Text style={styles.buttonText}> About </Text>
                         </TouchableOpacity>
@@ -179,9 +197,9 @@ export default class Settings extends Component {
                             <MembersList _id={this.props.screenProps._id}
                                  style={{margin:10}}></MembersList>
                             </View>
-                        </View> 
+                        </View>
                         //about tab
-                        :<View> 
+                        :<View>
                             <View style={styles.mainContainer}>
                                 <Text style={styles.nameText}>
                                     {this.state.name}
@@ -223,16 +241,16 @@ export default class Settings extends Component {
                                         <TextInput placeholder='club name/ acronym'
                                          style={styles.textInArea}
                                          label='Name' underlineColorAndroid="transparent"
-                                          onChangeText={(name) => this.setState({ name })} 
+                                          onChangeText={(name) => this.setState({ name })}
                                           value={this.state.name} />
                                     </View>
-                                    
+
                                     <View style={styles.textInAreaContainer}>
                                         <TextInput placeholder='purpose/ description'
-                                        style={styles.textInArea} 
+                                        style={styles.textInArea}
                                         label='Purpose' underlineColorAndroid="transparent"
-                                         multiline={true} numberOfLines={3} 
-                                         onChangeText={(purpose) => this.setState({ purpose })} 
+                                         multiline={true} numberOfLines={3}
+                                         onChangeText={(purpose) => this.setState({ purpose })}
                                          value={this.state.purpose} />
                                     </View>
                                     <View >
@@ -272,12 +290,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     nameText:{
-        fontWeight: '600', 
-        fontSize: 25, 
+        fontWeight: '600',
+        fontSize: 25,
         margin: 10
     },
-    subText:{ 
-        fontWeight: '500', 
+    subText:{
+        fontWeight: '500',
         fontSize: 20,
         marginLeft: 10,
         marginBottom: 5
@@ -324,8 +342,6 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         marginRight: 10,
         marginTop: 10,
-        marginBottom: 10,
-        fontFamily: 'Helvetica',
+        marginBottom: 10
     },
 });
-

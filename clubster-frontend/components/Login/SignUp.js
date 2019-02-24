@@ -24,7 +24,17 @@ export default class SignUp extends Component {
       name
     }).then(response => {
       if (response.status == 200 || response.status == 201) {
-        this.props.navigation.navigate('Login');
+        axios.post('http://localhost:3000/api/login', { username, password }).then(response => {
+          if (response.status == 200) {
+            AsyncStorage.setItem('jwtToken', response.data.token);
+            axios.defaults.headers.common['Authorization'] = response.data.token;
+            this.props.navigation.navigate('ClubsterNavigation');               //Navigate to Clubs page if successful
+          } else {
+            this.props.navigation.navigate('Login');
+          }
+        }).catch((err) => {
+          console.log('Not a valid account: ', err);                                           //Err
+        });
         axios.post("http://localhost:3000/api/notifications/newNoAuthenticate",
           { type: CLUBSTER_WELCOME, senderID: response.data.user._id });
       }
@@ -169,8 +179,8 @@ const styles = StyleSheet.create({
   },
   btntext: {
     color: '#FFFFFF',
-    fontSize: 22,
-    fontWeight: "bold",
+    fontSize: 30,
+    fontWeight: 'bold',
     textAlign: 'center'
   },
   login: {
@@ -180,9 +190,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   inputUser: {
-    width: 300,
-    height: 60,
-    borderRadius: 8
+    borderBottomColor: 'rgba(255, 255, 255, 0.6)',
+    borderBottomWidth: 1
   },
   labelUser: {
     fontSize: 20,

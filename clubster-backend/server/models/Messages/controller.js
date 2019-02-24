@@ -17,15 +17,23 @@ exports.insertMessage = (req, res) => {
          ]
     }).then((conversation) => {
     if(!conversation) {
-      console.log("Here!!");
-      return res.status(400).json({'Error':'No messages found'});
-    } else {
-      console.log(conversation);
-      Conversations.addMessage(newMessage, conversation._id);
-      newMessage.save().then((messageObj) => {
-        Message.findOne({_id: messageObj._id}).populate('user').then((message) => {
-          return res.status(201).json({message:message})}).catch((err) => { return res.status(400).json({error:'err is sending message'})});
+      let conversation = new Conversations({
+        idOfClub: groupId,
+        messages: []
+      });
+      conversation.save().then((conversation) => {
+        newMessage.save().then((messageObj) => {
+          Conversations.addMessage(messageObj, conversation._id);
+          Message.findOne({_id: messageObj._id}).populate('user').then((message) => {
+            return res.status(201).json({message:message})}).catch((err) => { return res.status(400).json({error:'err is sending message'})});
         }).catch(err => { return console.log(err)});
+
+      });
     }
+    newMessage.save().then((messageObj) => {
+      Conversations.addMessage(messageObj, conversation._id);
+      Message.findOne({_id: messageObj._id}).populate('user').then((message) => {
+      return res.status(201).json({message:message})}).catch((err) => { return res.status(400).json({error:'err is sending message'})});
+    }).catch(err => { return console.log(err)});
   });
 };

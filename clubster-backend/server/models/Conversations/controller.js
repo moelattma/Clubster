@@ -18,7 +18,3 @@ exports.findMessages = (req, res) => {
     }
   });
 };
-
-exports.findMessages = (req, res) => {
-	
-};

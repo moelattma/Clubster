@@ -20,24 +20,8 @@ export default class CommentCard extends Component {
     })
   }
 
-  _renderItem = () => {
-    return (
-      <CardItem bordered>
-        <Body>
-          <Text>
-            NativeBase is a free and open source framework that enable
-            developers to build
-            high-quality mobile apps using React Native iOS and Android
-            apps
-            with a fusion of ES6.
-          </Text>
-        </Body>
-      </CardItem>
-    )
-  }
   render() {
     return (
-      <Container>
         <Content padder>
           <Card>
             <CardItem header bordered>
@@ -53,7 +37,6 @@ export default class CommentCard extends Component {
             </CardItem>
           </Card>
         </Content>
-      </Container>
     );
   }
 }

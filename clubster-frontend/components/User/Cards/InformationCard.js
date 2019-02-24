@@ -6,54 +6,32 @@ import axios from 'axios';
 export default class InformationCard extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      comments: []
+
     };
   }
 
-  componentDidMount() {
-    const eventID = this.props.eventID; //eventID is hardcoded for now
-    axios.get(`http://localhost:3000/api/events/${eventID}/comments`).then((comments) => {
-      this.setState({
-        comments: comments
-      })
-    })
-  }
-
-  _renderItem = () => {
-    return (
-      <CardItem bordered>
-        <Body>
-          <Text>
-            NativeBase is a free and open source framework that enable
-            developers to build
-            high-quality mobile apps using React Native iOS and Android
-            apps
-            with a fusion of ES6.
-          </Text>
-        </Body>
-      </CardItem>
-    )
-  }
   render() {
+    const event = this.props.eventInfo;
+
     return (
-      <Container>
         <Content padder>
           <Card>
-            <CardItem header bordered>
-              <Text>Comments</Text>
+            <CardItem>
+              <Text>Name: {event.name}</Text>
             </CardItem>
-            <FlatList
-              data={this.state.comments}
-              renderItem={this._renderItem}
-              keyExtractor={comment => comment._id}
-            />
-            <CardItem footer bordered>
-              <Text>See All</Text>
+            <CardItem>
+              <Text>Description: {event.description}</Text>
+            </CardItem>
+            <CardItem>
+              <Text>Location: {event.location}</Text>
+            </CardItem>
+            <CardItem>
+              <Text>Date: {event.date}</Text>
             </CardItem>
           </Card>
         </Content>
-      </Container>
     );
   }
 }

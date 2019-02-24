@@ -12,6 +12,10 @@ const Form = t.form.Form;
 import converter from 'base64-arraybuffer';
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 import EventProfile from './EventProfile';
+import v1 from 'uuid/v1';
+import {accessKeyId, secretAccessKey} from '../../../keys/keys';
+import { RNS3 } from 'react-native-aws3';
+//import { addLikerToEvent } from '../../../../clubster-backend/server/models/Events/controller';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const EVENT_WIDTH = WIDTH * 9 / 10;
@@ -20,6 +24,7 @@ const EVENT_HEIGHT = HEIGHT * 3 / 7;
 const Event = t.struct({
   name: t.String,
   description: t.String,
+  date: t.String,
   location: t.String,
   time: t.String
 });
@@ -51,6 +56,8 @@ class ShowEvents extends Component {
   constructor(props) {
     super(props);
 
+    this._mounted = false;
+
     this.state = {
       clubEvents: [],
       loading: false,
@@ -78,15 +85,20 @@ class ShowEvents extends Component {
     }
   }
 
-  async componentDidMount() {
-    await Font.loadAsync({
-      Roboto: require("native-base/Fonts/Roboto.ttf"),
-      Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
-    });
+   componentDidMount() {
+    this._mounted = true;
+    // await Font.loadAsync({
+      // Roboto: require("native-base/Fonts/Roboto.ttf"),
+      // Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
+    // });
     this.willFocus = this.props.navigation.addListener('willFocus', () => {
-      this.getClubEvents();
+      if (this._mounted)
+        this.getClubEvents();
     });
-    this.getClubEvents();
+  }
+
+  componentWillUnmount() {
+    this._mounted = false;
   }
 
   getClubEvents() {
@@ -94,9 +106,11 @@ class ShowEvents extends Component {
     this.setState({ loading: true })
     axios.get(`http://localhost:3000/api/events/${_id}`)
       .then((response) => {
-        this.setState({ clubEvents: response.data.events, idOfUser: response.data.idOfUser });
+        if (this._mounted) {
+          this.setState({ clubEvents: response.data.events, idOfUser: response.data.idOfUser });
+          this.setState({ loading: false })
+        }
       });
-    this.setState({ loading: false })
   }
 
   _handleGoing = (item) => {
@@ -112,43 +126,23 @@ class ShowEvents extends Component {
     })
   }
 
-
-  // renderGoing = (item) => {
-  //   if (item.going && item.going.indexOf(this.state.idOfUser) > -1) {
-  //     return (
-  //       <Button transparent>
-  //         <Icon active name="star" />
-  //         <Text>{item.going.length} going</Text>
-  //       </Button>
-  //     )
-  //   } else {
-  //     <Button transparent>
-  //       <Icon name="star" />
-  //       <Text>{item.going.length} going</Text>
-  //     </Button>
-  //   }
-  // }
-
-  // renderLikes(item) {
-  //   if (item.likers && item.likers.indexOf(this.state.idOfUser) > -1) {
-  //     return (
-  //       <Button transparent>
-  //         <Icon active name="thumbs-up" />
-  //         <Text>{item.likers.length} likes</Text>
-  //       </Button>
-  //     )
-  //   } else {
-  //     <Button transparent>
-  //       <Icon name="thumbs-up" />
-  //       <Text>{item.likers.length} likes</Text>
-  //     </Button>
-  //   }
-  // }
+  _handleLikers = (item) => {
+    for (var i = 0; i < this.state.clubEvents.length; i++) {
+      if (this.state.clubEvents[i]._id === item._id)
+        break;
+    }
+    var clubEvents = this.state.clubEvents;
+    var id = this.state.idOfUser;
+    axios.post(`http://localhost:3000/api/events/${item._id}`).then((response) => {
+      clubEvents[i].likers = response.data.event.likers;
+      this.setState({ clubEvents: clubEvents });
+    })
+  }
 
   _renderItem = ({ item }) => {
     var url;
     if (item.image)
-      url = 'https://s3-us-west-1.amazonaws.com/qwerty-bucket/' + item.image;
+      url = 'https://s3.amazonaws.com/clubster-123/' + item.image;
     else
       url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC';
 
@@ -158,7 +152,8 @@ class ShowEvents extends Component {
           <Left>
             <Thumbnail source={{ uri: url }} />
             <Body>
-              <Text>NativeBase</Text>
+              <Text>is hosting an event: {item.name}</Text>
+              <Text note>GeekyAnts</Text>
               <Text note>GeekyAnts</Text>
             </Body>
           </Left>
@@ -168,12 +163,13 @@ class ShowEvents extends Component {
         </CardItem>
         <CardItem>
           <Left>
-            <Text>Title: {item.name}</Text>
-            <Text>Date: {item.date}</Text>
-            <Text>Location: {item.location}</Text>
+            <Body>
+              <Text note>{item.date} + {item.time}</Text>
+              <Text note>{item.location}</Text>
+            </Body>
           </Left>
           <Right>
-            <Button bordered onPress={() => this.props.navigation.navigate('EventProfile', { eventID: item._id })}>
+            <Button bordered onPress={() => this.props.navigation.navigate('EventProfile', { event: item })}>
               <Text>Know More</Text>
             </Button>
           </Right>
@@ -183,12 +179,12 @@ class ShowEvents extends Component {
             {
               item.likers && item.likers.indexOf(this.state.idOfUser) > -1 ?
                 <Button transparent>
-                  <Icon active name="thumbs-up" />
+                  <Icon name="thumbs-up" />
                   <Text>{item.likers.length} likes</Text>
                 </Button> :
                 <Button transparent>
-                  <Icon name="thumbs-up" />
-                  <Text>{item.likers.length} likes</Text>
+                  <Icon name="thumbs-up" style={{color:'gray'}}/>
+                  <Text style={{color:'gray'}}>{item.likers.length} likes</Text>
                 </Button>
             }
           </Left>
@@ -206,8 +202,8 @@ class ShowEvents extends Component {
                   <Text>{item.going.length} going</Text>
                 </Button> :
                 <Button transparent>
-                  <Icon name="star" />
-                  <Text>{item.going.length} going</Text>
+                  <Icon name="star" style={{color:'gray'}}/>
+                  <Text style={{color:'gray'}}>{item.going.length} going</Text>
                 </Button>
             }
           </Right>
@@ -248,7 +244,6 @@ class CreateClubEvent extends Component {
       });
       if(result.cancelled)
         return;
-      const data = new FormData();
       const key = `${v1()}.jpeg`;
       const file = {
           uri: result.uri,
@@ -256,29 +251,27 @@ class CreateClubEvent extends Component {
           name: key
       };
       const options = {
-        keyPrefix: '5c4d565f7b98cc025466c7ed/',
-        bucket: 'qwerty-bucket',
-        region: 'us-west-1',
+        keyPrefix: 's3/',
+        bucket: 'clubster-123',
+        region: 'us-east-1',
         accessKey:accessKeyId,
         secretKey: secretAccessKey,
         successActionStatus:201
       }
       var imageURL;
-      const fileUpload = await RNS3.put(file,options).then((response)=> {
-         console.log(response.body.postResponse.key);
+      await RNS3.put(file,options).then((response)=> {
          imageURL = response.body.postResponse.key;
       }).catch((err) => {console.log(err)});
+      const data = new FormData();
       data.append('name', this._formRef.getValue().name);
+      data.append('date', this._formRef.getValue().date);
       data.append('time', this._formRef.getValue().time);
       data.append('description', this._formRef.getValue().description);
       data.append('location', this._formRef.getValue().location);
       data.append('imageURL', imageURL);
-      console.log(fileUpload);
       await axios.post(`http://localhost:3000/api/events/${_id}/new`, data);
       this.props.navigation.navigate('ShowEvents');
-    } catch(error) {
-      console.log(error);
-    }
+    } catch (error) {console.log(error);}
   }
 
   render() {
