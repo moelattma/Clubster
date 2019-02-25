@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react';
 import { FlatList, TouchableOpacity, View, StyleSheet, ActivityIndicator } from 'react-native';
-import { List, ListItem, SearchBar } from 'react-native-elements';
+import { SearchBar } from 'react-native-elements';
 import _ from 'lodash';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import axios from 'axios';
+import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text } from 'native-base';
 
 export default class SearchClubs extends PureComponent {
     constructor() {
@@ -72,15 +73,26 @@ export default class SearchClubs extends PureComponent {
         );
     }
 
-    _renderItem = ({ item }) => (
-        <ListItem
-            roundAvatar
-            title={item.name}
-            onPress={() => this.props.navigation.navigate('ClubProfile', { _id: item._id, name: item.name })}
-            subtitle={item.description}
-            containerStyle={{ borderBottomWidth: 0, height: 80 }}
-        />
-    )
+    _renderItem = ({ item }) => {
+      let url = 'https://s3.amazonaws.com/clubster-123/'+item.image;
+      console.log(url);
+      console.log(item);
+      return (
+          <Content>
+            <List>
+              <ListItem avatar>
+                <Left>
+                  <Thumbnail source={{ uri: url }} />
+                </Left>
+                <Body>
+                  <Text>{item.name}</Text>
+                  <Text note>{item.description}</Text>
+                </Body>
+              </ListItem>
+            </List>
+          </Content>
+     );
+  }
 
     renderFooter = () => {
         if (!this.state.loading) return null;

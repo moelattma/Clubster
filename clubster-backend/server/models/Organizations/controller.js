@@ -21,7 +21,7 @@ exports.getUserClubs = (req, res) => {
 
 // Display all the clubs in our Mongo Collection
 exports.getAllClubs = (req, res) => {
-	Organization.find().select("_id name description president").then((organizations) => {
+	Organization.find().select("_id name description president image").then((organizations) => {
 		if (!organizations) {
 			return res.status(400).json({ 'Error': 'No organizations found' });
 		} else {
@@ -29,6 +29,13 @@ exports.getAllClubs = (req, res) => {
 		}
 	});
 };
+
+exports.getUserClubsGeneral = (req, res) => {
+	User.findOne({ _id: req.body._id }).select("arrayClubsAdmin arrayClubsMember").populate({ path: 'arrayClubsAdmin', select: "image name _id" })
+		.populate({ path: 'arrayClubsMember', select: 'image name _id' }).then((user) => {
+			return res.status(201).json({ 'arrayClubsAdmin': user.arrayClubsAdmin, 'arrayClubsMember': user.arrayClubsMember });	//populates array that user is admin of
+		}).catch((err) => console.log(err));
+}
 
 exports.isMember = (req, res) => {
 	const { orgID } = req.body;
