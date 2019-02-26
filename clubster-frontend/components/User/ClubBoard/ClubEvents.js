@@ -127,7 +127,7 @@ class ShowEvents extends Component {
   }
 
   _handleLikers = (item) => {
-    var clubEvents = this.state.clubEvents;
+      var clubEvents = this.state.clubEvents;
     var id = this.state.idOfUser;
     axios.post(`http://localhost:3000/api/events/${item._id}/likers`).then((response) => {
       console.log("posted")
