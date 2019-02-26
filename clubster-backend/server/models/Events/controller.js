@@ -144,7 +144,7 @@ exports.addLikerToEvent = (req, res) => {
 	Events.findByIdAndUpdate(eventID).then((event) => {
 		if (event) {
 			var currentLikers = event.likers;	//grabs current array of members(id form)
-			var isInArray = event.currentLikers.some(function (friend) {	//checks if the user is already in event's going array
+			var isInArray = currentLikers.some(function (friend) {	//checks if the user is already in event's going array
 				return friend.equals(idOfAttender);
 			});
 			//if user is in array, remove his/her id from the memeber array. Add him if otherwise.

@@ -127,7 +127,7 @@ class ShowEvents extends Component {
   }
 
   _handleLikers = (item) => {
-      var clubEvents = this.state.clubEvents;
+    var clubEvents = this.state.clubEvents;
     var id = this.state.idOfUser;
     axios.post(`http://localhost:3000/api/events/${item._id}/likers`).then((response) => {
       console.log("posted")
@@ -275,7 +275,8 @@ class CreateClubEvent extends Component {
     return (
       <View style={{ flex: 1 }}>
         <Form type={Event} ref={(ref) => this._formRef = ref} />
-        <TouchableOpacity onPress={() => this.createEvent()} style={{ height: 10, width: 60, backgroundColor: 'blue' }}>
+        <TouchableOpacity onPress={() => this.createEvent()} style={{ height: 25, width: 120, backgroundColor: 'blue' }}>
+        <Text style={{color:'gray'}}>Create Event!</Text>
         </TouchableOpacity>
       </View>
     );
