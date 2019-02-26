@@ -85,12 +85,12 @@ class ShowEvents extends Component {
     }
   }
 
-   componentDidMount() {
+  async componentDidMount() {
     this._mounted = true;
-    // await Font.loadAsync({
-      // Roboto: require("native-base/Fonts/Roboto.ttf"),
-      // Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
-    // });
+    await Font.loadAsync({
+      Roboto: require("native-base/Fonts/Roboto.ttf"),
+      Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
+    });
     this.willFocus = this.props.navigation.addListener('willFocus', () => {
       if (this._mounted)
         this.getClubEvents();
@@ -127,13 +127,10 @@ class ShowEvents extends Component {
   }
 
   _handleLikers = (item) => {
-    for (var i = 0; i < this.state.clubEvents.length; i++) {
-      if (this.state.clubEvents[i]._id === item._id)
-        break;
-    }
     var clubEvents = this.state.clubEvents;
     var id = this.state.idOfUser;
-    axios.post(`http://localhost:3000/api/events/${item._id}`).then((response) => {
+    axios.post(`http://localhost:3000/api/events/${item._id}/likers`).then((response) => {
+      console.log("posted")
       clubEvents[i].likers = response.data.event.likers;
       this.setState({ clubEvents: clubEvents });
     })
@@ -178,11 +175,11 @@ class ShowEvents extends Component {
           <Left>
             {
               item.likers && item.likers.indexOf(this.state.idOfUser) > -1 ?
-                <Button transparent>
+                <Button transparent onPress={() => this._handleLikers(item)}>
                   <Icon name="thumbs-up" />
                   <Text>{item.likers.length} likes</Text>
                 </Button> :
-                <Button transparent>
+                <Button transparent onPress={() => this._handleLikers(item)}>
                   <Icon name="thumbs-up" style={{color:'gray'}}/>
                   <Text style={{color:'gray'}}>{item.likers.length} likes</Text>
                 </Button>
@@ -197,11 +194,11 @@ class ShowEvents extends Component {
           <Right>
             {
               item.going && item.going.indexOf(this.state.idOfUser) > -1 ?
-                <Button transparent>
+                <Button transparent onPress={() => this._handleGoing(item)}>
                   <Icon active name="star" />
                   <Text>{item.going.length} going</Text>
                 </Button> :
-                <Button transparent>
+                <Button transparent onPress={() => this._handleGoing(item)}>
                   <Icon name="star" style={{color:'gray'}}/>
                   <Text style={{color:'gray'}}>{item.going.length} going</Text>
                 </Button>
