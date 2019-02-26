@@ -120,18 +120,18 @@ class ShowClubs extends Component {
       return <View style={[styles.eventContainer, { backgroundColor: 'transparent' }]} />;
     }
     return (
-      <TouchableWithoutFeedback onPressIn={() => this.navigateUser(item)} 
+      <TouchableWithoutFeedback onPressIn={() => this.navigateUser(item)}
         style={{ flexDirection: 'row' }}>
         <View style={styles.eventContainer} >
           <Image style={styles.containerImage} source={{ uri: item.image }} />
           <View style={{margin:10}}>
-          <Text allowFontScaling numberOfLines={1} 
-            style={styles.eventTitle}> {item.name} 
+          <Text allowFontScaling numberOfLines={1}
+            style={styles.eventTitle}> {item.name}
           </Text>
           </View>
           <Text style={{ position: 'absolute', right: 2, bottom: 2, fontSize: 12,
            fontWeight: 'bold' }}>
-             {(item.isAdmin ? 'A' : 'M')} 
+             {(item.isAdmin ? 'A' : 'M')}
           </Text>
         </View>
       </TouchableWithoutFeedback>
@@ -143,11 +143,11 @@ class ShowClubs extends Component {
       <View style={{ flex: 1, flexDirection: 'row', position: 'absolute',
         top: 0, alignSelf: 'center', justifyContent: 'space-evenly',
         backgroundColor: '#0064c8', width: WIDTH }}>
-        <Button bordered onPressIn={() => this.toggleAdmin(false)} 
+        <Button bordered onPressIn={() => this.toggleAdmin(false)}
           style={styles.topButtons}>
             <Text>Member</Text>
           </Button>
-          <Button bordered onPressIn={() => this.toggleAdmin(true)} 
+          <Button bordered onPressIn={() => this.toggleAdmin(true)}
             style={styles.topButtons} >
             <Text>Admin</Text>
           </Button>
@@ -286,10 +286,10 @@ class CreateClub extends Component {
             <Icon name="ios-camera"
               style={styles.cameraIcon} />
           </TouchableOpacity>
-        </Content>  
+        </Content>
 
-        <Button bordered 
-              onPress={this.submit} 
+        <Button bordered
+              onPress={this.submit}
               style={{ margin:20, width:100,
              justifyContent:'center', alignSelf:'center'}}>
             <Text>Create Club!</Text>
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   topButtons: {
     backgroundColor: '#E0E0E0',
     width: 100,
-    justifyContent:'center', 
+    justifyContent:'center',
     alignSelf:'center'
   },
   modalContent: {

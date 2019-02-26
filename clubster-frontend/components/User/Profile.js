@@ -10,6 +10,7 @@ import ImageGrid from './Cards/ImageGrid';
 import {accessKeyId, secretAccessKey} from '../../keys/keys';
 import v1 from 'uuid/v1';
 import { RNS3 } from 'react-native-aws3';
+import ClubList from './Cards/ClubList';
 export default class Profile extends Component {
     constructor() {
         super();
@@ -21,12 +22,23 @@ export default class Profile extends Component {
             major: '',
             hobbies: '',
             description: '',
-            errors: {}
+            errors: {},
+            Photos: true,
+            Clubs: false,
+            Skills: false,
         }
     }
 
     handlePhotoAction = () => {
-        console.log('photo image')
+        this.setState({Photos: true, Clubs: false, Skills: false})
+    }
+
+    handleSkillsAction = () => {
+        this.setState({Photos: false, Clubs: false, Skills: true})
+    }
+
+    handleClubsAction = () => {
+        this.setState({Photos: false, Clubs: true, Skills: false})
     }
 
     askPermissionsAsync = async () => {
@@ -201,16 +213,32 @@ export default class Profile extends Component {
                 <TouchableOpacity style={styles.button} onPress={this.handlePhotoAction.bind(this)}>
                     <Text style={styles.buttonText}> Photos </Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={this.handlePhotoAction.bind(this)}>
+                <TouchableOpacity style={styles.button} onPress={this.handleClubsAction.bind(this)}>
                     <Text style={styles.buttonText}> Clubs </Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={this.handlePhotoAction.bind(this)}>
+                <TouchableOpacity style={styles.button} onPress={this.handleSkillsAction.bind(this)}>
                     <Text style={styles.buttonText}> Skills </Text>
                 </TouchableOpacity>
                 </View>
                 <View style={{ flexDirection: 'column', alignSelf: 'center' }}>
-                    <ImageGrid />
+
                 </View>
+
+                {(this.state.Photos)
+                    //Photos tab
+                    ? <View style={{margin:10}}>
+                        <Text>Photos</Text>
+                    </View>
+                    //members tab
+                    : ((this.state.Skills)
+                    ? <View>
+                    <Text> Skills </Text>
+                    </View>
+                    //about tab
+                    :<View>
+                        <ClubList/>
+                    </View>
+                    )}
                 {/* MODAL  */}
                 <View style={{ flex: 1 }}>
 

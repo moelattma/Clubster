@@ -38,7 +38,7 @@ export default class ClubsFlatList extends Component {
 			</TouchableOpacity>
 		)
 	}
-	// item seprator using black color line in between 
+	// item seprator using black color line in between
 	renderSeparator = () => {
 		return (
 			<View

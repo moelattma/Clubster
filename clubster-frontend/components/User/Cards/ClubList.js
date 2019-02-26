@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Header, Content, Card, CardItem, Text, Body } from "native-base";
+import { Container, Header, Content, Card, CardItem, Text, Body, List } from "native-base";
 import { View, Dimensions, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import axios from 'axios';
 
@@ -14,10 +14,7 @@ export default class ClubList extends Component {
   }
 
   componentDidMount() {
-   this.willFocus = this.props.navigation.addListener('willFocus', () => {
-     if (this._mounted)
-       this.getComments();
-   });
+       this.getClubs();
   }
 
   getClubs() {
@@ -78,4 +75,4 @@ export default class ClubList extends Component {
 
 const styles = StyleSheet.create({
 
-}
+})

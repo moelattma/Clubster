@@ -31,7 +31,8 @@ exports.getAllClubs = (req, res) => {
 };
 
 exports.getUserClubsGeneral = (req, res) => {
-	User.findOne({ _id: req.body._id }).select("arrayClubsAdmin arrayClubsMember").populate({ path: 'arrayClubsAdmin', select: "image name _id" })
+	const { userID } = req.body;
+	User.findOne({ _id: userID }).select("arrayClubsAdmin arrayClubsMember").populate({ path: 'arrayClubsAdmin', select: "image name _id" })
 		.populate({ path: 'arrayClubsMember', select: 'image name _id' }).then((user) => {
 			return res.status(201).json({ 'arrayClubsAdmin': user.arrayClubsAdmin, 'arrayClubsMember': user.arrayClubsMember });	//populates array that user is admin of
 		}).catch((err) => console.log(err));
