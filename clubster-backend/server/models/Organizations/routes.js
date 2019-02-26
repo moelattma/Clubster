@@ -21,7 +21,7 @@ router.get('/organizations', passport.authenticate('jwt', {session:false}), (req
 	controller.getUserClubs(req, res);
 });
 
-router.get(':userID/organizations', passport.authenticate('jwt', {session:false}), (req, res) => {
+router.get('/:userID/organizations', passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.getUserClubsGeneral(req, res);
 });
 
