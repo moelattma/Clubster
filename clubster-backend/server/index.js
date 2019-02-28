@@ -7,8 +7,10 @@ const eventRoutes = require('./models/Events/routes');
 const ridesRoutes = require('./models/Rides/routes');
 const imageRoutes = require('./models/Images/routes');
 const conversationRoutes = require('./models/Conversations/routes');
+const conversationController = require('./models/Conversations/controller');
 const messageRoutes = require('./models/Messages/routes');
 const notificationRoutes = require('./models/Notifications/routes');
+const Conversations = require('./models/Conversations/model');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
@@ -36,23 +38,25 @@ app.use(passport.initialize());
 require('./utils/passport')(passport);
 
 app.use('/api', [loginRoutes, organizationRoutes,
-  profileRoutes, notificationRoutes, 
+  profileRoutes, notificationRoutes,
   eventRoutes, ridesRoutes, imageRoutes,
   conversationRoutes, messageRoutes, graphRoutes]);
 
 const PORT = process.env.PORT || 3000;
 const server = require("http").createServer(app);
 var io = require('socket.io').listen(server);
+var url = require('url');
 const port = 3000;
 
 io.sockets.on('connection', socket => {
+  console.log(socket);
   console.log("url"+socket.handshake.url);
   clientId=socket.handshake.query.id;
-  console.log("connected clientId:"+clientId);
-  console.log('a user connected');
-  socket.on("chat message", msg => {
-    console.log(msg);
-    io.emit('chat message', msg);
+  socket.on("input", msg => {
+    console.log('input detected');
+    Conversations.findOne({idOfClub: mongoose.Types.ObjectId(socket.handshake.query.groupId)}).populate({ path: 'messages', populate: { path: 'user' } }).then((conversation) => {
+      socket.emit('output', conversation.messages[conversation.messages.length - 1]);
+    })
   });
 });
 

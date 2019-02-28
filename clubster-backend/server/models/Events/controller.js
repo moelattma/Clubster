@@ -17,13 +17,25 @@ const Comments = require('../Comments/model');
 exports.getEvents = (req, res) => {
 	const { organizationID } = req.params;	// grabs id of organization in route URL.
 	//Find the orgnaization with id = organizationID and populate it's array of events along with each event's image.
-	Organization.findByIdAndUpdate(organizationID).populate({ path: 'events', populate: { path: 'image' } }).then((organization) => {
+	Organization.findByIdAndUpdate(organizationID).populate({ path: 'events', populate: { path: 'host' } }).then((organization) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No events found' });	//organization is null, DNE
 		} else {
 			return res.status(201).json({ 'events': organization.events, idOfUser: req.user._id }); //returns organization's events along with idOfUser
 		}
 	}).catch((err) => console.log(err));
+};
+
+exports.changeEventPicture = (req, res) => {
+	const { eventID } = req.params;
+
+	Events.findOneAndUpdate({ _id: eventID },{ $set: {"image": req.body.imageURL} }).then((event) => {
+		if(!event) {
+		  return res.status(404).json({ 'Error': 'error' });
+		} else {
+		  return res.status(201).json({'image': event.image});
+		}
+	  });
 };
 
 /*
@@ -76,14 +88,8 @@ exports.addMemberToEvent = (req, res) => {
 */
 exports.addEvent = (req, res) => {
 	const { organizationID } = req.params;	//grab the idOfOrganization whose id = idOfOrganization
-	var { name, date, description, expense } = req.body;	//grab data from req.body
-	expense = parseFloat(expense);	//convert expense to floating point
+	var { name, date, description, location, time, imageURL } = req.body;	//grab data from req.body
 	//Next 4 lines are how to write image info to db. We are going to change this soon. Code is more to memorize
-	var new_img = new Img;
-	new_img.img.data = fs.readFileSync(req.file.path)
-	new_img.img.contentType = 'image/jpeg';
-	//Save image
-	new_img.save().then((image) => {
 		//Find Organization whose id = organizationID
 		Organization.findByIdAndUpdate(organizationID).then((organization) => {
 			if (!organization) {
@@ -95,39 +101,30 @@ exports.addEvent = (req, res) => {
 					name: name,
 					date: date,
 					description: description,
+					host: req.user._id,
+					location: location,
+					time: time,
 					going: [req.user._id],
-					image: image._id,
-					likers: [req.user_id]
+					likers: [req.user._id],
+					comments: [],
+					image: imageURL
 				});
-				let expenses = new Expenses({
-					idOfClub: organizationID,
-					idOfEvent: clubEvent._id,
-					amount: expense
-				});
-				//write expense to db
-				expenses.save().then((expense) => {
-					if (expense) {
-						//write clubEvent to db
-						clubEvent.save().then((event) => {
-							// Add event's id to organization's events array
-							Organization.addEventToClub(organizationID, event._id);
-							// Find the Event whose id = event's id and populate it's image
-							Events.findOne({ _id: event._id }).populate('image').then((event) => {
-								return res.status(201).json({ 'event': event }); //return 201, all good
-							}).catch(err => {
-								return res.status(400).json({ 'Error': err });
-							});
-						}).catch((err) => {
-							return res.status(400).json({ 'Error': err });
-						});
-					}
+				//write clubEvent to db
+				clubEvent.save().then((event) => {
+					// Add event's id to organization's events array
+					Organization.addEventToClub(organizationID, event._id);
+					// Find the Event whose id = event's id and populate it's image
+					Events.findOne({ _id: event._id }).populate('host').then((event) => {
+						return res.status(201).json({ 'event': event }); //return 201, all good
+					}).catch(err => {
+						return res.status(400).json({ 'Error': err });
+					});
 				}).catch((err) => {
 					return res.status(400).json({ 'Error': err });
 				});
-
 			}
 		});
-	});
+
 }
 
 exports.getLikers = (req, res) => {
@@ -147,7 +144,7 @@ exports.addLikerToEvent = (req, res) => {
 	Events.findByIdAndUpdate(eventID).then((event) => {
 		if (event) {
 			var currentLikers = event.likers;	//grabs current array of members(id form)
-			var isInArray = event.currentLikers.some(function (friend) {	//checks if the user is already in event's going array
+			var isInArray = currentLikers.some(function (friend) {	//checks if the user is already in event's going array
 				return friend.equals(idOfAttender);
 			});
 			//if user is in array, remove his/her id from the memeber array. Add him if otherwise.
@@ -185,11 +182,25 @@ exports.addLikerToEvent = (req, res) => {
 exports.getComments = (req, res) => {
 	const { eventID } = req.params;	// grabs id of organization in route URL.
 	//Find the orgnaization with id = organizationID and populate it's array of events along with each event's image.
-	Events.findByIdAndUpdate(eventID).populate({ path: 'comments'}).then((organization) => {
+	Events.findByIdAndUpdate(eventID).populate({path: 'comments', populate: {path: 'userID'}}).then((event) => {
+		if (!event) {
+			console.log('wwwow');
+			return res.status(400).json({ 'Error': 'No events found' });	//organization is null, DNE
+		} else {
+			console.log(event.comments);
+			return res.status(201).json({ 'comments': event.comments, idOfUser: req.user._id }); //returns organization's events along with idOfUser
+		}
+	}).catch((err) => console.log(err));
+}
+
+exports.getPhotos = (req, res) => {
+	const { eventID } = req.params;	// grabs id of organization in route URL.
+	//Find the orgnaization with id = organizationID and populate it's array of events along with each event's image.
+	Events.findByIdAndUpdate(eventID).then((event) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No events found' });	//organization is null, DNE
 		} else {
-			return res.status(201).json({ 'comments': organization.comments, idOfUser: req.user._id }); //returns organization's events along with idOfUser
+			return res.status(201).json({ 'photos': event.photos, idOfUser: req.user._id }); //returns organization's events along with idOfUser
 		}
 	}).catch((err) => console.log(err));
 }
@@ -203,6 +214,7 @@ exports.addCommentToEvent = (req, res) => {
 	});
 	comment.save().then((comment) => {
 			if(comment){
+				console.log(comment);
 				Events.findOneAndUpdate(
 					{ _id: eventID },
 					{ $push: { comments: comment._id } },
@@ -211,7 +223,9 @@ exports.addCommentToEvent = (req, res) => {
 						if (error) {
 							console.log(error);
 						} else {
-							return res.status(201).json({ event });
+							Events.findOne({_id:eventID}).populate({path: 'comments', populate: {path: 'userID'}}).then((event) => {
+								return res.status(201).json({ event });
+							})
 						}
 					});
 			}
@@ -219,5 +233,19 @@ exports.addCommentToEvent = (req, res) => {
 				return res.status(400).json({ 'Error': 'No comments found' });
 			}
 	})
+}
 
+exports.addPhotoToEvent = (req, res) => {
+	const { imageURL } = req.body;
+	const { eventID } = req.params;
+	Events.findOneAndUpdate(
+		{ _id: eventID },
+		{ $push: { photos: imageURL } },
+		function (error, event) {
+			if (error) {
+				console.log(error);
+			} else {
+				return res.status(201).json({ 'photos':event.photos });
+			}
+		});
 }

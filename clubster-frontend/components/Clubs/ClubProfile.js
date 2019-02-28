@@ -19,7 +19,6 @@ export default class ClubProfile extends Component {
             organizationID: orgID,
             name: '',
             president: '',
-            purpose: '',
             description: '',
             isLoading: true,
             joinable: false,
@@ -32,9 +31,9 @@ export default class ClubProfile extends Component {
         axios.post("http://localhost:3000/api/organizations/isMember", { orgID: this.state.organizationID }).then((response) => {
             this.setState({ joinable: (!response.data.isMember) });
 
-            const { imageId, name, president, purpose, description } = response.data.organization;
+            const { imageId, name, president, description } = response.data.organization;
 
-            this.setState({ name, president, purpose, description });
+            this.setState({ name, president, description });
             if(imageId)
                 this.setState({ img: 'data:image/jpeg;base64,' + converter.encode(imageId.img.data.data) });
             this.setState({ isLoading: false });
@@ -61,7 +60,7 @@ export default class ClubProfile extends Component {
     };
 
     render() {
-        const { president, purpose, description, organizationID } = this.state;
+        const { president, description, organizationID } = this.state;
 
         if (!this.state.isLoading) {
             let joins = null;
@@ -81,9 +80,6 @@ export default class ClubProfile extends Component {
                 <View style={styles.background}>
                     <Text style={{ textAlign: 'center', marginTop: 20 }}>
                         President: {president}
-                    </Text>
-                    <Text style={{ textAlign: 'center', marginLeft: WIDTH / 10, marginRight: WIDTH / 10, marginTop: 20 }}>
-                        Purpose: {purpose}
                     </Text>
                     <Text style={{ textAlign: 'center', marginLeft: WIDTH / 10, marginRight: WIDTH / 10, marginTop: 20 }}>
                         Description: {description}

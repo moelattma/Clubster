@@ -5,18 +5,17 @@
 const fs = require('fs');
 const multer = require('multer');
 const router = require('express').Router();
-var upload = multer({ dest: 'uploads/' });
-const Organization = require('../Organizations/model');
+const controller = require('./controller');
 
-router.get(':orgID/SideGraphs', function(req, res) {
+router.get('/:orgID/SideGraphs', function(req, res) {
     controller.getSideGraphs(req, res);
 });
 
-router.get(':orgID/ActiveChart', function(req, res) {
+router.get('/:orgID/ActiveChart', function(req, res) {
     controller.getActiveChart(req, res);
 });
 
-router.get(':orgID/EventAttendance', function(req, res) {
+router.get('/:orgID/EventAttendance', function(req, res) {
     controller.getEventAttendance(req, res);
 });
 

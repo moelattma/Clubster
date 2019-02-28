@@ -3,6 +3,7 @@ const controller = require('./controller');
 const passport = require('passport');
 
 router.get('/conversations/:groupId', passport.authenticate('jwt', {session:false}), (req, res) => {
+	console.log('Hi');
 	controller.findMessages(req, res);
 });
 

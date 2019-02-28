@@ -61,8 +61,6 @@ export default class ClubsFlatList extends Component {
 			.catch((error) => {
 				console.log(error);
 			})
-
-		console.log()
 	}
 	render() {
 		return (

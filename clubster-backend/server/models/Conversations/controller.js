@@ -1,5 +1,6 @@
-const Conversations = require('./model')
+const Conversations = require('./model');
 const Organization = require('../Organizations/model')
+const PORT = process.env.PORT || 3000;
 
 exports.findMessages = (req, res) => {
 	const {groupId} = req.params;
@@ -11,7 +12,13 @@ exports.findMessages = (req, res) => {
          ]
     }).then((conversation) => {
     if(!conversation) {
-      return res.status(400).json({'Error':'No messages found'});
+			let conversation = new Conversations({
+        idOfClub: groupId,
+        messages: []
+      });
+      conversation.save().then((conversation) => {
+				return res.status(201).json({conversation:conversation, userId: req.user._id});
+			});
     } else {
 			console.log('MARRRIO');
       return res.status(201).json({conversation:conversation, userId: req.user._id});

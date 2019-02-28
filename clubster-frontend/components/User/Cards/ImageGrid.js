@@ -54,7 +54,7 @@ class ImageGrid extends Component {
       }
       var imageURL;
       const fileUpload = await RNS3.put(file,options).then((response)=> {
-         console.log(response.body.postResponse.key);
+        //  console.log(response.body.postResponse.key);
          imageURL = response.body.postResponse.key;
       }).catch((err) => {console.log(err)});
       const data = new FormData();

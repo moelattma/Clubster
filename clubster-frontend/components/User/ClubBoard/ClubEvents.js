@@ -8,10 +8,12 @@ import { createStackNavigator } from 'react-navigation';
 import tx from 'tcomb-additional-types';
 import { ImagePicker, Permissions, Constants } from 'expo';
 import { Font, AppLoading } from "expo";
-const Form = t.form.Form;
 import converter from 'base64-arraybuffer';
-import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
+import { Container, Header, Content, Card,
+       CardItem, Thumbnail, Text, Button, Icon,
+        Left, Body, Right, Form, Item, Input } from 'native-base';
 import EventProfile from './EventProfile';
+import Comments from './Comments';
 import v1 from 'uuid/v1';
 import {accessKeyId, secretAccessKey} from '../../../keys/keys';
 import { RNS3 } from 'react-native-aws3';
@@ -20,14 +22,6 @@ import { RNS3 } from 'react-native-aws3';
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const EVENT_WIDTH = WIDTH * 9 / 10;
 const EVENT_HEIGHT = HEIGHT * 3 / 7;
-
-const Event = t.struct({
-  name: t.String,
-  description: t.String,
-  date: t.String,
-  location: t.String,
-  time: t.String
-});
 
 export default class ClubEvents extends Component {
   componentWillMount() {
@@ -61,7 +55,12 @@ class ShowEvents extends Component {
     this.state = {
       clubEvents: [],
       loading: false,
-      idOfUser: ''
+      idOfUser: '',
+      name: '',
+      description: '',
+      date: '',
+      location: '',
+      time: ''
     }
   }
 
@@ -85,11 +84,11 @@ class ShowEvents extends Component {
     }
   }
 
-   componentDidMount() {
+  async componentDidMount() {
     this._mounted = true;
     // await Font.loadAsync({
-      // Roboto: require("native-base/Fonts/Roboto.ttf"),
-      // Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
+    //   Roboto: require("native-base/Fonts/Roboto.ttf"),
+    //   Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
     // });
     this.willFocus = this.props.navigation.addListener('willFocus', () => {
       if (this._mounted)
@@ -110,7 +109,8 @@ class ShowEvents extends Component {
           this.setState({ clubEvents: response.data.events, idOfUser: response.data.idOfUser });
           this.setState({ loading: false })
         }
-      });
+      })
+      .catch((err) => { console.log('getClubEvents failed'); console.log(err) });
   }
 
   _handleGoing = (item) => {
@@ -122,8 +122,9 @@ class ShowEvents extends Component {
     var id = this.state.idOfUser;
     axios.post(`http://localhost:3000/api/events/${item._id}`).then((response) => {
       clubEvents[i].going = response.data.event.going;
-      this.setState({ clubEvents: clubEvents });
+      this.setState({clubEvents:clubEvents});
     })
+    .catch((err) => {console.log('error getting Going'); console.log(err)});
   }
 
   _handleLikers = (item) => {
@@ -133,10 +134,11 @@ class ShowEvents extends Component {
     }
     var clubEvents = this.state.clubEvents;
     var id = this.state.idOfUser;
-    axios.post(`http://localhost:3000/api/events/${item._id}`).then((response) => {
+    axios.post(`http://localhost:3000/api/events/${item._id}/likers`).then((response) => {
       clubEvents[i].likers = response.data.event.likers;
-      this.setState({ clubEvents: clubEvents });
+      this.setState({clubEvents:clubEvents});
     })
+    .catch((err) => {console.log('error posting to Likers'); console.log(err)});
   }
 
   _renderItem = ({ item }) => {
@@ -178,18 +180,18 @@ class ShowEvents extends Component {
           <Left>
             {
               item.likers && item.likers.indexOf(this.state.idOfUser) > -1 ?
-                <Button transparent>
+                <Button transparent onPress={() => this._handleLikers(item)}>
                   <Icon name="thumbs-up" />
                   <Text>{item.likers.length} likes</Text>
                 </Button> :
-                <Button transparent>
+                <Button transparent onPress={() => this._handleLikers(item)}>
                   <Icon name="thumbs-up" style={{color:'gray'}}/>
                   <Text style={{color:'gray'}}>{item.likers.length} likes</Text>
                 </Button>
             }
           </Left>
           <Body>
-            <Button transparent>
+            <Button transparent onPress={() => this.props.navigation.navigate('Comments', { eventID: item._id })}>
               <Icon active name="chatbubbles" />
               <Text>{item.comments.length} comments</Text>
             </Button>
@@ -197,11 +199,11 @@ class ShowEvents extends Component {
           <Right>
             {
               item.going && item.going.indexOf(this.state.idOfUser) > -1 ?
-                <Button transparent>
+                <Button transparent onPress={() => this._handleGoing(item)}>
                   <Icon active name="star" />
                   <Text>{item.going.length} going</Text>
                 </Button> :
-                <Button transparent>
+                <Button transparent onPress={() => this._handleGoing(item)}>
                   <Icon name="star" style={{color:'gray'}}/>
                   <Text style={{color:'gray'}}>{item.going.length} going</Text>
                 </Button>
@@ -228,13 +230,25 @@ class ShowEvents extends Component {
 
 class CreateClubEvent extends Component {
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      name: '',
+      description: '',
+      date: '',
+      location: '',
+      time: '',
+      imageURL: ''
+    }
+  }
+
   askPermissionsAsync = async () => {
     await Permissions.askAsync(Permissions.CAMERA);
     await Permissions.askAsync(Permissions.CAMERA_ROLL);
   };
 
-  createEvent = async () => {
-    const { _id } = this.props.screenProps;
+  useLibraryHandler = async () => {
     await this.askPermissionsAsync();
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
@@ -258,29 +272,92 @@ class CreateClubEvent extends Component {
         secretKey: secretAccessKey,
         successActionStatus:201
       }
-      var imageURL;
-      await RNS3.put(file,options).then((response)=> {
-         imageURL = response.body.postResponse.key;
-      }).catch((err) => {console.log(err)});
-      const data = new FormData();
-      data.append('name', this._formRef.getValue().name);
-      data.append('date', this._formRef.getValue().date);
-      data.append('time', this._formRef.getValue().time);
-      data.append('description', this._formRef.getValue().description);
-      data.append('location', this._formRef.getValue().location);
-      data.append('imageURL', imageURL);
-      await axios.post(`http://localhost:3000/api/events/${_id}/new`, data);
-      this.props.navigation.navigate('ShowEvents');
-    } catch (error) {console.log(error);}
+      await RNS3.put(file, options).then((response) => {
+        this.setState({
+          imageURL: response.body.postResponse.key
+        });
+      }).catch((err) => { console.log('upload image to aws failed');console.log(err) });
+    } catch (error) {console.log('library handle failed'); console.log(error);}
+  }
+
+  createEvent = () => {
+    const { _id } = this.props.screenProps;
+    console.log('org id', _id)
+    const { name, date, time, description, location, imageURL } = this.state;
+    console.log('imageurl', imageURL)
+    axios.post('http://localhost:3000/api/events/'+_id+'/new', {
+      name,
+      date,
+      time,
+      description,
+      location,
+      imageURL
+    }).then((response) => {
+      console.log('creatEvent success')
+      console.log('response', response.status)
+    })
+    .catch((err) => { console.log('creatEvent failed'); console.log(err) });
+    this.props.navigation.navigate('ShowEvents');
   }
 
   render() {
+
+    const { name, date, time, description, location } = this.state;
+
     return (
-      <View style={{ flex: 1 }}>
-        <Form type={Event} ref={(ref) => this._formRef = ref} />
-        <TouchableOpacity onPress={() => this.createEvent()} style={{ height: 10, width: 60, backgroundColor: 'blue' }}>
+      <Container>
+      <Form>
+        <Item>
+          <Input placeholder="Name"
+            label='name'
+            onChangeText={(name) => this.setState({ name })}
+            value={name}
+          />
+        </Item>
+        <Item>
+          <Input placeholder="Date"
+            label='date'
+            onChangeText={(date) => this.setState({ date })}
+            value={date}
+          />
+        </Item>
+        <Item>
+          <Input placeholder="Time"
+            label='time'
+            onChangeText={(time) => this.setState({ time })}
+            value={time}
+          />
+        </Item>
+        <Item>
+          <Input placeholder="Location"
+            label='location'
+            onChangeText={(location) => this.setState({ location })}
+            value={location}
+          />
+        </Item>
+        <Item>
+          <Input placeholder="Description"
+            label='description'
+            onChangeText={(description) => this.setState({ description })}
+            value={description}
+          />
+        </Item>
+      </Form>
+      <Content>
+        <TouchableOpacity onPress={this.useLibraryHandler}>
+          <Icon name="ios-camera"
+            style={styles.cameraIcon} />
         </TouchableOpacity>
-      </View>
+      </Content>
+
+      <Button bordered
+            onPress={this.createEvent}
+            style={{ margin:20, width:160,
+          justifyContent:'center', alignSelf:'center'}}>
+          <Text>Create Event!</Text>
+        </Button>
+
+      </Container>
     );
   }
 }
@@ -289,7 +366,8 @@ const ClubEventNavigator = createStackNavigator(
   {
     ShowEvents: { screen: ShowEvents },
     CreateClubEvent: { screen: CreateClubEvent },
-    EventProfile: { screen: EventProfile }
+    EventProfile: { screen: EventProfile },
+    Comments: { screen: Comments }
   },
   {
     navigationOptions: {
@@ -339,5 +417,9 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
     fontSize: 20
-  }
+  },
+  cameraIcon:{
+    fontSize: 40,
+    margin:20
+  },
 });
