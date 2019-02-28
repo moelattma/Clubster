@@ -93,9 +93,10 @@ export default class Settings extends Component {
             console.log('president', president)
             console.log('name', name)
             console.log('description', description)
+            console.log('image', response.data.org.imageId.img.data.data)
 
             this.setState({
-                president, name, description,
+                president: president, name, description,
                 img: 'data:image/jpeg;base64,' + converter.encode(response.data.org.imageId.img.data.data),
                 isLoading: false
             });
@@ -143,9 +144,7 @@ export default class Settings extends Component {
         })
     }
 
-
     render() {
-
         return (
             <View>
                 <View>
@@ -210,10 +209,10 @@ export default class Settings extends Component {
                                     {this.state.president}
                                 </Text>
                                 <Text style={styles.subText}>
-                                    Purpose/ description:
+                                    Description/ purpose:
                                 </Text>
                                 <Text style={{ marginLeft: 10, marginBottom: 7 }}>
-                                    {this.state.purpose}
+                                    {this.state.description}
                                 </Text>
                             </View>
                         </View>
