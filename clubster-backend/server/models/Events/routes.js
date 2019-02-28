@@ -42,7 +42,7 @@ router.post('/events/:eventID/likers', passport.authenticate('jwt', {session:fal
 	controller.addLikerToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
-router.post('/events/:eventID/comment', passport.authenticate('jwt', {session:false}), (req, res) => {
+router.post('/events/:eventID/comments', passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.addCommentToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 

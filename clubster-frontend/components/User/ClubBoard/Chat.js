@@ -18,14 +18,13 @@ export default class Chat extends Component {
 
     componentDidMount() {
       const { screenProps } = this.props;
-      this.socket = io(`http://localhost:3000/?id=' + ${screenProps._id}`);
-      this.socket.on('output', function(data) {
+      this.socket = io('http://localhost:3000/', { query:  `groupId=${screenProps._id}` });
+      this.socket.on('output', data => {
         this.setState(previousState => ({
-          messages: GiftedChat.append(previousState.messages, messages)
+          messages: GiftedChat.append(previousState.messages, data)
         }));
       });
       axios.get(`http://localhost:3000/api/conversations/${screenProps._id}`).then((response) => {
-        console.log('Hiiii' + response.data);
         this.setState({ messages: response.data.conversation.messages });
         this.setState({ userId: response.data.userId });
         console.log(this.state.userId);
@@ -40,10 +39,8 @@ export default class Chat extends Component {
       axios.post(`http://localhost:3000/api/messages/${screenProps._id}`, {
         text: text
       }).then((message) => {
-        console.log(message.data.message);
-        this.setState(previousState => ({
-          messages: GiftedChat.append(previousState.messages, messages)
-        }))
+        this.socket.emit('input', text);
+        console.log(message[0].text);
       }).catch((err) => console.log(err));
     }
 

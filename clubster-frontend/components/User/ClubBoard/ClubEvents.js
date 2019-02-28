@@ -12,6 +12,7 @@ const Form = t.form.Form;
 import converter from 'base64-arraybuffer';
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 import EventProfile from './EventProfile';
+import Comments from './Comments';
 import v1 from 'uuid/v1';
 import {accessKeyId, secretAccessKey} from '../../../keys/keys';
 import { RNS3 } from 'react-native-aws3';
@@ -122,17 +123,20 @@ class ShowEvents extends Component {
     var id = this.state.idOfUser;
     axios.post(`http://localhost:3000/api/events/${item._id}`).then((response) => {
       clubEvents[i].going = response.data.event.going;
-      this.setState({ clubEvents: clubEvents });
+      this.setState({clubEvents:clubEvents});
     })
   }
 
   _handleLikers = (item) => {
+    for (var i = 0; i < this.state.clubEvents.length; i++) {
+      if (this.state.clubEvents[i]._id === item._id)
+        break;
+    }
     var clubEvents = this.state.clubEvents;
     var id = this.state.idOfUser;
     axios.post(`http://localhost:3000/api/events/${item._id}/likers`).then((response) => {
-      console.log("posted")
       clubEvents[i].likers = response.data.event.likers;
-      this.setState({ clubEvents: clubEvents });
+      this.setState({clubEvents:clubEvents});
     })
   }
 
@@ -186,7 +190,7 @@ class ShowEvents extends Component {
             }
           </Left>
           <Body>
-            <Button transparent>
+            <Button transparent onPress={() => this.props.navigation.navigate('Comments', { eventID: item._id })}>
               <Icon active name="chatbubbles" />
               <Text>{item.comments.length} comments</Text>
             </Button>
@@ -287,7 +291,8 @@ const ClubEventNavigator = createStackNavigator(
   {
     ShowEvents: { screen: ShowEvents },
     CreateClubEvent: { screen: CreateClubEvent },
-    EventProfile: { screen: EventProfile }
+    EventProfile: { screen: EventProfile },
+    Comments: { screen: Comments }
   },
   {
     navigationOptions: {
