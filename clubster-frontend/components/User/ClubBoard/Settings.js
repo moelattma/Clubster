@@ -18,8 +18,6 @@ export default class Settings extends Component {
             show: false,
             president: '',
             name: '',
-            acronym: '',
-            purpose: '',
             description: '',
             img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC',
             about: true,
@@ -89,12 +87,15 @@ export default class Settings extends Component {
 
     componentDidMount() {
         const { _id } = this.props.screenProps;
-
+        console.log('org id', _id)
         axios.get(`http://localhost:3000/api/organizations/getOrg/${_id}`).then((response) => {
-            const { president, name, acronym, purpose, description } = response.data.org;
+            const { president, name, description } = response.data.org;
+            console.log('president', president)
+            console.log('name', name)
+            console.log('description', description)
 
             this.setState({
-                president, name, acronym, purpose, description,
+                president, name, description,
                 img: 'data:image/jpeg;base64,' + converter.encode(response.data.org.imageId.img.data.data),
                 isLoading: false
             });
@@ -105,9 +106,7 @@ export default class Settings extends Component {
         const { _id } = this.props.screenProps;
         axios.post(`http://localhost:3000/api/organizations/${_id}`, {
             name: this.state.name,
-            acronym: this.state.acronym,
-            purpose: this.state.purpose,
-            description: this.state.description
+            description: this.state.description,
         }).then((response) => {
             this.setState({ show: false });
         }).catch((error) => { return; });
@@ -248,10 +247,10 @@ export default class Settings extends Component {
                                     <View style={styles.textInAreaContainer}>
                                         <TextInput placeholder='purpose/ description'
                                         style={styles.textInArea}
-                                        label='Purpose' underlineColorAndroid="transparent"
+                                        label='Description' underlineColorAndroid="transparent"
                                          multiline={true} numberOfLines={3}
-                                         onChangeText={(purpose) => this.setState({ purpose })}
-                                         value={this.state.purpose} />
+                                         onChangeText={(description) => this.setState({ description })}
+                                         value={this.state.description} />
                                     </View>
                                     <View >
                                         <View>

@@ -101,7 +101,6 @@ class ShowEvents extends Component {
   }
 
   getClubEvents() {
-    console.log('getting club events')
     const { _id } = this.props.screenProps;
     this.setState({ loading: true })
     axios.get(`http://localhost:3000/api/events/${_id}`)
@@ -122,7 +121,6 @@ class ShowEvents extends Component {
     var clubEvents = this.state.clubEvents;
     var id = this.state.idOfUser;
     axios.post(`http://localhost:3000/api/events/${item._id}`).then((response) => {
-      console.log('post event going successful', repoonse.date.event.going)
       clubEvents[i].going = response.data.event.going;
       this.setState({clubEvents:clubEvents});
     })
@@ -144,8 +142,6 @@ class ShowEvents extends Component {
   }
 
   _renderItem = ({ item }) => {
-    console.log('item' ,item)
-    console.log('item image' ,item.image)
     var url;
     if (item.image)
       url = 'https://s3.amazonaws.com/clubster-123/' + item.image;
