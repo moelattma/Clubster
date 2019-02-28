@@ -10,15 +10,15 @@ const Schema = mongoose.Schema;
 * Creation of User Schema. We specify a const variable with fields: name, email, password, avatar, array of clubs where user is member, and array of clubs where user is admin.
 */
 const Rides = new Schema({
-  driverid: {
+  driverID: {
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'users'
   },
-  ridersid: [{
+  ridersID: [{
     type: Schema.Types.ObjectId,
     ref: 'users'
   }],
-  passangerSeats: {
+  passengerSeats: {
     type: Number
   },
   description: {
