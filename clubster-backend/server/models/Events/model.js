@@ -54,6 +54,10 @@ const Events = new Schema({
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'users'
   }],
+  rides: [{
+    type: Schema.Types.ObjectId,   //Specifiers
+    ref: 'Rides'
+  }],
   comments: [{
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'comments'
@@ -76,6 +80,13 @@ Events.statics.removeGoingUser = async function(eventID, userID) {
 Events.statics.updateInfoByIndex = async function(eventID) {
   console.log('hi');
   await this.update({_id:eventID}, { $inc: {value:1 }});
+}
+  Events.statics.addEventRide = async function(eventID, rideID) {
+  await this.findByIdAndUpdate(eventID, { $push: { rides: rideID } });
+}
+
+Events.statics.removeEventRide = async function(eventID, rideID) {
+  await this.findByIdAndUpdate(eventID, { $pull: { rides: rideID } });
 }
 
 /*

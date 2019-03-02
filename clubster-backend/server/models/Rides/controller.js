@@ -6,57 +6,43 @@
 const User = require('../Users/model');
 const Profile = require('./model');
 const mongoose = require('mongoose');
-const Img = require('../Images/model');
 const fs = require('fs');
+const Rides = require('./model');
+const Events = require('./../Events/model');
 
-exports.changeProfile = (req, res) => {
-  Profile.findOneAndUpdate({ user: req.user._id },{ $set: {"image": req.body.imageURL} }).then((profile) => {
-    if(!profile) {
-      return res.status(404).json({ 'Error': 'error' });
-    } else {
-      return res.status(201).json({'profile': profile});
-    }
-  });
-};
-
-exports.profileSubmission = (req, res) => {
-  const { major, hobbies, facebook, instagram, linkedIn, description } = req.body; // destructure, pull value and assign it
-
-  // making new profile object
-  const newProfile = {
-    user: req.user._id,
-    major: major,
-    hobbies: hobbies,
-    social: {
-      facebook: facebook,
-      linkedin: linkedIn,
-      instagram: instagram,
-    },
+exports.createRide = (req, res) => {
+  const { eventID } = req.params;
+  const { passengerSeats, description } = req.body;
+  const { _id } = req.user;
+  let newRide = new Rides({
+    driverID: _id,
+    ridersID: [],
+    passengerSeats: passengerSeats,
     description: description
-  };
-
-  Profile.findOne({ user: req.user._id }).then((profile) => {
-    if (profile) {
-      Profile.findOneAndUpdate(
-        { user: req.user._id },
-        { $set: newProfile },    // overwrites the previous profile with new one
-        { new: true }
-      ).then((profile) => {
-        Profile.findOne({ user: req.user._id }).populate('image').then((profile) => {
-          if (profile)
-            return res.status(201).json({ 'profile': profile });
-          else
-            return res.status(400).json({ 'err': 'err' });
-        });
-      })    // if sccueedd the return the profile
-    } else {
-      new Profile(newProfile).save().then((profile) => res.json(profile));
-    }
   });
+  
+  newRide.save().then( ride => {
+    Events.addEventRide(eventID, ride._id);
+    return res.status(201).json({ 'ride':ride });
+  })
 };
 
-exports.retrieveProfile = (req, res) => {
-  Profile.findOne({ user: req.user._id }).then((profile) => {
-    return res.status(201).json({ 'profile': profile, 'name': req.user.name });
-  });
+exports.joinRide = (req, res) => {
+  const { eventID, rideID } = req.params;
+  const { passengerSeats, description } = req.body;
+  const { _id } = req.user;
+  Rides.findByIdAndUpdate(rideID).then((ride) => {
+    if(!ride){
+      return res.status(400).json({ 'Error': 'No such ride exists' }); //DNE, doesnt exist
+    }
+    else{
+
+    }
+  })
+
+
+};
+
+exports.getRides = (req, res) => {
+  
 };

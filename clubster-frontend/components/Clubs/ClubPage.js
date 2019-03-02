@@ -209,8 +209,6 @@ class CreateClub extends Component {
   };
 
   useLibraryHandler = async () => {
-
-    console.log('library handle')
     await this.askPermissionsAsync();
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
@@ -235,11 +233,9 @@ class CreateClub extends Component {
         successActionStatus: 201
       }
       await RNS3.put(file, options).then((response) => {
-        console.log('image response', response.body.postResponse.key);
         this.setState({
           imageURL: response.body.postResponse.key
         });
-        console.log('state image', this.state.imageURL)
       }).catch((err) => { console.log(err) });
     } catch (error) {
       console.log(error);
@@ -248,13 +244,12 @@ class CreateClub extends Component {
 
   submit = () => {
     const { name, description, imageURL } = this.state;
-    console.log('imageurl', imageURL)
     axios.post('http://localhost:3000/api/organizations/new', {
       name,
       description,
       imageURL
     }).then((response) => {
-      console.log('response', response.status)
+      // console.log('response', response.status)
     })
     .catch((err) => { console.log(err) });
     this.props.navigation.navigate('ShowClubs');

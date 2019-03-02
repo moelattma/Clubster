@@ -33,7 +33,7 @@ export default class Comments extends Component {
 
  _renderItem() {
    return this.state.comments.map((data) => {
-     console.log(data);
+    //  console.log(data);
      return (
        <ListItem avatar>
          <Left>

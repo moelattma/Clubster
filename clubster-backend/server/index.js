@@ -17,7 +17,6 @@ const morgan = require('morgan');
 const passport = require('passport');
 const {databasePassword, databaseUsername} = require('../keys/keys');
 const multer = require('multer');
-const axios = require('axios');
 const graphRoutes = require('./models/Graphs/routes');
 
 mongoose.Promise = global.Promise; // let's us use then catch
