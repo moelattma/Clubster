@@ -97,7 +97,7 @@ Organization.statics.addEventToClub = async function(organizationID, eventID) {
       organization.updateInfoByIndex(i);
     }
     for(let j = 0;j<organization.events.length;j++) {
-      if(organization.events[j].value >= 5) {
+      if(organization.events[j].value <= 5 && organization.events[j].value > 0) {
         Events.updateInfoByIndex(organization.events[j]._id);
       }
     }
