@@ -40,6 +40,9 @@ const User = new Schema({
     ref: 'organizations',
     required: false
   }],
+  activityScore:{
+    type:Number
+  },
   arrayClubsAdmin: [{
     type: Schema.Types.ObjectId,
     ref: 'organizations',

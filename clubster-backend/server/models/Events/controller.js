@@ -107,7 +107,8 @@ exports.addEvent = (req, res) => {
 					going: [req.user._id],
 					likers: [req.user._id],
 					comments: [],
-					image: imageURL
+					image: imageURL,
+					value: 5
 				});
 				//write clubEvent to db
 				clubEvent.save().then((event) => {

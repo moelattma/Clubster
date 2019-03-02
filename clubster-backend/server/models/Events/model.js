@@ -43,6 +43,9 @@ const Events = new Schema({
   photos: [{
     type:String
   }],
+  value: {
+    type: Number
+  },
   going: [{
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'users'
@@ -64,6 +67,15 @@ Events.statics.addGoingUser = async function(eventID, userID) {
 //Method to remove a user from an event. Async/Await method
 Events.statics.removeGoingUser = async function(eventID, userID) {
   await this.findByIdAndUpdate(eventID, { $pull: { going: userID } });
+}
+
+Events.statics.removeGoingUser = async function(eventID, userID) {
+  await this.findByIdAndUpdate(eventID, { $pull: { going: userID } });
+}
+
+Events.statics.updateInfoByIndex = async function(eventID) {
+  console.log('hi');
+  await this.update({_id:eventID}, { $inc: {value:1 }});
 }
 
 /*
