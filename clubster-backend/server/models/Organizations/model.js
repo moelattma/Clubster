@@ -60,7 +60,10 @@ const Organization = new Schema({
   }],
   photos: [{
     type: String
-  }]
+  }],
+  totalComments: {
+    type: Number
+  }
 });
 
 Organization.methods.updateInfoByIndex = function(index) {
@@ -77,8 +80,41 @@ Organization.methods.updateInfoByIndex = function(index) {
     this.save()
 }
 
+Organization.statics.modifyActiveScore = async function(organizationID, memberID, value, type) {
+  let prevValue = 0;
+  await this.findByIdAndUpdate(organizationID).populate('members').then((organization)=> {
+    for(let i = 0;i<organization.members.length;i++) {
+      if(organization.members[i]._id == memberID) {
+        prevValue = organization.members[i].activeScore;
+        break;
+      }
+    }
+  });
+  (type == -1) ? prevValue -= value : prevValue += value;
+  if(prevValue < 0) {
+    prevValue = 0;
+  }
+  await this.update({"_id": organizationID, "members.member": memberID}, {$set: {"members.$.activeScore": prevValue}});
+}
+
 Organization.statics.addMemberToClub = async function(organizationID, memberID) {
-  await this.findByIdAndUpdate(organizationID, { $push: { members: { member: memberID, activeScore:0 } } });
+  await this.findByIdAndUpdate(organizationID, {$set:{}}).populate('members.member').populate('events').then((organization) => {
+    console.log("Yiiii", organization);
+    for(let i = 0;i<organization.members.length;i++) {
+      organization.updateInfoByIndex(i);
+    }
+    for(let j = 0;j<organization.events.length;j++) {
+      if(organization.events[j].value <= 5 && organization.events[j].value > 0) {
+        Events.updateInfoByIndex(organization.events[j]._id);
+      }
+    }
+  });
+}
+Organization.statics.increaseComments = async function(organizationID) {
+  await this.update({_id:organizationID}, { $inc: {totalComments:1 }});
+}
+Organization.statics.updateInfoByIndex = async function(eventID) {
+  await this.update({_id:eventID}, { $inc: {value:-1 }});
 }
 
 Organization.statics.addAdminToClub = async function(organizationID, adminID) {

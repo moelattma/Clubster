@@ -23,6 +23,7 @@ import Dashboard from './User/ClubBoard/Settings';
 import ClubEvents from './User/ClubBoard/ClubEvents';
 import Chat from './User/ClubBoard/Chat';
 import MemberList from './User/ClubBoard/MembersList';
+import Graphs from './User/ClubBoard/Graphs';
 
 export const LoginNavigator = createSwitchNavigator(
     {
@@ -125,7 +126,7 @@ export const AdminNavigator = createMaterialTopTabNavigator(
                     <MaterialCommunityIcons name='information-variant' size={27} color={tintColor} />
                 ),
             }
-        },
+        }
     },
     {
         initialRouteName: 'ClubEvents',

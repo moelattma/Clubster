@@ -8,7 +8,8 @@ const WIDTH = Dimensions.get('window').width;
 export default class GalleryImage extends Component {
   render() {
     const { uri, index, onPress } = this.props;
-    // console.log('hii  ', uri, index, onPress);
+
+     console.log('hii  ', uri, index, onPress);
     return (
       <Button
         onPress={() => onPress(index)}
@@ -23,7 +24,7 @@ export default class GalleryImage extends Component {
           animation={'bounceIn'}
           delay={100 * index}
           duration={500}
-          source= {{uri: 'https://facebook.github.io/react-native/docs/assets/favicon.png'}}
+          source= {{uri: uri}}
           style={{
             height: 160,
             left: 5,
