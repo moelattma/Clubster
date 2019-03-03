@@ -63,11 +63,14 @@ export default class EventProfile extends Component {
     }
 
     render() {
+        console.log(this.event);
         const eventInfo = {
+            _id: this.event._id,
             name: this.event.name,
             description: this.event.description,
             location: this.event.location,
-            date: this.event.date
+            date: this.event.date,
+            photos: this.event.photos
         }
 
         return (
@@ -78,7 +81,7 @@ export default class EventProfile extends Component {
                 </TouchableWithoutFeedback>
                 <InformationCard eventInfo={eventInfo} />
                 <CommentCard />
-                <Gallery />
+                <Gallery eventInfo={eventInfo} />
               </ScrollView>
             </Container>
         );

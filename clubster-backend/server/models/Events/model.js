@@ -79,9 +79,9 @@ Events.statics.removeGoingUser = async function(eventID, userID) {
 
 Events.statics.updateInfoByIndex = async function(eventID) {
   console.log('hi');
-  await this.update({_id:eventID}, { $inc: {value:1 }});
+  await this.update({_id:eventID}, { $inc: {value:-1 }});
 }
-  
+
 Events.statics.addEventRide = async function(eventID, rideID) {
   await this.findByIdAndUpdate(eventID, { $push: { rides: rideID } });
 }

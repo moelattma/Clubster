@@ -13,11 +13,11 @@ export default class CommentCard extends Component {
 
   componentDidMount() {
     const eventID = this.props.eventID; //eventID is hardcoded for now
-    axios.get(`http://localhost:3000/api/events/${eventID}/comments`).then((comments) => {
-      this.setState({
-        comments: comments
-      })
-    })
+    // axios.get(`http://localhost:3000/api/events/${eventID}/comments`).then((comments) => {
+    //   this.setState({
+    //     comments: comments
+    //   })
+    // })
   }
 
   render() {

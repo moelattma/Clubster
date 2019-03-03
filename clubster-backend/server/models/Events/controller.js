@@ -42,6 +42,7 @@ exports.changeEventPicture = (req, res) => {
 exports.addMemberToEvent = (req, res) => {
 	const { eventID } = req.params;	// grabs the eventID from url
 	const idOfAttender = req.user._id;	// grabs of id of user from passport instance.
+	console.log('jk');
 	// Checks if Event exists. If it does, add idOfAttender to the event whose id = evetID's member array
 	Events.findByIdAndUpdate(eventID).then((event) => {
 		if (event) {
@@ -59,6 +60,9 @@ exports.addMemberToEvent = (req, res) => {
 						if (error) {
 							console.log(error);
 						} else {
+							console.log(event);
+							console.log(('hi', event.organization,idOfAttender, event.value));
+							Organization.modifyActiveScore(event.organization,idOfAttender, event.value, -1);
 							return res.status(201).json({ event });
 						}
 					});
@@ -71,6 +75,9 @@ exports.addMemberToEvent = (req, res) => {
 						if (error) {
 							console.log(error);
 						} else {
+							console.log(event.organization);
+							console.log(('hi', event.organization,idOfAttender, event.value));
+							Organization.modifyActiveScore(event.organization,idOfAttender, event.value, 1);
 							return res.status(201).json({ event });
 						}
 					});
@@ -222,6 +229,7 @@ exports.addCommentToEvent = (req, res) => {
 						if (error) {
 							console.log(error);
 						} else {
+							Organization.increaseComments(event.organization);
 							Events.findOne({_id:eventID}).populate({path: 'comments', populate: {path: 'userID'}}).then((event) => {
 								return res.status(201).json({ event });
 							})
