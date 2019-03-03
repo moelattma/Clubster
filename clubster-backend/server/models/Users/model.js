@@ -30,10 +30,8 @@ const User = new Schema({
     type: String,
     required: true
   },
-  avatar: {
-    type: Schema.Types.ObjectId,
-    ref: 'images',
-    required: false
+  image: {
+    type: String
   },
   arrayClubsMember: [{
     type: Schema.Types.ObjectId,
@@ -47,7 +45,16 @@ const User = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'organizations',
     required: false
-  }]
+  }],
+  major: {
+    type: String
+  },
+  biography: {
+    type: String
+  },
+  hobbies: {
+    type: [String]
+  },
 });
 
 User.statics.clubMemberPushing = async function(organizationID, memberID) {

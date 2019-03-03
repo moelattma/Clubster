@@ -74,25 +74,19 @@ export default class SearchClubs extends PureComponent {
     }
 
     _renderItem = ({ item }) => {
-      let url = 'https://s3.amazonaws.com/clubster-123/'+item.image;
-      console.log(url);
-      console.log(item);
-      return (
-          <Content>
-            <List>
-              <ListItem avatar>
+        let url = 'https://s3.amazonaws.com/clubster-123/' + item.image;
+        return (
+            <ListItem avatar onPress={() => this.props.navigation.navigate('ClubProfile', { _id: item._id, name: item.name })}>
                 <Left>
-                  <Thumbnail source={{ uri: url }} />
+                    <Thumbnail source={{ uri: url }} />
                 </Left>
                 <Body>
-                  <Text>{item.name}</Text>
-                  <Text note>{item.description}</Text>
+                    <Text>{item.name}</Text>
+                    <Text note>{item.description}</Text>
                 </Body>
-              </ListItem>
-            </List>
-          </Content>
-     );
-  }
+            </ListItem>
+        );
+    }
 
     renderFooter = () => {
         if (!this.state.loading) return null;
@@ -105,18 +99,16 @@ export default class SearchClubs extends PureComponent {
 
     render() {
         return (
-            <List containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}>
-                <FlatList
-                    data={this.state.organizations.slice(0, 40)}
-                    renderItem={this._renderItem}
-                    keyExtractor={organization => organization.name}
-                    ListHeaderComponent={this.renderHeader}
-                    ItemSeparatorComponent={this.renderSeparator}
-                    ListFooterComponent={this.renderFooter}
-                    refreshing={this.state.loading}
-                    onRefresh={() => this.getOrganizations()}
-                />
-            </List>
+            <FlatList
+                data={this.state.organizations.slice(0, 40)}
+                renderItem={this._renderItem}
+                keyExtractor={organization => organization.name}
+                ListHeaderComponent={this.renderHeader}
+                ItemSeparatorComponent={this.renderSeparator}
+                ListFooterComponent={this.renderFooter}
+                refreshing={this.state.loading}
+                onRefresh={() => this.getOrganizations()}
+            />
         );
     }
 }

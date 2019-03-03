@@ -7,8 +7,6 @@
 const Events = require('./model');	//events schema
 const Organization = require('../Organizations/model');	//organizations schema
 const mongoose = require('mongoose');	//mongoose, library to communicate with backend
-const Img = require('../Images/model');	//image model
-const fs = require('fs');	//file system
 const Comments = require('../Comments/model');
 
 /*
@@ -17,7 +15,7 @@ const Comments = require('../Comments/model');
 exports.getEvents = (req, res) => {
 	const { organizationID } = req.params;	// grabs id of organization in route URL.
 	//Find the orgnaization with id = organizationID and populate it's array of events along with each event's image.
-	Organization.findByIdAndUpdate(organizationID).populate({ path: 'events', populate: { path: 'host' } }).then((organization) => {
+	Organization.findByIdAndUpdate(organizationID).populate({ path: 'events', populate: { path: 'host', select: 'name image' } }).then((organization) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No events found' });	//organization is null, DNE
 		} else {

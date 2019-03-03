@@ -4,7 +4,6 @@
 
 // grabs scheme in the profile/model
 const User = require('../Users/model');
-const Profile = require('./model');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const Rides = require('./model');
@@ -23,26 +22,29 @@ exports.createRide = (req, res) => {
   
   newRide.save().then( ride => {
     Events.addEventRide(eventID, ride._id);
-    return res.status(201).json({ 'ride':ride });
+    return res.status(201).json({ 'ride': ride });
   })
 };
 
 exports.joinRide = (req, res) => {
-  const { eventID, rideID } = req.params;
-  const { passengerSeats, description } = req.body;
+  const { rideID } = req.params;
   const { _id } = req.user;
   Rides.findByIdAndUpdate(rideID).then((ride) => {
-    if(!ride){
+    if (!ride){
       return res.status(400).json({ 'Error': 'No such ride exists' }); //DNE, doesnt exist
-    }
-    else{
-
+    } else if (ride.ridersID.length >= ride.passengerSeats) {
+      return res.status(400).json({ 'Error': 'Ride is full!' }); //DNE, doesnt exist
+    } else {
+      Rides.addRider(rideID, _id);
+      return res.status(201).json({ 'ride': ride });
     }
   })
-
-
 };
 
 exports.getRides = (req, res) => {
-  
+  Events.findById(req.body.eventID).select("rides")
+  .populate({ path: 'rides', populate: { path: 'driverID', populate: { path: 'image', select: 'name image' } }})
+  .populate({ path: 'rides', populate: { path: 'ridersID', populate: { path: 'image', select: 'name image' } }}).then((event) => {
+    console.log(rides);
+  });
 };

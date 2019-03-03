@@ -1,13 +1,7 @@
 import React, { Component } from 'react';
 import { View, Dimensions, FlatList, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, Image, ScrollView } from 'react-native';
 import axios from 'axios';
-import t from 'tcomb-form-native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { createStackNavigator } from 'react-navigation';
-import tx from 'tcomb-additional-types';
-import { ImagePicker, Permissions, Constants } from 'expo';
-import { Font, AppLoading } from "expo";
+import { ImagePicker, Permissions } from 'expo';
 import v1 from 'uuid/v1';
 import { accessKeyId, secretAccessKey } from '../../../keys/keys';
 import { RNS3 } from 'react-native-aws3';
@@ -90,5 +84,3 @@ export default class EventProfile extends Component {
         );
     }
 }
-
-const styles = StyleSheet.create({});

@@ -106,7 +106,7 @@ export const AdminNavigator = createMaterialTopTabNavigator(
             screen: ClubEvents,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <MaterialIcons name='event' size={30} color={tintColor} />
+                    <MaterialIcons name='event' size={27} color={tintColor} />
                 ),
             }
         },
@@ -114,7 +114,7 @@ export const AdminNavigator = createMaterialTopTabNavigator(
             screen: Chat,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <MaterialCommunityIcons name='wechat' size={30} color={tintColor} />
+                    <MaterialCommunityIcons name='wechat' size={27} color={tintColor} />
                 ),
             }
         },
@@ -122,7 +122,7 @@ export const AdminNavigator = createMaterialTopTabNavigator(
             screen: Dashboard,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <MaterialCommunityIcons name='information-variant' size={30} color={tintColor} />
+                    <MaterialCommunityIcons name='information-variant' size={27} color={tintColor} />
                 ),
             }
         },
@@ -148,7 +148,7 @@ export const MemberNavigator = createMaterialTopTabNavigator(
             screen: ClubEvents,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <MaterialIcons name="event" size={30} color={tintColor} />
+                    <MaterialIcons name="event" size={27} color={tintColor} />
                 ),
             }
         },
@@ -156,7 +156,7 @@ export const MemberNavigator = createMaterialTopTabNavigator(
             screen: Dashboard,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <FontAwesome name="home" size={30} color={tintColor} />
+                    <FontAwesome name="home" size={27} color={tintColor} />
                 )
             }
         }

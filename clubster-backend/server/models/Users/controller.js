@@ -6,12 +6,10 @@
 
 //Import Node.js libraries.
 const User = require('./model');              //import User Schema
-// const gravatar = require('gravatar');         //import gravatar, helps with profile
 const bcrypt = require('bcrypt');             //bcrypt library is useful for salting, hashing passwords
 const jwt = require('jsonwebtoken');          //jwt is used for making a token for logged in users
-const { secret } = require('../../../keys/keys');  //get secret fields for doing CRUD opertions on our database
 
-var numberOfSaltIterations = 12;
+const numberOfSaltIterations = 12;
 
 exports.createUser = (req, res) => {
   //Code to register a User in our Mongo Collection
@@ -54,7 +52,7 @@ exports.findUser = (req, res) => {
         // both password and username are correct and sends success token to server
         if (same) {
           const payload = { _id: user._id, name: user.name, avatar: user.avatar };
-          let token = jwt.sign(payload, 'secret', { expiresIn: 3600 }, (err, token) => {
+          jwt.sign(payload, 'secret', { expiresIn: 3600 }, (err, token) => {
             res.json({
               success: true,
               token: 'Bearer ' + token
@@ -67,3 +65,36 @@ exports.findUser = (req, res) => {
     }
   });
 }
+
+exports.changePhoto = (req, res) => {
+  User.findOneAndUpdate({ _id: req.user._id }, { $set: { "image": req.body.imageURL } }).then((user) => {
+    if (!user) {
+      return res.status(404).json({ 'Error': 'error' });
+    } else {
+      return res.status(201).json({ 'image': user.image });
+    }
+  });
+};
+
+exports.submitProfile = (req, res) => {
+  const { major, hobbies, biography } = req.body; // destructure, pull value and assign it
+
+  User.findOneAndUpdate({ _id: req.user._id },
+    { $set: { "major": major, "hobbies": hobbies, "biography": biography } })
+    .then(() => {
+      User.findById(req.user._id).select('-username -email -password').then((user) => {
+        if (user) {
+          return res.status(201).json({ 'profile': user });
+        } else {
+          return res.status(400).json({ 'error': 'could not find user' });
+        }
+      });
+    });
+};
+
+exports.retrieveProfile = (req, res) => {
+  User.findById(req.user._id).select('-username -email -password').then((user) => {
+    return res.status(201).json({ 'profile': user });
+  });
+};
+

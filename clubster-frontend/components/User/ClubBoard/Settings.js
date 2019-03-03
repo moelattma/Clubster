@@ -7,6 +7,9 @@ import converter from 'base64-arraybuffer';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MembersList from './MembersList';
+import v1 from 'uuid/v1';
+import { RNS3 } from 'react-native-aws3';
+import { accessKeyId, secretAccessKey } from '../../../keys/keys';
 
 const { WIDTH, HEIGHT } = Dimensions.get('window');
 
@@ -26,16 +29,20 @@ export default class Settings extends Component {
         }
     }
 
+    static navigationOptions = ({ navigation, screenProps }) => {
+        return {
+            header: (
+                <Text> HII</Text>
+            )
+        };
+    }
+
     askPermissionsAsync = async () => {
         await Permissions.askAsync(Permissions.CAMERA);
         await Permissions.askAsync(Permissions.CAMERA_ROLL);
     };
 
-    changePicture = () => {
-        this.useLibraryHandler();
-    };
-
-    useLibraryHandler = async () => {
+    changePicture = async () => {
       await this.askPermissionsAsync();
       try {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -63,11 +70,8 @@ export default class Settings extends Component {
         await RNS3.put(file,options).then((response)=> {
            imageURL = response.body.postResponse.key;
         }).catch((err) => {console.log(err)});
-        const data = new FormData();
-        data.append('imageURL', imageURL);
-        axios.post(`http://localhost:3000/api/organizations/modifyOrgPicture/${_id}`, data).then((response) => {
-            var url = 'data:image/jpeg;base64,' + converter.encode(response.data.imageId.img.data.data);
-            this.setState({ img: url });
+        axios.post(`http://localhost:3000/api/organizations/modifyOrgPicture/${this.props.screenProps._id}`, { imageURL }).then((response) => {
+            this.setState({ img: 'https://s3.amazonaws.com/clubster-123/' + response.data.image });
         }).catch((err) => { return; });
         this.props.navigation.navigate('ShowClubs');
       } catch(error) {
@@ -75,32 +79,18 @@ export default class Settings extends Component {
       };
     };
 
-    useCameraHandler = async () => {
-        await this.askPermissionsAsync();
-        let result = await ImagePicker.launchCameraAsync({
-            allowsEditing: true,
-            aspect: [4, 3],
-            base64: false,
-        });
-        this.setState({ result });
-    };
-
     componentDidMount() {
         const { _id } = this.props.screenProps;
         console.log('org id', _id)
         axios.get(`http://localhost:3000/api/organizations/getOrg/${_id}`).then((response) => {
             const { president, name, description } = response.data.org;
-            console.log('president', president)
-            console.log('name', name)
-            console.log('description', description)
-            console.log('image', response.data.org.imageId.img.data.data)
-
+            console.log(response.data);
             this.setState({
                 president: president, name, description,
-                img: 'data:image/jpeg;base64,' + converter.encode(response.data.org.imageId.img.data.data),
+                img: 'https://s3.amazonaws.com/clubster-123/' + response.data.org.image,
                 isLoading: false
             });
-        }).catch((error) => { return; });
+        }).catch(() => { return; });
     }
 
     submitClubChanges() {
@@ -108,9 +98,9 @@ export default class Settings extends Component {
         axios.post(`http://localhost:3000/api/organizations/${_id}`, {
             name: this.state.name,
             description: this.state.description,
-        }).then((response) => {
+        }).then(() => {
             this.setState({ show: false });
-        }).catch((error) => { return; });
+        }).catch(() => { return; });
     }
 
     hide = () => {
@@ -157,7 +147,7 @@ export default class Settings extends Component {
                                 color={'black'}
                             />
                         </TouchableOpacity>
-                        <TouchableOpacity onPressIn={() => this.useLibraryHandler()}>
+                        <TouchableOpacity onPressIn={() => this.changePicture()}>
                             <Image style={{ height: 200, width: WIDTH }}
                                 source={{ uri: this.state.img }} />
                         </TouchableOpacity>

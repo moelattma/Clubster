@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View,
-   Dimensions, TouchableWithoutFeedback, FlatList } from 'react-native';
+import {
+  Image, StyleSheet, Text, TouchableOpacity, View,
+  Dimensions, TouchableWithoutFeedback, FlatList, ScrollView,
+  RefreshControl
+} from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
@@ -35,8 +38,12 @@ export default class ClubsPage extends Component {
 }
 
 class ShowClubs extends Component {
-  constructor() { // Initializing state
-    super();
+  constructor(props) { // Initializing state
+    super(props);
+
+    props.navigation.setParams({ refreshClubs: this.getUserClubs });
+    props.navigation.setParams({ showAdmin: true })
+
     this.state = {
       clubsAdmin: [],
       clubsMember: [],
@@ -55,7 +62,7 @@ class ShowClubs extends Component {
         <View style={{ marginLeft: 13 }}>
           <FontAwesome
             name="plus" size={32} color={'black'}
-            onPress={() => navigation.navigate('CreateClub')} />
+            onPress={() => navigation.navigate('CreateClub', { refreshClubs: navigation.state.params.refreshClubs })} />
         </View>
       ),
       headerRight: (
@@ -65,22 +72,28 @@ class ShowClubs extends Component {
             onPress={() => screenProps.clubPage.navigate('ClubSearch')} />
         </View>
       ),
-      headerTop: (
-        <View style={{ marginTop: 43 }}>
-          <FontAwesome
-            name="plus" size={32} color={'black'}
-            onPress={() => navigation.navigate('CreateClub')} />
+      headerTitle: (
+        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }} >
+          <Button transparent onPress={() => navigation.setParams({ showAdmin: false })}>
+            <Text style={[{ fontSize: 20, fontWeight: 'bold' }, navigation.state.params &&
+              !navigation.state.params.showAdmin ? { color: '#0064c8' } : {}]} >Member</Text>
+          </Button>
+          <Text style={{ fontSize: 32, fontWeight: 'bold' }} >|</Text>
+          <Button transparent onPress={() => navigation.setParams({ showAdmin: true })} >
+            <Text style={[{ fontSize: 20, fontWeight: 'bold' }, !navigation.state.params ||
+              navigation.state.params.showAdmin ? { color: '#0064c8' } : {}]} >Admin</Text>
+          </Button>
         </View>
       )
     };
   };
 
-  componentWillMount() {
-    this.willFocus = this.props.navigation.addListener('willFocus', () => { this.getUserClubs(); });
+  async componentWillMount() {
+    this.setState({ loading: true });
+    await this.getUserClubs();
   };
 
-  getUserClubs = () => {
-    this.setState({ loading: true });
+  getUserClubs = async () => {
     var getClubsAdmin = [];
     var getClubsMember = [];
     axios.get("http://localhost:3000/api/organizations").then((response) => {
@@ -105,10 +118,9 @@ class ShowClubs extends Component {
         getClubsAdmin.push({ empty: true });
       if (getClubsMember.length % 2 != 0)
         getClubsMember.push({ empty: true });
-      this.setState({ clubsAdmin: getClubsAdmin, clubsMember: getClubsMember, loading: false }); // Setting up state variable
-    }).catch((err) => {
+      this.setState({ clubsAdmin: getClubsAdmin, clubsMember: getClubsMember }); // Setting up state variable
       this.setState({ loading: false });
-    });
+    }).catch(() => { this.setState({ loading: false }); });
   };
 
   navigateUser = (item) => {
@@ -120,79 +132,55 @@ class ShowClubs extends Component {
       return <View style={[styles.eventContainer, { backgroundColor: 'transparent' }]} />;
     }
     return (
-      <TouchableWithoutFeedback onPressIn={() => this.navigateUser(item)}
+      <TouchableWithoutFeedback onPress={() => this.navigateUser(item)}
         style={{ flexDirection: 'row' }}>
         <View style={styles.eventContainer} >
           <Image style={styles.containerImage} source={{ uri: item.image }} />
-          <View style={{margin:10}}>
-          <Text allowFontScaling numberOfLines={1}
-            style={styles.eventTitle}> {item.name}
-          </Text>
+          <View style={{ margin: 10 }}>
+            <Text allowFontScaling numberOfLines={1}
+              style={styles.eventTitle}> {item.name}
+            </Text>
           </View>
-          <Text style={{ position: 'absolute', right: 2, bottom: 2, fontSize: 12,
-           fontWeight: 'bold' }}>
-             {(item.isAdmin ? 'A' : 'M')}
-          </Text>
         </View>
       </TouchableWithoutFeedback>
     );
   }
 
-  _renderBanner = () => {
-    return (
-      <View style={{ flex: 1, flexDirection: 'row', position: 'absolute',
-        top: 0, alignSelf: 'center', justifyContent: 'space-evenly',
-        backgroundColor: '#0064c8', width: WIDTH }}>
-        <Button bordered onPressIn={() => this.toggleAdmin(false)}
-          style={styles.topButtons}>
-            <Text>Member</Text>
-          </Button>
-          <Button bordered onPressIn={() => this.toggleAdmin(true)}
-            style={styles.topButtons} >
-            <Text>Admin</Text>
-          </Button>
-      </View>
-    );
-  }
-
-  toggleAdmin = (tapped) => {
-    this.setState({ tappedAdmin: tapped });
-  }
-
-  _renderClubs = () => {
-    if (this.state.tappedAdmin) {
+  render() {
+    if (!this.props.navigation.state.params || this.props.navigation.state.params.showAdmin) {
       return (
-        <FlatList
-          data={this.state.clubsAdmin.slice(0, 40)}
-          renderItem={this._renderItem}
-          horizontal={false}
-          numColumns={2}
-          keyExtractor={club => club._id}
+        <ScrollView refreshControl={<RefreshControl
           refreshing={this.state.loading}
           onRefresh={this.getUserClubs}
-        />)
+        />}>
+          <FlatList
+            data={this.state.clubsAdmin.slice(0, 40)}
+            renderItem={this._renderItem}
+            horizontal={false}
+            numColumns={2}
+            keyExtractor={club => club._id}
+            extraData={this.state}
+          />
+        </ScrollView>
+      )
     }
     else {
       return (
-        <FlatList
-          data={this.state.clubsMember.slice(0, 40)}
-          renderItem={this._renderItem}
-          horizontal={false}
-          numColumns={2}
-          keyExtractor={club => club._id}
+        <ScrollView refreshControl={<RefreshControl
           refreshing={this.state.loading}
           onRefresh={this.getUserClubs}
-        />)
+        />}>
+          <FlatList
+            data={this.state.clubsMember.slice(0, 40)}
+            renderItem={this._renderItem}
+            horizontal={false}
+            numColumns={2}
+            keyExtractor={club => club._id}
+            extraData={this.state}
+          />
+        </ScrollView>
+      )
     }
-  }
-
-  render() {
-    return (
-      <View>
-        {this._renderClubs()}
-        {this._renderBanner()}
-      </View>
-    );
   }
 }
 
@@ -233,30 +221,24 @@ class CreateClub extends Component {
         successActionStatus: 201
       }
       await RNS3.put(file, options).then((response) => {
-        this.setState({
-          imageURL: response.body.postResponse.key
-        });
+        this.setState({ imageURL: response.body.postResponse.key });
       }).catch((err) => { console.log(err) });
-    } catch (error) {
-      console.log(error);
-    };
+    } catch (error) { console.log(error); };
   };
 
-  submit = () => {
+  submit = async () => {
     const { name, description, imageURL } = this.state;
     axios.post('http://localhost:3000/api/organizations/new', {
-      name,
-      description,
-      imageURL
-    }).then((response) => {
-      // console.log('response', response.status)
-    })
-    .catch((err) => { console.log(err) });
-    this.props.navigation.navigate('ShowClubs');
+      name, description, imageURL
+    });
+    var func = this.props.navigation.getParam('refreshClubs');
+    if (func) {
+      await func();
+      this.props.navigation.navigate('ShowClubs');
+    }
   }
 
   render() {
-
     const { name, description } = this.state;
     return (
       <Container>
@@ -284,11 +266,13 @@ class CreateClub extends Component {
         </Content>
 
         <Button bordered
-              onPress={this.submit}
-              style={{ margin:20, width:100,
-             justifyContent:'center', alignSelf:'center'}}>
-            <Text>Create Club!</Text>
-          </Button>
+          onPress={this.submit}
+          style={{
+            margin: 20, width: 100,
+            justifyContent: 'center', alignSelf: 'center'
+          }}>
+          <Text>Create Club!</Text>
+        </Button>
 
       </Container>
     );
@@ -318,7 +302,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     borderRadius: 5,
   },
-  containerImage:{
+  containerImage: {
     alignItems: 'center',
     borderColor: '#d6d7da',
     flex: 1,
@@ -338,8 +322,8 @@ const styles = StyleSheet.create({
   topButtons: {
     backgroundColor: '#E0E0E0',
     width: 100,
-    justifyContent:'center',
-    alignSelf:'center'
+    justifyContent: 'center',
+    alignSelf: 'center'
   },
   modalContent: {
     backgroundColor: 'white',
@@ -357,9 +341,9 @@ const styles = StyleSheet.create({
     flex: 1,
     marginVertical: 20,
   },
-  cameraIcon:{
+  cameraIcon: {
     fontSize: 40,
-    margin:20
+    margin: 20
   },
   btn: {
     position: 'absolute',
