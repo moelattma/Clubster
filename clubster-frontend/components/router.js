@@ -156,7 +156,7 @@ export const MemberNavigator = createMaterialTopTabNavigator(
             screen: Dashboard,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <FontAwesome name="home" size={27} color={tintColor} />
+                    <MaterialCommunityIcons name='information-variant' size={27} color={tintColor} />
                 )
             }
         }

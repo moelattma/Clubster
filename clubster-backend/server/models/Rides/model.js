@@ -26,7 +26,7 @@ const Rides = new Schema({
   }
 });
 
-Events.statics.addRider = async function(rideID, riderID) {
+Rides.statics.addRider = async function(rideID, riderID) {
   await this.findByIdAndUpdate(rideID, { $push: { ridersID: riderID } });
 }
 

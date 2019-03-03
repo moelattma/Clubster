@@ -1,4 +1,3 @@
-
 /*
 * This is the controller for the Notifications schema. In this file, we will code out the methods that will get all the notificatiosn based on the userID.
 * author: ayunus@ucsc.edu mmajidi@ucsc.edu
@@ -83,7 +82,9 @@ exports.newNotification = (req, res) => {
 			switch (type) {
 				case ORG_JOIN_ADMIN:
 				case ORG_JOIN_MEM:
-					notification.idOfReceivers = admins;
+					notification.idOfReceivers = [];
+					for (var i = 0; i < admins.length; ++i) 
+						notification.idOfReceivers.push(admins[i].admin);
 					notification.message = `${req.user.name} wants to join ${name} as ` + ((type == ORG_JOIN_ADMIN) ? `an admin!` : `a member!`);
 					notification.isActive = true;
 					break;

@@ -40,7 +40,7 @@ export default class ClubsPage extends Component {
 class ShowClubs extends Component {
   constructor(props) { // Initializing state
     super(props);
-
+    
     props.navigation.setParams({ refreshClubs: this.getUserClubs });
     props.navigation.setParams({ showAdmin: true })
 
@@ -89,11 +89,11 @@ class ShowClubs extends Component {
   };
 
   async componentWillMount() {
-    this.setState({ loading: true });
     await this.getUserClubs();
   };
 
   getUserClubs = async () => {
+    this.setState({ loading: true });
     var getClubsAdmin = [];
     var getClubsMember = [];
     axios.get("http://localhost:3000/api/organizations").then((response) => {
@@ -228,7 +228,7 @@ class CreateClub extends Component {
 
   submit = async () => {
     const { name, description, imageURL } = this.state;
-    axios.post('http://localhost:3000/api/organizations/new', {
+    await axios.post('http://localhost:3000/api/organizations/new', {
       name, description, imageURL
     });
     var func = this.props.navigation.getParam('refreshClubs');

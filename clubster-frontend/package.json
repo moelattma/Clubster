@@ -9,6 +9,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@expo/vector-icons": "^8.1.0",
     "@pusher/chatkit": "^0.7.18",
     "ImageViewer": "^1.5.8",
     "axios": "^0.18.0",
