@@ -24,6 +24,11 @@ router.post('/profile', passport.authenticate('jwt', { session: false }), (req, 
 	controller.submitProfile(req, res);
 });
 
+// user posts a photo
+router.post('/profile/photo', passport.authenticate('jwt', { session: false }), (req, res) => {
+	controller.submitProfile(req, res);
+});
+
 // user requesting their profile on screen
 router.get('/profile', passport.authenticate('jwt', { session: false }), (req, res) => {
 	controller.retrieveProfile(req, res);

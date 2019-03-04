@@ -35,7 +35,16 @@ export default class Gallery extends Component {
   }
 
   componentDidMount() {
-    let photos = this.props.eventInfo.photos;
+    let photos;
+    if(this.props && this.props.eventInfo) {
+      photos = (this.props.eventInfo.photos.length > 0) ? this.props.eventInfo.photos : ['s3/2391cac0-3c9d-11e9-8f51-8972130a1d1d.jpeg'];
+    } else if(this.props && this.props.userPhotos) {
+      photos = (this.props.userPhotos.photos.length > 0) ? this.props.userPhotos.photos : ['s3/2391cac0-3c9d-11e9-8f51-8972130a1d1d.jpeg'];
+    } else if(this.props && this.props.clubPhotos) {
+      photos = (this.props.clubPhotos.photos.length > 0) ? this.props.clubPhotos.photos : ['s3/2391cac0-3c9d-11e9-8f51-8972130a1d1d.jpeg'];
+    } else {
+      photos = ['s3/2391cac0-3c9d-11e9-8f51-8972130a1d1d.jpeg'];
+    }
     this.setState({images: photos})
   }
 

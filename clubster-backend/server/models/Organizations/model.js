@@ -126,9 +126,12 @@ Organization.statics.deleteClubMember = async function(organizationID, memberID)
   await this.findByIdAndUpdate(organizationID, { $pull: { members: { member:memberID } } });
 }
 
+Organization.statics.addPhoto = async function(organizationID, url) {
+  await this.findByIdAndUpdate(organizationID, { $push: { photos: url } });
+}
+
 Organization.statics.addEventToClub = async function(organizationID, eventID) {
   await this.findByIdAndUpdate(organizationID, {$set:{}}).populate('members.member').populate('events').then((organization) => {
-    console.log("Yiiii", organization);
     for(let i = 0;i<organization.members.length;i++) {
       organization.updateInfoByIndex(i);
     }

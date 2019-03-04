@@ -14,33 +14,40 @@ export default class Comments extends Component {
   }
 
   componentDidMount() {
-    axios.get(`http://localhost:3000/api/events/${this.props.screenProps._id}/comments`).then((response) => {
-      this.setState({comments: response.data.comments});
-    });
+    if(this.props && this.props.navigation.getParam('comments', null)) {
+      this.setState({comments: this.props.comments});
+    } else {
+      axios.get(`http://localhost:3000/api/events/${this.props.navigation.getParam('eventID', null)}/comments`).then((response) => {
+        this.setState({comments: response.data.comments});
+      });
+    }
   }
 
   onSub = text => {
     var comments = this.state.comments;
-    axios.post(`http://localhost:3000/api/events/${this.props.screenProps._id}/comments`, {
+    axios.post(`http://localhost:3000/api/events/${this.props.navigation.getParam('eventID', null)}/comments`, {
       text:text
     }).then((response) => {
       comments.push(response.data.comment);
+      console.log(comments);
       this.setState({comments: comments});
+
     });
   }
 
 
 
  _renderItem() {
-   return this.state.comments.map((data) => {
+   return this.state.comments.map((data, i) => {
+     let url = 'https://s3.amazonaws.com/clubster-123/' + data.userID.image;
     //  console.log(data);
      return (
-       <ListItem avatar>
+       <ListItem key = {i} avatar>
          <Left>
-           <Thumbnail source={{ uri: data.userID.avatar }} />
+           <Thumbnail source={{ uri:url}} />
          </Left>
          <Body>
-           <Text>{data.text}</Text>
+           <Text>{data.content}</Text>
          </Body>
        </ListItem>
      )
