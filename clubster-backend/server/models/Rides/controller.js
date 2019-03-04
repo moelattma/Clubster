@@ -1,13 +1,11 @@
+// Rides controller
 /*
 * This is the controller for the Rides schema.
 */
 
 // grabs scheme in the profile/model
-const User = require('../Users/model');
-const mongoose = require('mongoose');
-const fs = require('fs');
 const Rides = require('./model');
-const Events = require('./../Events/model');
+const Events = require('../Events/model');
 
 exports.createRide = (req, res) => {
   const { eventID } = req.params;

@@ -1,3 +1,4 @@
+// Organizations controller
 /*
 * This is the controller for the Organizations schema.
 * author: ayunus@ucsc.edu
@@ -34,12 +35,16 @@ exports.getAllClubs = (req, res) => {
 
 exports.isMember = (req, res) => {
 	const { orgID } = req.body;
-	const userID = req.user._id;
+	let userID = req.user._id;
 
 	Organization.findByIdAndUpdate(orgID).populate('imageId').then((organization) => {
 		if (!organization)
 			return res.status(400).json({ 'Error': 'No organization found' })
-		const isMember = organization.members.indexOf(userID) != -1;
+		const { members } = organization;
+		var isMember = false;
+		members.forEach(element => {
+			if (userID.equals(element.member)) isMember = true; 
+		});
 		var noteStatus;
 		Notification.findOne({ $and: [{ idOfSender: req.user._id }, { idOfOrganization: orgID }, { $or: [{ type: "ORG_JOIN_ADMIN" }, { type: "ORG_JOIN_MEMBER" }] }] }).then((notification) => {
 			(notification && notification.isActive) ? noteStatus = true : noteStatus = false;

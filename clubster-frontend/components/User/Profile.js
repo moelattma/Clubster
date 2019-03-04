@@ -5,6 +5,7 @@ import axios from 'axios';
 import Modal from "react-native-modal";
 import converter from 'base64-arraybuffer';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+// import { CachedImage }  from 'react-native-cached-image'
 import { SocialIcon } from 'react-native-elements'
 import ImageGrid from './Cards/ImageGrid';
 import { accessKeyId, secretAccessKey } from '../../keys/keys';
@@ -53,7 +54,6 @@ export default class Profile extends Component {
         try {
             await AsyncStorage.removeItem('jwtToken');
             delete axios.defaults.headers.common['Authorization'];
-            console.log(this.props.screenProps);
             this.props.screenProps.logoutNavigation.navigate('Login');
         }
         catch (exception) {
@@ -81,7 +81,6 @@ export default class Profile extends Component {
             linkedIn: this.state.linkedIn, biography: this.state.biography
         }).then((response) => {
             if (response.status == 201 || response.status == 200) {
-                console.log(response.data);
                 this.setState({ show: false, hobbies: hobbiesList.join(', ') });
             }
         })
@@ -167,10 +166,9 @@ export default class Profile extends Component {
                         />
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.avatar}
+                <TouchableOpacity key={this.state.img} style={styles.avatar}
                     onPress={() => this.changePicture()}>
-                    <Image style={styles.imageAvatar}
-                        source={{ uri: this.state.img }} />
+                    <Image style={styles.imageAvatar} source={{ uri: this.state.img }} />
                 </TouchableOpacity>
                 <Text style={{
                     flexDirection: 'row', alignSelf: 'center',

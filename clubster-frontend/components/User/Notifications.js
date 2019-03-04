@@ -12,6 +12,7 @@ const REJECT_JOIN = "REJECT_JOIN";
 export default class Notifications extends Component {
     constructor(props) {
         super(props);
+
         this.state = {
             notifications: [],
             refreshing: false,
