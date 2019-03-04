@@ -72,14 +72,13 @@ export default class EventProfile extends Component {
 
     openModal(){
         const event = this.props.navigation.getParam('event', null);
-        console.log('event',event)
+        console.log('open modal')
         if(!event){
             console.log('event does not exist in event profile')
             return;
         }
         axios.get(`http://localhost:3000/api/${event._id}/rides`)
         .then(rides => {
-            console.log(rides)
             this.setState({
                 isModalVisible: true,
                 rides: rides
@@ -114,16 +113,17 @@ export default class EventProfile extends Component {
         }).then((response) => {
             if (response.status == 201 || response.status == 200) {
                 this.setState({ 
-                    show: false, 
-                    rides: ride
+                    isModalVisible: false, 
+                    rides: response.data.ride
                 });
+                console.log('ride created', response.data.ride)
             }
         })
         .catch((err) => {console.log('error creating new ride'); console.log(err)});
     }
 
     render() {
-        console.log(this.event);
+        // console.log(this.event);
         const eventInfo = {
             _id: this.event._id,
             name: this.event.name,
@@ -170,7 +170,8 @@ export default class EventProfile extends Component {
                     </TouchableOpacity>
                     </View>
                     {this.state.form
-                    ?<Form>
+                    ?<View>
+                    <Form>
                     <Item>
                     <Input placeholder="number of available seats?"
                             label='seats'
@@ -200,15 +201,15 @@ export default class EventProfile extends Component {
                              />
                     </Item>
                     
-                    <Button bordered onPress={this.submitRide()}
+                    </Form>
+                    <Button bordered onPress={() => this.submitRide()}
                     style={{margin:20}}>
                         <Text>Submit Ride!</Text>
                     </Button>
-                    </Form>
+                    </View>
                     :null}
                 </View>
                 </Modal>
-
             </View>
             </Container>
         );

@@ -19,7 +19,7 @@ const Rides = new Schema({
     ref: 'users'
   }],
   passengerSeats: {
-    type: Number
+    type: String
   },
   time: {
     type: String
