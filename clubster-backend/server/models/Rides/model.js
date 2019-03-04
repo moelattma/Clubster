@@ -21,6 +21,12 @@ const Rides = new Schema({
   passengerSeats: {
     type: Number
   },
+  time: {
+    type: String
+  },
+  location: {
+    type: String
+  },
   description: {
     type: String
   }

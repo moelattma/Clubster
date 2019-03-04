@@ -5,11 +5,12 @@ import { ImagePicker, Permissions } from 'expo';
 import v1 from 'uuid/v1';
 import { accessKeyId, secretAccessKey } from '../../../keys/keys';
 import { RNS3 } from 'react-native-aws3';
-import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
+import { Container, Card, CardItem, Form, Content, Item, Text, Button, Icon, Left, Body, Right, Input } from 'native-base';
 import CommentCard from '../Cards/CommentCard';
 import InformationCard from '../Cards/InformationCard';
 import ImageGrid from '../Cards/ImageGrid';
 import Gallery from '../Cards/Gallery';
+import Modal from 'react-native-modal';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 
@@ -19,7 +20,14 @@ export default class EventProfile extends Component {
 
         this.event = this.props.navigation.getParam('event', null);
         this.state = {
-            eventImage: this.event.image ? 'https://s3.amazonaws.com/clubster-123/' + this.event.image : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC'
+            eventImage: this.event.image ? 'https://s3.amazonaws.com/clubster-123/' + this.event.image : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC',
+            isModalVisible: false,
+            form: false,
+            rides: [],
+            seats: '',
+            rideTime: '',
+            rideLocation: '',
+            description: '',
         }
    }
 
@@ -62,6 +70,58 @@ export default class EventProfile extends Component {
         } catch (error) { console.log(error); }
     }
 
+    openModal(){
+        const event = this.props.navigation.getParam('event', null);
+        console.log('event',event)
+        if(!event){
+            console.log('event does not exist in event profile')
+            return;
+        }
+        axios.get(`http://localhost:3000/api/${event._id}/rides`)
+        .then(rides => {
+            console.log(rides)
+            this.setState({
+                isModalVisible: true,
+                rides: rides
+            })
+            console.log('rides', rides.data.rides)
+        })
+        .catch(err => {console.log(err)})
+    }
+
+    closeModal(){
+        this.setState({
+            isModalVisible: false,
+        })
+    }
+
+    dropDown(){
+        console.log('drop Down')
+        this.setState({
+            form: true
+        })
+    }
+
+    submitRide(){
+        const event = this.props.navigation.getParam('event', null);
+        const { seats, rideTime, rideLocation, description } = this.state;
+        console.log('submit', seats, rideTime, rideLocation, description);
+        axios.post(`http://localhost:3000/api/${event._id}/createRide`, {
+            passengerSeats: this.state.seats,
+            time: this.state.rideTime,
+            location: this.state.location,
+            description: this.state.description,
+        }).then((response) => {
+            if (response.status == 201 || response.status == 200) {
+                this.setState({ 
+                    show: false, 
+                    rides: ride
+                });
+            }
+        })
+        .catch((err) => {console.log('error creating new ride'); console.log(err)});
+    }
+
     render() {
         console.log(this.event);
         const eventInfo = {
@@ -73,6 +133,8 @@ export default class EventProfile extends Component {
             photos: this.event.photos
         }
 
+        var { seats, rideTime, rideLocation, description } = this.state;
+
         return (
             <Container>
               <ScrollView>
@@ -82,8 +144,107 @@ export default class EventProfile extends Component {
                 <InformationCard eventInfo={eventInfo} />
                 <CommentCard />
                 <Gallery eventInfo={eventInfo} />
+                <Content padder>
+                <Card>
+                    <CardItem footer bordered>
+                    <TouchableOpacity onPress={() => this.openModal()}>
+                        <Text>See Rides</Text>
+                    </TouchableOpacity>
+                    </CardItem>
+                </Card>
+                </Content>
               </ScrollView>
+
+              <View>
+                <Modal isVisible={this.state.isModalVisible}
+                style={styles.modalStyle}>
+                <View style={{ flex: 1, margin: 20 }}>  
+                    <View style={styles.modalButtons}>
+                    <TouchableOpacity onPress={() => this.closeModal()}>
+                        <Icon name="ios-arrow-dropleft"
+                        style={styles.modalButton}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => this.dropDown()}>
+                        <Icon name="ios-add"
+                        style={styles.modalButton}/>
+                    </TouchableOpacity>
+                    </View>
+                    {this.state.form
+                    ?<Form>
+                    <Item>
+                    <Input placeholder="number of available seats?"
+                            label='seats'
+                            onChangeText={(seats) => this.setState({ seats })}
+                            value={seats}
+                             />
+                    </Item>
+                    <Item>
+                    <Input placeholder="Pick up time."
+                            label='rideTime'
+                            onChangeText={(rideTime) => this.setState({ rideTime })}
+                            value={rideTime}
+                             />
+                    </Item>
+                    <Item>
+                    <Input placeholder="Pick up location."
+                            label='location'
+                            onChangeText={(rideLocation) => this.setState({ rideLocation })}
+                            value={rideLocation}
+                             />
+                    </Item>
+                    <Item>
+                    <Input placeholder="Notes."
+                            label='description'
+                            onChangeText={(description) => this.setState({ description })}
+                            value={description}
+                             />
+                    </Item>
+                    
+                    <Button bordered onPress={this.submitRide()}
+                    style={{margin:20}}>
+                        <Text>Submit Ride!</Text>
+                    </Button>
+                    </Form>
+                    :null}
+                </View>
+                </Modal>
+
+            </View>
             </Container>
         );
     }
 }
+
+
+const styles = StyleSheet.create({
+    aboutText:{
+        marginLeft: 10,
+        marginTop: 20,
+        justifyContent: 'center',
+        fontWeight: 'bold'
+    },
+    editButton:{
+        backgroundColor:'white',
+        margin: 10,
+        alignSelf: 'flex-end',
+        fontSize: 40
+    },
+    modalStyle:{
+        backgroundColor: 'white',
+        padding: 10,
+        marginTop: 50,
+        marginRight: 20,
+        marginBottom: 30,
+        marginLeft: 20,
+        borderRadius: 10 
+    },
+    modalButtons:{
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+    modalButton:{
+        color:'black', 
+        fontSize:40,
+        margin: 10
+    }
+});

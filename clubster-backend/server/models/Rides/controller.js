@@ -9,18 +9,25 @@ const Events = require('../Events/model');
 
 exports.createRide = (req, res) => {
   const { eventID } = req.params;
-  const { passengerSeats, description } = req.body;
+  const { passengerSeats, time, location, description } = req.body;
   const { _id } = req.user;
   let newRide = new Rides({
     driverID: _id,
     ridersID: [],
     passengerSeats: passengerSeats,
+    time: time,
+    location: location,
     description: description
   });
   
   newRide.save().then( ride => {
     Events.addEventRide(eventID, ride._id);
-    return res.status(201).json({ 'ride': ride });
+    if(!ride) {
+      return res.status(400).json({'Error' : 'No such ride exists'});
+    }
+    else{
+      return res.status(201).json({ 'ride': ride });
+    }
   })
 };
 
@@ -40,9 +47,17 @@ exports.joinRide = (req, res) => {
 };
 
 exports.getRides = (req, res) => {
-  Events.findById(req.body.eventID).select("rides")
-  .populate({ path: 'rides', populate: { path: 'driverID', populate: { path: 'image', select: 'name image' } }})
-  .populate({ path: 'rides', populate: { path: 'ridersID', populate: { path: 'image', select: 'name image' } }}).then((event) => {
-    console.log(rides);
+  Events.findById(req.params.eventID).select("rides")
+  // .populate({ path: 'rides', populate: { path: 'driverID', populate: { path: 'image', select: 'name image' } }})
+  // .populate({ path: 'rides', populate: { path: 'ridersID', populate: { path: 'image', select: 'name image' } }})
+  .then((event) => {
+    console.log(event);
+    if(!event){
+      return res.status(400).json({ 'Error': 'Ride DNE!' });
+    }
+    else{
+      return res.status(201).json({ 'rides': event.rides });
+    }
   });
+
 };
