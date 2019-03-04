@@ -55,6 +55,9 @@ const User = new Schema({
   hobbies: {
     type: [String]
   },
+  photos:  {
+    type: [String]
+  },
 });
 
 User.statics.clubMemberPushing = async function(organizationID, memberID) {

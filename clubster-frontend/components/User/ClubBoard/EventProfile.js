@@ -113,8 +113,8 @@ export default class EventProfile extends Component {
             description: this.state.description,
         }).then((response) => {
             if (response.status == 201 || response.status == 200) {
-                this.setState({ 
-                    show: false, 
+                this.setState({
+                    show: false,
                     rides: ride
                 });
             }
@@ -130,6 +130,7 @@ export default class EventProfile extends Component {
             description: this.event.description,
             location: this.event.location,
             date: this.event.date,
+            comments: this.event.comments,
             photos: this.event.photos
         }
 
@@ -142,7 +143,7 @@ export default class EventProfile extends Component {
                     <Image source={{ uri: this.state.eventImage }} style={{ height: 200 }} />
                 </TouchableWithoutFeedback>
                 <InformationCard eventInfo={eventInfo} />
-                <CommentCard />
+                <CommentCard eventInfo={eventInfo}/>
                 <Gallery eventInfo={eventInfo} />
                 <Content padder>
                 <Card>
@@ -158,7 +159,7 @@ export default class EventProfile extends Component {
               <View>
                 <Modal isVisible={this.state.isModalVisible}
                 style={styles.modalStyle}>
-                <View style={{ flex: 1, margin: 20 }}>  
+                <View style={{ flex: 1, margin: 20 }}>
                     <View style={styles.modalButtons}>
                     <TouchableOpacity onPress={() => this.closeModal()}>
                         <Icon name="ios-arrow-dropleft"
@@ -199,7 +200,7 @@ export default class EventProfile extends Component {
                             value={description}
                              />
                     </Item>
-                    
+
                     <Button bordered onPress={this.submitRide()}
                     style={{margin:20}}>
                         <Text>Submit Ride!</Text>
@@ -236,14 +237,14 @@ const styles = StyleSheet.create({
         marginRight: 20,
         marginBottom: 30,
         marginLeft: 20,
-        borderRadius: 10 
+        borderRadius: 10
     },
     modalButtons:{
         flexDirection: 'row',
         justifyContent: 'space-between'
     },
     modalButton:{
-        color:'black', 
+        color:'black',
         fontSize:40,
         margin: 10
     }

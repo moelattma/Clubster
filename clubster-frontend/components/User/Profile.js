@@ -7,7 +7,8 @@ import converter from 'base64-arraybuffer';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 // import { CachedImage }  from 'react-native-cached-image'
 import { SocialIcon } from 'react-native-elements'
-import ImageGrid from './Cards/ImageGrid';
+import Gallery from './Cards/Gallery';
+import InformationCard from './Cards/InformationCard';
 import { accessKeyId, secretAccessKey } from '../../keys/keys';
 import v1 from 'uuid/v1';
 import { RNS3 } from 'react-native-aws3';
@@ -32,6 +33,7 @@ export default class Profile extends Component {
             hobbies: '',
             biography: '',
             errors: {},
+            images: [],
             selected: SELECT_ABOUT,
         }
     }
@@ -123,11 +125,49 @@ export default class Profile extends Component {
 
     componentWillMount() {
         axios.get('http://localhost:3000/api/profile').then((response) => {
-            const { name, image, major, biography, hobbies } = response.data.profile;
+            const { name, image, major, biography, hobbies, photos } = response.data.profile;
             if (response.data.profile) {
-                this.setState({ name: name, major: major ? major: '', biography: biography ? biography : '',
+                this.setState({ name: name, major: major ? major: '', photos: photos, biography: biography ? biography : '',
                     hobbies: hobbies ? hobbies.join(" ") : '', img: 'https://s3.amazonaws.com/clubster-123/' + image });
             }
+        });
+    };
+
+    async photoSubmit() {
+      await this.askPermissionsAsync();
+      try {
+          let result = await ImagePicker.launchImageLibraryAsync({
+              allowsEditing: true,
+              aspect: [4, 3],
+              base64: false,
+          });
+          if (result.cancelled)
+              return;
+
+          const key = `${v1()}.jpeg`;
+          const file = {
+              uri: result.uri,
+              type: 'image/jpeg',
+              name: key
+          };
+          const options = {
+              keyPrefix: 's3/',
+              bucket: 'clubster-123',
+              region: 'us-east-1',
+              accessKey: accessKeyId,
+              secretKey: secretAccessKey,
+              successActionStatus: 201
+          }
+          var imageURL;
+          await RNS3.put(file, options).then((response) => {
+              imageURL = response.body.postResponse.key;
+          }).catch((err) => { console.log(err) });
+          axios.post('http://localhost:3000/api/profile/photo', {imageURL: imageURL}).then((response) => {
+              this.setState({images:response.data.photos});
+          });
+        } catch (error) { console.log(error); }
+        axios.post('http://localhost:3000/api/profile/photo').then((response) => {
+            this.setState({images:response.data.photos});
         });
     };
 
@@ -148,6 +188,7 @@ export default class Profile extends Component {
 
 
     render() {
+
         return (
             <ScrollView>
                 <View style={{ height: HEIGHT / 4, backgroundColor: '#59cbbd' }}>
@@ -207,16 +248,12 @@ export default class Profile extends Component {
 
                 {(this.state.selected == SELECT_ABOUT)
                     //Photos tab
-                    ? <View style={{ margin: 10 }}>
-                        <Text>About</Text>
-                    </View>
+                    ? <InformationCard userInfo = {this.state} />
                     //members tab
                     : ((this.state.selected == SELECT_PHOTOS)
-                        ? <View>
-                            <Text> Photos </Text>
-                        </View>
+                        ? <Gallery userPhotos = {this.state} />
                         //about tab
-                        : 
+                        :
                         <ClubList />
                     )}
                 {/* MODAL  */}

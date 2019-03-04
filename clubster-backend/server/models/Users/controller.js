@@ -93,8 +93,22 @@ exports.submitProfile = (req, res) => {
 };
 
 exports.retrieveProfile = (req, res) => {
-  User.findById(req.user._id).select('-username -email -password').then((user) => {
+  User.findById(req.user._id).select('-username -email -password -photos').then((user) => {
     return res.status(201).json({ 'profile': user });
   });
 };
 
+exports.addPhotoToEvent = (req, res) => {
+	const { imageURL } = req.body;
+	const { userID } = req.params;
+	User.findOneAndUpdate(
+		{ _id:  userID },
+		{ $push: { photos: imageURL } },
+		function (error, user) {
+			if (error) {
+				console.log(error);
+			} else {
+				return res.status(201).json({ 'photos': user.photos });
+			}
+		});
+}

@@ -230,8 +230,8 @@ exports.addCommentToEvent = (req, res) => {
 							console.log(error);
 						} else {
 							Organization.increaseComments(event.organization);
-							Events.findOne({_id:eventID}).populate({path: 'comments', populate: {path: 'userID'}}).then((event) => {
-								return res.status(201).json({ event });
+							Comments.findByIdAndUpdate(comment._id).populate({path: 'userID'}).then((comment) => {
+								return res.status(201).json({ comment });
 							})
 						}
 					});

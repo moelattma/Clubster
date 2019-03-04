@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Container, Header, Content, Card, CardItem, Text, Body } from "native-base";
+import { Container, Header, Content, Card, CardItem, Text, Body, List, ListItem, Left, Thumbnail } from "native-base";
 import { View, Dimensions, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import axios from 'axios';
-
+import Comments from '../ClubBoard/Comments';
 export default class CommentCard extends Component {
   constructor(props) {
     super(props);
@@ -12,27 +12,44 @@ export default class CommentCard extends Component {
   }
 
   componentDidMount() {
-    const eventID = this.props.eventID; //eventID is hardcoded for now
-    // axios.get(`http://localhost:3000/api/events/${eventID}/comments`).then((comments) => {
-    //   this.setState({
-    //     comments: comments
-    //   })
-    // })
+    const eventID = this.props.eventInfo._id; //eventID is hardcoded for now
+    axios.get(`http://localhost:3000/api/events/${eventID}/comments`).then((response) => {
+      this.setState({comments: response.data.comments});
+    });
   }
 
+
+   _renderItem = () => {
+     return (
+       this.state.comments.map((data) => {
+       let url = 'https://s3.amazonaws.com/clubster-123/' + data.userID.image;
+      //  console.log(data);
+       return (
+         <ListItem avatar>
+           <Left>
+             <Thumbnail source={{ uri:url}} />
+           </Left>
+           <Body>
+             <Text>{data.content}</Text>
+           </Body>
+         </ListItem>
+       )
+     })
+   )}
+
   render() {
+    let commentTruncated = this.state.comments;
+    commentTruncated.length = 3;
     return (
         <Content padder>
           <Card>
             <CardItem header bordered>
               <Text>Comments</Text>
             </CardItem>
-            <FlatList
-              data={this.state.comments}
-              renderItem={this._renderItem}
-              keyExtractor={comment => comment._id}
-            />
-            <CardItem footer bordered>
+            <List>
+              {this._renderItem()}
+            </List>
+            <CardItem footer bordered onPress={() => this.props.navigation.navigate('Comments', { comments: this.state.comments })}>
               <Text>See All</Text>
             </CardItem>
           </Card>

@@ -38,9 +38,9 @@ export default class Input extends Component {
       // This moves children view with input field and submit button
       // up above the keyboard when it's active
       <KeyboardAvoidingView
-        keyboardVerticalOffset = {-500}
-        behavior='position'
-      >
+  keyboardVerticalOffset={100}
+  behavior={'padding'}
+  >
         <View style={styles.container}>
           {/* Comment input field */}
           <TextInput
