@@ -12,7 +12,7 @@ import converter from 'base64-arraybuffer';
 import v1 from 'uuid/v1';
 import { accessKeyId, secretAccessKey } from '../../keys/keys';
 import { createStackNavigator } from 'react-navigation';
-import { Content, Container, Icon, Form, Item, Input, Button } from 'native-base';
+import { Content, Container, Thumbnail, Form, Item, Input, Button } from 'native-base';
 import { RNS3 } from 'react-native-aws3';
 
 const window = Dimensions.get('window');
@@ -189,6 +189,7 @@ class CreateClub extends Component {
     super(props);
     this.state = {
       img: 'https://facebook.github.io/react/logo-og.png',
+      uri: 'https://image.flaticon.com/icons/png/512/128/128423.png'
     }
   }
   askPermissionsAsync = async () => {
@@ -221,7 +222,10 @@ class CreateClub extends Component {
         successActionStatus: 201
       }
       await RNS3.put(file, options).then((response) => {
-        this.setState({ imageURL: response.body.postResponse.key });
+        this.setState({ 
+          imageURL: response.body.postResponse.key,
+          uri: 'https://s3.amazonaws.com/clubster-123/' + response.body.postResponse.key,
+         })
       }).catch((err) => { console.log(err) });
     } catch (error) { console.log(error); };
   };
@@ -260,8 +264,8 @@ class CreateClub extends Component {
         </Form>
         <Content>
           <TouchableOpacity onPress={this.useLibraryHandler}>
-            <Icon name="ios-camera"
-              style={styles.cameraIcon} />
+               <Thumbnail square large style={styles.imageThumbnail}
+                source={{uri: this.state.uri}} />
           </TouchableOpacity>
         </Content>
 
@@ -341,9 +345,10 @@ const styles = StyleSheet.create({
     flex: 1,
     marginVertical: 20,
   },
-  cameraIcon: {
-    fontSize: 40,
-    margin: 20
+  imageThumbnail: {
+    margin: 20,
+    alignSelf: 'center',
+    borderRadius: 2
   },
   btn: {
     position: 'absolute',
