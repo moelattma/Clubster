@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, Dimensions, Image } from 'react-native';
+import { TouchableOpacity, TouchableWithoutFeedback, StyleSheet, View, Dimensions, Image, ScrollView } from 'react-native';
 import axios from 'axios';
 import converter from 'base64-arraybuffer';
+import InformationCard from '../User/Cards/InformationCard';
+import Gallery from '../User/Cards/Gallery';
+import { Container, Card, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text } from 'native-base';
 
 const { width: WIDTH } = Dimensions.get('window');
 
@@ -19,6 +22,7 @@ export default class ClubProfile extends Component {
             organizationID: orgID,
             name: '',
             president: '',
+            _id:'',
             description: '',
             isLoading: true,
             joinable: false,
@@ -31,9 +35,9 @@ export default class ClubProfile extends Component {
         axios.post("http://localhost:3000/api/organizations/isMember", { orgID: this.state.organizationID }).then((response) => {
             this.setState({ joinable: (!response.data.isMember) });
 
-            const { imageId, name, president, description } = response.data.organization;
+            const { imageId, name, president, description, _id } = response.data.organization;
 
-            this.setState({ name, president, description });
+            this.setState({ name, president, description, _id });
             if(imageId)
                 this.setState({ img: 'data:image/jpeg;base64,' + converter.encode(imageId.img.data.data) });
             this.setState({ isLoading: false });
@@ -60,7 +64,7 @@ export default class ClubProfile extends Component {
     };
 
     render() {
-        const { president, description, organizationID } = this.state;
+        const { president, description, organizationID, _id } = this.state;
 
         if (!this.state.isLoading) {
             let joins = null;
@@ -77,18 +81,19 @@ export default class ClubProfile extends Component {
                 );
             }
             return (
-                <View style={styles.background}>
-                    <Text style={{ textAlign: 'center', marginTop: 20 }}>
-                        President: {president}
-                    </Text>
-                    <Text style={{ textAlign: 'center', marginLeft: WIDTH / 10, marginRight: WIDTH / 10, marginTop: 20 }}>
-                        Description: {description}
-                    </Text>
-                    <Image style={styles.imageAvatar} source={{ uri: this.state.img }} />
-                    {joins}
-                </View>
+              <Container>
+                <ScrollView>
+                  <TouchableWithoutFeedback >
+                      <Image source={{ uri: this.state.img }} style={{ height: 200 }} />
+                  </TouchableWithoutFeedback>
+                  <InformationCard clubInfo={this.state} />
+                  <Gallery clubInfo={this.state} />
+                </ScrollView>
+                  {joins}
+
+                </Container>
             );
-        } 
+        }
         return null;
     }
 }
