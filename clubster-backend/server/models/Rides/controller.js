@@ -48,8 +48,9 @@ exports.joinRide = (req, res) => {
 
 exports.getRides = (req, res) => {
   Events.findById(req.params.eventID).select("rides")
-  // .populate({ path: 'rides', populate: { path: 'driverID', populate: { path: 'image', select: 'name image' } }})
-  // .populate({ path: 'rides', populate: { path: 'ridersID', populate: { path: 'image', select: 'name image' } }})
+  .populate('rides')
+  .populate({ path: 'rides', populate: { path: 'driverID', select: 'name image' } })
+  .populate({ path: 'rides', populate: { path: 'ridersID', select: 'name image' } })
   .then((event) => {
     console.log(event);
     if(!event){

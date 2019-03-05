@@ -5,7 +5,8 @@ import { ImagePicker, Permissions } from 'expo';
 import v1 from 'uuid/v1';
 import { accessKeyId, secretAccessKey } from '../../../keys/keys';
 import { RNS3 } from 'react-native-aws3';
-import { Container, Card, CardItem, Form, Content, Item, Text, Button, Icon, Left, Body, Right, Input } from 'native-base';
+import { Container, Card, CardItem, Form, Content, 
+    ListItem, Thumbnail, Item, Text, Button, Icon, Left, Body, Right, Input } from 'native-base';
 import CommentCard from '../Cards/CommentCard';
 import InformationCard from '../Cards/InformationCard';
 import ImageGrid from '../Cards/ImageGrid';
@@ -72,18 +73,13 @@ export default class EventProfile extends Component {
 
     openModal(){
         const event = this.props.navigation.getParam('event', null);
-        console.log('open modal')
-        if(!event){
-            console.log('event does not exist in event profile')
-            return;
-        }
         axios.get(`http://localhost:3000/api/${event._id}/rides`)
-        .then(rides => {
+        .then(response => {
             this.setState({
                 isModalVisible: true,
-                rides: rides
+                rides: response.data.rides
             })
-            console.log('rides', rides.data.rides)
+            console.log(response.data.rides)
         })
         .catch(err => {console.log(err)})
     }
@@ -95,7 +91,6 @@ export default class EventProfile extends Component {
     }
 
     dropDown(){
-        console.log('drop Down')
         this.setState({
             form: true
         })
@@ -104,26 +99,39 @@ export default class EventProfile extends Component {
     submitRide(){
         const event = this.props.navigation.getParam('event', null);
         const { seats, rideTime, rideLocation, description } = this.state;
-        console.log('submit', seats, rideTime, rideLocation, description);
         axios.post(`http://localhost:3000/api/${event._id}/createRide`, {
-            passengerSeats: this.state.seats,
-            time: this.state.rideTime,
-            location: this.state.location,
-            description: this.state.description,
+            passengerSeats: seats,
+            time: rideTime,
+            location: rideLocation,
+            description: description,
         }).then((response) => {
             if (response.status == 201 || response.status == 200) {
                 this.setState({ 
                     isModalVisible: false, 
                     rides: response.data.ride
                 });
-                console.log('ride created', response.data.ride)
             }
         })
         .catch((err) => {console.log('error creating new ride'); console.log(err)});
     }
 
+    _renderItem = ({ item }) => {
+        return (
+          <ListItem thumbnail style={styles.listStyle}>
+            <Left>
+              <Thumbnail large source={{ uri: 'https://s3.amazonaws.com/clubster-123/'+item.driverID.image }} />
+            </Left>
+            <Body>
+              <Text>{item.driverID.name}</Text>
+            </Body>
+            {/* <Right>
+              <Text>{item.isAdmin ? 'Admin' : 'Member'}</Text>
+            </Right> */}
+          </ListItem>
+        );
+      }
+
     render() {
-        // console.log(this.event);
         const eventInfo = {
             _id: this.event._id,
             name: this.event.name,
@@ -208,7 +216,14 @@ export default class EventProfile extends Component {
                         <Text>Submit Ride!</Text>
                     </Button>
                     </View>
-                    :null}
+                    :
+                    <FlatList
+                        data={this.state.rides}
+                        renderItem={this._renderItem}
+                        horizontal={false}
+                        keyExtractor={club => club._id}
+                    />
+                    }
                 </View>
                 </Modal>
             </View>
@@ -248,5 +263,9 @@ const styles = StyleSheet.create({
         color:'black',
         fontSize:40,
         margin: 10
+    },
+    listStyle:{
+        height: HEIGHT/8,
+        marginTop: 3
     }
 });

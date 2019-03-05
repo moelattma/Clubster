@@ -15,7 +15,7 @@ import {
 import axios from 'axios';
 
 
-export default class MemberList extends Component {
+export default class MembersList extends Component {
   constructor() {
     //calling react's constructor, configures this key word
     super();
@@ -90,14 +90,22 @@ export default class MemberList extends Component {
 
   componentWillMount() {
     const orgID = this.props._id;
+    console.log('Memberlist id', orgID)
     if(this.props._id == null){
       console.log('id is null')
     }
     else{
     // get request-setup memberArr[]
-    axios.get(`http://localhost:3000/api/organizations/${orgID}/members`).then((response) => {
+    axios.get(`http://localhost:3000/api/organizations/${orgID}/members`)
+    .then((response) => {
       const { members, idOfUser, admins, president } = response.data;
-      this.setState({ memberArr: members, idOfUser, admins, isLoading: false, president });
+      this.setState({ 
+        memberArr: members,
+         idOfUser, 
+         admins, 
+         isLoading: false,
+         president 
+        });
     });
   }
   }
