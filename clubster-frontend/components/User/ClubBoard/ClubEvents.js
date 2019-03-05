@@ -244,7 +244,9 @@ class CreateClubEvent extends Component {
       date: '',
       location: '',
       time: '',
-      imageURL: ''
+      imageURL: '',
+      uri: 'https://image.flaticon.com/icons/png/512/128/128423.png',
+      isImageUploaded: false
     }
   }
 
@@ -279,7 +281,9 @@ class CreateClubEvent extends Component {
       }
       await RNS3.put(file, options).then((response) => {
         this.setState({
-          imageURL: response.body.postResponse.key
+          imageURL: response.body.postResponse.key,
+          uri: 'https://s3.amazonaws.com/clubster-123/' + response.body.postResponse.key,
+          isImageUploaded: true
         });
       }).catch((err) => { console.log('upload image to aws failed');console.log(err) });
     } catch (error) {console.log('library handle failed'); console.log(error);}
@@ -349,11 +353,21 @@ class CreateClubEvent extends Component {
         </Item>
       </Form>
       <Content>
-        <TouchableOpacity onPress={this.useLibraryHandler}>
-          <Icon name="ios-camera"
-            style={styles.cameraIcon} />
+      {this.state.isImageUploaded == false
+      ?
+      <TouchableOpacity onPress={this.useLibraryHandler}>
+        <Thumbnail square small style={styles.uploadIcon}
+            source={{uri: this.state.uri}} />
+      </TouchableOpacity>
+      :
+      <TouchableOpacity onPress={this.useLibraryHandler}>
+          <Thumbnail square style={styles.imageThumbnail}
+              source={{uri: this.state.uri}} />
         </TouchableOpacity>
+      }
       </Content>
+      
+
 
       <Button bordered
             onPress={this.createEvent}
@@ -423,8 +437,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 20
   },
-  cameraIcon:{
-    fontSize: 40,
-    margin:20
+  uploadIcon:{
+    alignSelf: 'center',
+    margin: 10,
+  },
+  imageThumbnail: {
+    margin: 20,
+    alignSelf: 'center',
+    borderRadius: 2,
+    width: WIDTH/1.5,
+    height: HEIGHT/3 
   },
 });

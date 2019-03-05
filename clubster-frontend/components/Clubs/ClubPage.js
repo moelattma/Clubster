@@ -189,7 +189,8 @@ class CreateClub extends Component {
     super(props);
     this.state = {
       img: 'https://facebook.github.io/react/logo-og.png',
-      uri: 'https://image.flaticon.com/icons/png/512/128/128423.png'
+      uri: 'https://image.flaticon.com/icons/png/512/128/128423.png',
+      isImageUploaded: false
     }
   }
   askPermissionsAsync = async () => {
@@ -225,6 +226,7 @@ class CreateClub extends Component {
         this.setState({ 
           imageURL: response.body.postResponse.key,
           uri: 'https://s3.amazonaws.com/clubster-123/' + response.body.postResponse.key,
+          isImageUploaded: true
          })
       }).catch((err) => { console.log(err) });
     } catch (error) { console.log(error); };
@@ -263,10 +265,18 @@ class CreateClub extends Component {
           </Item>
         </Form>
         <Content>
-          <TouchableOpacity onPress={this.useLibraryHandler}>
+        {this.state.isImageUploaded == false
+        ?
+        <TouchableOpacity onPress={this.useLibraryHandler}>
+               <Thumbnail square small style={styles.uploadIcon}
+                source={{uri: this.state.uri}} />
+          </TouchableOpacity>
+        :
+        <TouchableOpacity onPress={this.useLibraryHandler}>
                <Thumbnail square large style={styles.imageThumbnail}
                 source={{uri: this.state.uri}} />
           </TouchableOpacity>
+        }
         </Content>
 
         <Button bordered
@@ -345,10 +355,16 @@ const styles = StyleSheet.create({
     flex: 1,
     marginVertical: 20,
   },
+  uploadIcon:{
+    alignSelf: 'center',
+    margin: 10,
+  },
   imageThumbnail: {
     margin: 20,
     alignSelf: 'center',
-    borderRadius: 2
+    borderRadius: 2,
+    width: WIDTH/1.5,
+    height: HEIGHT/3 
   },
   btn: {
     position: 'absolute',
