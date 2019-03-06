@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import converter from 'base64-arraybuffer';
+import { Container, Card, CardItem, Thumbnail, Form, Content, Item, Icon, Left, Body, Right, Input } from 'native-base';
+
 import {
   TouchableOpacity,
   StyleSheet,
@@ -48,33 +50,23 @@ export default class MembersList extends Component {
     if (item.member.image)
       url = 'https://s3.amazonaws.com/clubster-123/' + item.member.image;
     return (
-      <View style={{ flexDirection: 'row', backgroundColor: 'lightgrey', justifyContent: 'center' }}>
-        <View style={{ flexDirection: 'row', flex: .85 }}>
-          <View>
-            <TouchableOpacity onPress={() => ToastAndroid.show(item.book_title, ToastAndroid.SHORT)}>
-              <Image style={styles.img} source={{ uri: url }} />
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity onPress={() => ToastAndroid.show(item.book_title, ToastAndroid.SHORT)}>
-            <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'stretch', }}>
-              <View >
-                <Text style={styles.nm}>
-                  {item.member.name}
-                </Text>
-              </View>
-              <View >
-                {this.state.president == item._id ? 
-                  <Text style={{ fontSize: 16, color: 'black', marginLeft: 10 }} >President</Text> :
-                  (this.state.admins.indexOf(item._id) > -1) ? 
-                    <Text style={{ fontSize: 16, color: 'black', marginLeft: 10 }}>Admin</Text> : 
-                    <Text style={{ fontSize: 16, color: 'black', marginLeft: 10 }}>Member</Text>
-                }
-              </View>
-            </View>
+      <Card>
+        <CardItem style={styles.cardStyle}>
+          <TouchableOpacity>
+            <Thumbnail large style={styles.img} source={{ uri: url }} />
           </TouchableOpacity>
-        </View>
-        {this.renderTrash(item)}
-      </View>
+          <Text style={styles.nm}>
+                {item.member.name}
+          </Text>
+          {this.state.president == item._id ? 
+            <Text style={{ fontSize: 16, color: 'black', marginLeft: 10 }} >President</Text> :
+            (this.state.admins.indexOf(item._id) > -1) ? 
+              <Text style={{ fontSize: 16, color: 'black', marginLeft: 10 }}>Admin</Text> : 
+              <Text style={{ fontSize: 16, color: 'black', marginLeft: 10 }}>Member</Text>
+          }
+          {this.renderTrash(item)}
+        </CardItem>
+      </Card>
     )
   }
 
@@ -148,10 +140,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   img: {
-    borderRadius: 20,
-    borderWidth: 4,
-    borderColor: 'lightgrey',
     height: 80,
     width: 80
-  }
+  },
+  cardStyle:{
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    height: 82, 
+    width: null
+  },
 });

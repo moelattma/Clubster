@@ -6,7 +6,7 @@ import { ImagePicker, Permissions, Constants } from 'expo';
 import converter from 'base64-arraybuffer';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { Container, Card, CardItem, Form, Content, Item, Icon, Left, Body, Right, Input } from 'native-base';
+import { Container } from 'native-base';
 import MembersList from './MembersList';
 import v1 from 'uuid/v1';
 import Gallery from '../Cards/Gallery';
