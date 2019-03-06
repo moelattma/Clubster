@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, Dimensions, StyleSheet, Text, View, Button, TextInput, Image } from 'react-native';
+import { TouchableOpacity, Dimensions, StyleSheet, View, TextInput, Image } from 'react-native';
+import { Button, Text } from 'native-base';
 import Modal from "react-native-modal";
 import axios from 'axios';
 import { ImagePicker, Permissions, Constants } from 'expo';
@@ -148,19 +149,16 @@ export default class Settings extends Component {
                                 source={{ uri: this.state.img }} />
                         </TouchableOpacity>
 
-                        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                        <TouchableOpacity style={styles.button}
-                            onPress={() => this.aboutClicked()}>
-                            <Text style={styles.buttonText}> About </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.button}
-                            onPress={() => this.photosClicked()}>
-                            <Text style={styles.buttonText}> Photos </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.button}
-                            onPress={() => this.membersClicked()}>
-                            <Text style={styles.buttonText}> Members </Text>
-                        </TouchableOpacity>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
+                        <Button bordered style={styles.buttonText} onPress={() => this.aboutClicked()}>
+                            <Text> About </Text>
+                        </Button>
+                        <Button bordered style={styles.buttonText} onPress={() => this.photosClicked()}>
+                            <Text > Photos </Text>
+                        </Button>
+                        <Button bordered style={styles.buttonText} transparent onPress={() => this.membersClicked()}>
+                        <Text > Members </Text>
+                        </Button>
                         </View>
                     </View>
 
@@ -305,20 +303,8 @@ const styles = StyleSheet.create({
         height: 60,
         width: WIDTH / 3
     },
-    button:{
-        backgroundColor: '#E0E0E0',
-        borderRadius: 20,
-        borderWidth: 1.5,
-        borderColor: '#338293',
-        margin: 10,
-        width: '27%',
-    },
     buttonText:{
-        color: '#338293',
-        textAlign: 'center',
-        marginLeft: 10,
-        marginRight: 10,
-        marginTop: 10,
-        marginBottom: 10
+        margin: 10,
+        marginBottom: 0
     },
 });

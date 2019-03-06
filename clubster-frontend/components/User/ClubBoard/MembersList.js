@@ -59,10 +59,10 @@ export default class MembersList extends Component {
                 {item.member.name}
           </Text>
           {this.state.president == item._id ? 
-            <Text style={{ fontSize: 16, color: 'black', marginLeft: 10 }} >President</Text> :
+            <Text style={styles.memberText} >President</Text> :
             (this.state.admins.indexOf(item._id) > -1) ? 
-              <Text style={{ fontSize: 16, color: 'black', marginLeft: 10 }}>Admin</Text> : 
-              <Text style={{ fontSize: 16, color: 'black', marginLeft: 10 }}>Member</Text>
+              <Text style={styles.memberText}>Admin</Text> : 
+              <Text style={styles.memberText}>Member</Text>
           }
           {this.renderTrash(item)}
         </CardItem>
@@ -85,7 +85,6 @@ export default class MembersList extends Component {
     axios.get(`http://localhost:3000/api/organizations/${orgID}/members`)
     .then((response) => {
       const { members, idOfUser, admins, president } = response.data;
-      console.log('memberlist response', response.data)
       this.setState({ 
         memberArr: members,
          idOfUser, 
@@ -150,4 +149,9 @@ const styles = StyleSheet.create({
     height: 82, 
     width: null
   },
+  memberText:{
+    fontSize: 16, 
+    color: 'black', 
+    marginLeft: 10
+  }
 });
