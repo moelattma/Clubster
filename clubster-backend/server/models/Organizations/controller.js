@@ -73,7 +73,9 @@ exports.getMembers = (req, res) => {
 	const { orgID } = req.params;
 
 	// finds and return organization id of specific club
-	Organization.findByIdAndUpdate(orgID).select('members admins president').populate({ path: 'members', populate: { path: 'avatar' }, select: 'name avatar _id' }).then((organization) => {
+	Organization.findByIdAndUpdate(orgID, 'members admins president')
+	.populate('members.member', 'name image _id' )
+	.then((organization) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No organizations found' });
 		} else {

@@ -32,14 +32,6 @@ export default class Settings extends Component {
         }
     }
 
-    static navigationOptions = ({ navigation, screenProps }) => {
-        return {
-            header: (
-                <Text> HII</Text>
-            )
-        };
-    }
-
     askPermissionsAsync = async () => {
         await Permissions.askAsync(Permissions.CAMERA);
         await Permissions.askAsync(Permissions.CAMERA_ROLL);
@@ -179,11 +171,6 @@ export default class Settings extends Component {
                         //members tab
                         : ((this.state.members) ? <View>
                             <View style={{margin: 10}}>
-                            <MaterialIcons
-                                            name="people"
-                                            size={30}
-                                            color={'black'}
-                                        />
                             <MembersList _id={this.props.screenProps._id}
                                  style={{margin:10}}></MembersList>
                             </View>
