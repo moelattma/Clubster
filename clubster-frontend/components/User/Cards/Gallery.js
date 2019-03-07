@@ -39,8 +39,10 @@ export default class Gallery extends Component {
     if(this.props && this.props.eventInfo) {
       photos = (this.props.eventInfo.photos.length > 0) ? this.props.eventInfo.photos : ['s3/2391cac0-3c9d-11e9-8f51-8972130a1d1d.jpeg'];
     } else if(this.props && this.props.userPhotos) {
-      photos = (this.props.userPhotos.photos.length > 0) ? this.props.userPhotos.photos : ['s3/2391cac0-3c9d-11e9-8f51-8972130a1d1d.jpeg'];
+      console.log('gallery 2', this.props.userPhotos.images)
+      photos = (this.props.userPhotos.images.length > 0) ? this.props.userPhotos.images : ['s3/2391cac0-3c9d-11e9-8f51-8972130a1d1d.jpeg'];
     } else if(this.props && this.props.clubPhotos) {
+      console.log('gallery 3', this.props.clubPhotos.photos)
       photos = (this.props.clubPhotos.photos.length > 0) ? this.props.clubPhotos.photos : ['s3/2391cac0-3c9d-11e9-8f51-8972130a1d1d.jpeg'];
     } else {
       photos = ['s3/2391cac0-3c9d-11e9-8f51-8972130a1d1d.jpeg'];
@@ -94,7 +96,6 @@ export default class Gallery extends Component {
     const { images } = this.state;
     const { index, shown } = this.state;
     return (
-      <Content padder>
         <Card>
           <CardItem header bordered>
             <Text>Photos: <FontAwesome name="plus" size={18} color={'black'} onPress = {() => {this.onSubmit()}} /></Text>
@@ -122,7 +123,6 @@ export default class Gallery extends Component {
             />
           </View>
         </Card>
-      </Content>
     );
   }
 }
