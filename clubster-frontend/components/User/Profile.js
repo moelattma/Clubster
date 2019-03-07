@@ -1,19 +1,17 @@
 import React, { Component } from 'react';
-import { AsyncStorage, View, ScrollView, StyleSheet, Text, Image, TouchableOpacity, Button, TextInput, Dimensions } from 'react-native';
-import { Font, ImagePicker, Permissions, Constants } from 'expo';
+import { AsyncStorage, View, ScrollView, StyleSheet,
+     Image, TouchableOpacity, TextInput, Dimensions } from 'react-native';
+import { Font, ImagePicker, Permissions } from 'expo';
 import axios from 'axios';
 import Modal from "react-native-modal";
-import converter from 'base64-arraybuffer';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-// import { CachedImage }  from 'react-native-cached-image'
-import { SocialIcon } from 'react-native-elements'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Gallery from './Cards/Gallery';
 import InformationCard from './Cards/InformationCard';
 import { accessKeyId, secretAccessKey } from '../../keys/keys';
 import v1 from 'uuid/v1';
 import { RNS3 } from 'react-native-aws3';
 import ClubList from './Cards/ClubList';
-import { Container } from 'native-base';
+import { Container, Button, Text } from 'native-base';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 
@@ -211,40 +209,22 @@ export default class Profile extends Component {
                     onPress={() => this.changePicture()}>
                     <Image style={styles.imageAvatar} source={{ uri: this.state.img }} />
                 </TouchableOpacity>
-                <Text style={{
-                    flexDirection: 'row', alignSelf: 'center',
-                    marginTop: 70, fontSize: 20, color: 'black', fontWeight: 'bold' }}>
-                    {this.state.name}
-                </Text>
-                <Text style={{
-                    flexDirection: 'row', alignSelf: 'center',
-                    fontSize: 20, color: 'black', fontWeight: 'bold'
-                }}>
-                    {this.state.major}
-                </Text>
-                <View style={{
-                    flexDirection: 'row', flexWrap: 'wrap',
-                    justifyContent: 'center'
-                }}>
-                    <Text style={{ textAlign: 'center' }}>
-                        {this.state.biography}
-                    </Text>
-                </View>
+                <View style={{height: 100}}></View>
 
-                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                    <TouchableOpacity style={styles.button} onPress={this.handleAboutAction.bind(this)}>
-                        <Text style={styles.buttonText}> About </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={this.handlePhotoAction.bind(this)}>
-                        <Text style={styles.buttonText}> Photos </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} onPress={this.handleClubsAction.bind(this)}>
-                        <Text style={styles.buttonText}> Clubs </Text>
-                    </TouchableOpacity>
-                </View>
-                <View style={{ flexDirection: 'column', alignSelf: 'center' }}>
-
-                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
+                        <Button bordered style={styles.buttonText} 
+                        onPress={this.handleAboutAction.bind(this)}>
+                            <Text>About</Text>
+                        </Button>
+                        <Button bordered style={styles.buttonText} 
+                        onPress={this.handlePhotoAction.bind(this)}>
+                            <Text>Photos</Text>
+                        </Button>
+                        <Button bordered style={styles.buttonText} transparent 
+                        onPress={this.handleClubsAction.bind(this)}>
+                            <Text>Clubs</Text>
+                        </Button>
+                        </View>
 
                 {(this.state.selected == SELECT_ABOUT)
                     //Photos tab
@@ -274,7 +254,6 @@ export default class Profile extends Component {
                                 <Text style={styles.SubmitBtn}>Save</Text>
                             </TouchableOpacity>
 
-
                             <TouchableOpacity onPress={() => { this.setState({ show: false }) }}>
                                 <Text style={styles.closeText}>Cancel</Text>
                             </TouchableOpacity>
@@ -299,10 +278,7 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#338293',
         textAlign: 'center',
-        marginLeft: 25,
-        marginRight: 25,
-        marginTop: 10,
-        marginBottom: 10,
+        margin: 10,
     },
     header: {
         backgroundColor: "#00BFFF",
