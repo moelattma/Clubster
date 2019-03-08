@@ -227,12 +227,12 @@ export default class Profile extends Component {
                         </View>
 
                 {(this.state.selected == SELECT_ABOUT)
-                    //Photos tab
+                    //about tab
                     ? <InformationCard userInfo = {this.state} />
-                    //members tab
+                    //photos tab
                     : ((this.state.selected == SELECT_PHOTOS)
                         ? <Gallery userPhotos = {this.state} />
-                        //about tab
+                        //clubs tab
                         :
                         <ClubList />
                     )}
@@ -276,8 +276,6 @@ const styles = StyleSheet.create({
         width: '27%'
     },
     buttonText: {
-        color: '#338293',
-        textAlign: 'center',
         margin: 10,
     },
     header: {
@@ -327,7 +325,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#ff6666',
         color: '#fff',
         fontWeight: 'bold',
-        // margin: 20,
         padding: 5
     },
     SubmitBtn: {
@@ -338,20 +335,15 @@ const styles = StyleSheet.create({
         padding: 5
     },
     header: {
-        // flex: 1,
         backgroundColor: 'lightgreen',
         marginBottom: 1000,
     },
     profilePic: {
-        // flex: 1,
         flexGrow: 1,
         alignItems: 'center',
         justifyContent: 'center',
         position: 'absolute',
-        top: -40,
-
-        // backgroundColor: '#03A9F4',
-
+        top: -40, 
     },
     profilePicWrap: {
         width: 180,
@@ -372,60 +364,6 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         borderColor: '#fff',
         borderWidth: 4,
-        //justifyContent: 'center',
-    },
-    name: {
-        marginTop: 20,
-        fontSize: 20,
-        color: 'black',
-        fontWeight: 'bold',
-    },
-    major: {
-        fontSize: 14,
-        color: 'black',
-        fontStyle: 'italic',
-    },
-
-    // CSS for Bar
-    bar: {
-        borderTopColor: '#fff',
-        borderTopWidth: 4,
-        backgroundColor: 'black',
-        flexDirection: 'row'
-    },
-    barSeparator: {
-        borderRightWidth: 4,
-    },
-    barTop: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-        fontStyle: 'italic'
-    },
-    // btn: {
-    //     position: 'absolute',
-    //     width: 50,
-    //     height: 50,
-    //     backgroundColor: '#3399ff',
-    //     borderRadius: 30,
-    //     bottom: 0,
-    //     right: 0,
-    //     alignItems: 'center',
-    //     justifyContent: 'center'
-    // },
-    plus: {
-        fontSize: 40,
-        color: 'white'
-    },
-    barBottom: {
-        color: 'white',
-        fontSize: 14,
-        fontWeight: 'bold'
-    },
-    barItem: {
-        flex: 1,
-        padding: 18,
-        alignItems: 'center'
     },
     editButton: {
         position: 'absolute',

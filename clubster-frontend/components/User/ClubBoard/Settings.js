@@ -77,10 +77,8 @@ export default class Settings extends Component {
 
     componentDidMount() {
         const { _id } = this.props.screenProps;
-        console.log('org id', _id)
         axios.get(`http://localhost:3000/api/organizations/getOrg/${_id}`).then((response) => {
             const { president, name, description, photos } = response.data.org;
-            console.log(response.data);
             this.setState({
                 president: president, name, description,
                 img: 'https://s3.amazonaws.com/clubster-123/' + response.data.org.image,
