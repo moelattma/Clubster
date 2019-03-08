@@ -24,6 +24,7 @@ import ClubEvents from './User/ClubBoard/ClubEvents';
 import Chat from './User/ClubBoard/Chat';
 import MemberList from './User/ClubBoard/MembersList';
 import Graphs from './User/ClubBoard/Graphs';
+import SideGraph from './User/Cards/SideGraph';
 
 export const LoginNavigator = createSwitchNavigator(
     {
@@ -124,6 +125,14 @@ export const AdminNavigator = createMaterialTopTabNavigator(
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
                     <MaterialCommunityIcons name='information-variant' size={27} color={tintColor} />
+                ),
+            }
+        },
+        Graphs: {
+            screen: Graphs,
+            navigationOptions: {
+                tabBarIcon: ({ tintColor }) => (
+                    <MaterialCommunityIcons name='wechat' size={27} color={tintColor} /> 
                 ),
             }
         }
