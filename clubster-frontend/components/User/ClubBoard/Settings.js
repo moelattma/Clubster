@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, Dimensions, StyleSheet, View, TextInput, Image } from 'react-native';
-import { Button, Text } from 'native-base';
+import { TouchableOpacity, Dimensions, StyleSheet, View, TextInput, ScrollView, Image } from 'react-native';
 import Modal from "react-native-modal";
 import axios from 'axios';
 import { ImagePicker, Permissions, Constants } from 'expo';
 import converter from 'base64-arraybuffer';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { Container } from 'native-base';
+import { Container, Card, Button, Text, Form, Content, Item, Icon, Left, Body, Right, Input, Thumbnail } from 'native-base';
 import MembersList from './MembersList';
 import v1 from 'uuid/v1';
 import Gallery from '../Cards/Gallery';
@@ -75,7 +74,7 @@ export default class Settings extends Component {
       };
     };
 
-    componentDidMount() {
+    componentWillMount() {
         const { _id } = this.props.screenProps;
         axios.get(`http://localhost:3000/api/organizations/getOrg/${_id}`).then((response) => {
             const { president, name, description, photos } = response.data.org;
@@ -131,48 +130,40 @@ export default class Settings extends Component {
 
     render() {
         return (
-            <Container>
-                <View>
-                    <View>
-                        <TouchableOpacity style={ styles.editButton}
-                            onPress={this._showModal} >
-                            <FontAwesome
-                                name="edit"
-                                size={35}
-                                color={'black'}
-                            />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPressIn={() => this.changePicture()}>
-                            <Image style={{ height: 200, width: WIDTH }}
-                                source={{ uri: this.state.img }} />
-                        </TouchableOpacity>
+            <ScrollView>
+                <TouchableOpacity style={styles.editButton} onPress={this._showModal}>
+                    <FontAwesome name="edit" size={35} color={'black'} />
+                </TouchableOpacity>
 
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
-                        <Button bordered style={styles.buttonText} onPress={() => this.aboutClicked()}>
-                            <Text> About </Text>
-                        </Button>
-                        <Button bordered style={styles.buttonText} onPress={() => this.photosClicked()}>
-                            <Text > Photos </Text>
-                        </Button>
-                        <Button bordered style={styles.buttonText} transparent onPress={() => this.membersClicked()}>
+                <TouchableOpacity onPressIn={this.changePicture}>
+                    <Thumbnail square style={{ height: 200, width: WIDTH }}
+                        source={{ uri: this.state.img }} />
+                </TouchableOpacity>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
+                    <Button bordered style={styles.buttonText} onPress={() => this.aboutClicked()}>
+                        <Text> About </Text>
+                    </Button>
+                    <Button bordered style={styles.buttonText} onPress={() => this.photosClicked()}>
+                        <Text > Photos </Text>
+                    </Button>
+                    <Button bordered style={styles.buttonText} transparent onPress={() => this.membersClicked()}>
                         <Text > Members </Text>
-                        </Button>
+                    </Button>
+                </View>
+
+                {(this.state.photosDisplay)
+                    //Photos tab
+                    ? <Gallery clubPhotos={this.state} />
+                    //members tab
+                    : ((this.state.members) ? <View>
+                        <View style={{ margin: 10 }}>
+                            <MembersList _id={this.props.screenProps._id}
+                                style={{ margin: 10 }}></MembersList>
                         </View>
                     </View>
-
-
-                    {(this.state.photosDisplay)
-                        //Photos tab
-                        ? <Gallery clubPhotos = {this.state} />
-                        //members tab
-                        : ((this.state.members) ? <View>
-                            <View style={{margin: 10}}>
-                            <MembersList _id={this.props.screenProps._id}
-                                 style={{margin:10}}></MembersList>
-                            </View>
-                        </View>
                         //about tab
-                        :<View>
+                        : <View>
                             <View style={styles.mainContainer}>
                                 <Text style={styles.nameText}>
                                     {this.state.name}
@@ -191,55 +182,54 @@ export default class Settings extends Component {
                                 </Text>
                             </View>
                         </View>
-                        )}
+                    )}
 
-                    {/*---------- MODAL  ---------------*/}
-                    <View>
-                        <Modal isVisible={this.state.show} onRequestClose={this.hide}>
-                            <View style={styles.modalView}>
-                                <View>
-                                    <TouchableOpacity onPress={this._hideModal}>
-                                        <MaterialIcons
-                                            name="cancel"
-                                            size={30}
-                                            color={'red'}
-                                        />
-                                    </TouchableOpacity>
-                                </View>
-                                <View >
-                                    <Text style={styles.pageTitle}>
-                                        Edit Club Information
+                {/*---------- MODAL  ---------------*/}
+                <View>
+                    <Modal isVisible={this.state.show} onRequestClose={this.hide}>
+                        <View style={styles.modalView}>
+                            <View>
+                                <TouchableOpacity onPress={this._hideModal}>
+                                    <MaterialIcons
+                                        name="cancel"
+                                        size={30}
+                                        color={'red'}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                            <View >
+                                <Text style={styles.pageTitle}>
+                                    Edit Club Information
                                 </Text>
-                                    <View style={styles.textInAreaContainer}>
-                                        <TextInput placeholder='club name/ acronym'
-                                         style={styles.textInArea}
-                                         label='Name' underlineColorAndroid="transparent"
-                                          onChangeText={(name) => this.setState({ name })}
-                                          value={this.state.name} />
-                                    </View>
+                                <View style={styles.textInAreaContainer}>
+                                    <TextInput placeholder='club name/ acronym'
+                                        style={styles.textInArea}
+                                        label='Name' underlineColorAndroid="transparent"
+                                        onChangeText={(name) => this.setState({ name })}
+                                        value={this.state.name} />
+                                </View>
 
-                                    <View style={styles.textInAreaContainer}>
-                                        <TextInput placeholder='purpose/ description'
+                                <View style={styles.textInAreaContainer}>
+                                    <TextInput placeholder='purpose/ description'
                                         style={styles.textInArea}
                                         label='Description' underlineColorAndroid="transparent"
-                                         multiline={true} numberOfLines={3}
-                                         onChangeText={(description) => this.setState({ description })}
-                                         value={this.state.description} />
-                                    </View>
-                                    <View >
-                                        <View>
-                                            <Button
-                                                title="Save"
-                                                onPress={() => { this.submitClubChanges() }}
-                                            />
-                                        </View>
+                                        multiline={true} numberOfLines={3}
+                                        onChangeText={(description) => this.setState({ description })}
+                                        value={this.state.description} />
+                                </View>
+                                <View >
+                                    <View>
+                                        <Button
+                                            title="Save"
+                                            onPress={() => { this.submitClubChanges() }}
+                                        />
                                     </View>
                                 </View>
                             </View>
-                        </Modal>
-                    </View>
+                        </View>
+                    </Modal>
                 </View>
-            </Container>
+            </ScrollView>
         );
     }
 }
@@ -304,5 +294,26 @@ const styles = StyleSheet.create({
     buttonText:{
         margin: 10,
         marginBottom: 0
+    },
+    avatar: {
+        // width: WIDTH / 3,
+        // height: WIDTH / 3,
+        // borderRadius: WIDTH / 6,
+        borderWidth: 4,
+        borderColor: 'white',
+        marginBottom: 10,
+        alignSelf: 'center',
+        position: 'absolute',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: HEIGHT / 4 - WIDTH / 6
+    },
+    imageAvatar: {
+        width: WIDTH / 3,
+        height: WIDTH / 3,
+        borderColor: 'white',
+        borderRadius: WIDTH / 6,
+        alignSelf: 'center',
+        // position: 'relative'
     },
 });

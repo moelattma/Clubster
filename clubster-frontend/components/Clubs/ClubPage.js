@@ -241,7 +241,7 @@ class CreateClub extends Component {
     if (func) {
       await func();
       this.props.navigation.navigate('ShowClubs');
-    }
+    } else this.props.navigation.navigate('ShowClubs');
   }
 
   render() {

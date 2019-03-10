@@ -5,8 +5,8 @@ import { ImagePicker, Permissions } from 'expo';
 import v1 from 'uuid/v1';
 import { accessKeyId, secretAccessKey } from '../../../keys/keys';
 import { RNS3 } from 'react-native-aws3';
-import { Container, Card, CardItem, Form, Content, 
-    ListItem, Thumbnail, Item, Text, Button, Icon, Left, Body, Right, Input } from 'native-base';
+import { Container, Card, CardItem, Form, Content, ListItem, Thumbnail, Item, 
+         Text, Button, Icon, Left, Body, Right, Input } from 'native-base';
 import CommentCard from '../Cards/CommentCard';
 import InformationCard from '../Cards/InformationCard';
 import ImageGrid from '../Cards/ImageGrid';
@@ -30,7 +30,7 @@ export default class EventProfile extends Component {
             rideLocation: '',
             description: '',
         }
-   }
+    }
 
     askPermissionsAsync = async () => {
         await Permissions.askAsync(Permissions.CAMERA);
@@ -71,32 +71,32 @@ export default class EventProfile extends Component {
         } catch (error) { console.log(error); }
     }
 
-    openModal(){
+    openModal() {
         const event = this.props.navigation.getParam('event', null);
         axios.get(`http://localhost:3000/api/${event._id}/rides`)
-        .then(response => {
-            this.setState({
-                isModalVisible: true,
-                rides: response.data.rides
+            .then(response => {
+                this.setState({
+                    isModalVisible: true,
+                    rides: response.data.rides
+                })
+                console.log(response.data.rides)
             })
-            console.log(response.data.rides)
-        })
-        .catch(err => {console.log(err)})
+            .catch(err => { console.log(err) })
     }
 
-    closeModal(){
-        this.setState({
-            isModalVisible: false,
-        })
+    closeModal() {
+        if (this.state.form)
+            this.setState({ form: false });
+        else this.setState({ isModalVisible: false });
     }
 
-    dropDown(){
+    dropDown() {
         this.setState({
             form: true
         })
     }
 
-    submitRide(){
+    submitRide() {
         const event = this.props.navigation.getParam('event', null);
         const { seats, rideTime, rideLocation, description } = this.state;
         axios.post(`http://localhost:3000/api/${event._id}/createRide`, {
@@ -106,30 +106,55 @@ export default class EventProfile extends Component {
             description: description,
         }).then((response) => {
             if (response.status == 201 || response.status == 200) {
-                this.setState({ 
-                    isModalVisible: false, 
+                this.setState({
+                    form: false,
                     rides: response.data.ride
                 });
             }
         })
-        .catch((err) => {console.log('error creating new ride'); console.log(err)});
+        .catch((err) => { console.log('error creating new ride'); console.log(err) });
+    }
+
+    addRider = (item) => {
+        console.log('add to this ride ' + item);
+        axios.post(`http://localhost:3000/api/${item._id}/joinRide`).then(response => {
+            console.log(response.status.ride);
+        });
     }
 
     _renderItem = ({ item }) => {
         return (
-          <ListItem thumbnail style={styles.listStyle}>
-            <Left>
-              <Thumbnail large source={{ uri: 'https://s3.amazonaws.com/clubster-123/'+item.driverID.image }} />
-            </Left>
-            <Body>
-              <Text>{item.driverID.name}</Text>
-            </Body>
-            {/* <Right>
-              <Text>{item.isAdmin ? 'Admin' : 'Member'}</Text>
-            </Right> */}
-          </ListItem>
+            <View>
+                <ListItem thumbnail style={styles.listStyle}>
+                    <ScrollView horizontal>
+                        <Left>
+                            <Thumbnail large source={{ uri: 'https://s3.amazonaws.com/clubster-123/' + item.driverID.image }} />
+                        </Left>
+                        <Body>
+                            <FlatList
+                                data={item.ridersID}
+                                renderItem={this._renderRider}
+                                horizontal={true}
+                                keyExtractor={rider => rider._id}
+                            />
+                        </Body>
+                        <Right >
+                            <Icon onPress={() => this.addRider(item)} name="ios-add" style={{ color: 'black', fontSize: 24 }} />
+                        </Right>
+                    </ScrollView>
+                </ListItem>
+                <Text style={{ textAlign: 'center' }}>{item.time} | {item.location} | {item.description}</Text>
+            </View>
         );
-      }
+    }
+
+    _renderRider = ({ item }) => {
+        return ( 
+            <ListItem thumbnail> 
+                <Thumbnail small source={{ uri: 'https://s3.amazonaws.com/clubster-123/' + item.image  }}/>
+            </ListItem>
+        );
+    }
 
     render() {
         const eventInfo = {
@@ -146,87 +171,85 @@ export default class EventProfile extends Component {
 
         return (
             <Container>
-              <ScrollView>
-                <TouchableWithoutFeedback onPress={() => this.changeEventPicture()}>
-                    <Image source={{ uri: this.state.eventImage }} style={{ height: 200 }} />
-                </TouchableWithoutFeedback>
-                <InformationCard eventInfo={eventInfo} />
-                <CommentCard eventInfo={eventInfo}/>
-                <Gallery eventInfo={eventInfo} />
-                <Content padder>
-                <Card>
-                    <CardItem footer bordered>
-                    <TouchableOpacity onPress={() => this.openModal()}>
-                        <Text>See Rides</Text>
-                    </TouchableOpacity>
-                    </CardItem>
-                </Card>
-                </Content>
-              </ScrollView>
+                <ScrollView>
+                    <TouchableWithoutFeedback onPress={() => this.changeEventPicture()}>
+                        <Image source={{ uri: this.state.eventImage }} style={{ height: 200 }} />
+                    </TouchableWithoutFeedback>
+                    <InformationCard eventInfo={eventInfo} />
+                    <CommentCard eventInfo={eventInfo} />
+                    <Gallery eventInfo={eventInfo} />
+                    <Content padder>
+                        <Card>
+                            <CardItem footer bordered>
+                                <TouchableOpacity onPress={() => this.openModal()}>
+                                    <Text>See Rides</Text>
+                                </TouchableOpacity>
+                            </CardItem>
+                        </Card>
+                    </Content>
+                </ScrollView>
 
-              <View>
                 <Modal isVisible={this.state.isModalVisible}
-                style={styles.modalStyle}>
-                <View style={{ flex: 1, margin: 20 }}>
-                    <View style={styles.modalButtons}>
-                    <TouchableOpacity onPress={() => this.closeModal()}>
-                        <Icon name="ios-arrow-dropleft"
-                        style={styles.modalButton}/>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => this.dropDown()}>
-                        <Icon name="ios-add"
-                        style={styles.modalButton}/>
-                    </TouchableOpacity>
+                    style={styles.modalStyle}>
+                    <View style={{ flex: 1, margin: 2 }}>
+                        <View style={styles.modalButtons}>
+                            <TouchableOpacity onPress={() => this.closeModal()}>
+                                <Icon name="ios-arrow-dropleft"
+                                    style={styles.modalButton} />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => this.dropDown()}>
+                                <Icon name="ios-add"
+                                    style={styles.modalButton} />
+                            </TouchableOpacity>
+                        </View>
+                        {this.state.form
+                            ? <View>
+                                <Form>
+                                    <Item>
+                                        <Input placeholder="number of available seats?"
+                                            label='seats'
+                                            onChangeText={(seats) => this.setState({ seats })}
+                                            value={seats}
+                                        />
+                                    </Item>
+                                    <Item>
+                                        <Input placeholder="Pick up time."
+                                            label='rideTime'
+                                            onChangeText={(rideTime) => this.setState({ rideTime })}
+                                            value={rideTime}
+                                        />
+                                    </Item>
+                                    <Item>
+                                        <Input placeholder="Pick up location."
+                                            label='location'
+                                            onChangeText={(rideLocation) => this.setState({ rideLocation })}
+                                            value={rideLocation}
+                                        />
+                                    </Item>
+                                    <Item>
+                                        <Input placeholder="Notes."
+                                            label='description'
+                                            onChangeText={(description) => this.setState({ description })}
+                                            value={description}
+                                        />
+                                    </Item>
+
+                                </Form>
+                                <Button bordered onPress={() => this.submitRide()}
+                                    style={{ margin: 20 }}>
+                                    <Text>Submit Ride!</Text>
+                                </Button>
+                            </View>
+                            :
+                            <FlatList
+                                data={this.state.rides}
+                                renderItem={this._renderItem}
+                                horizontal={false}
+                                keyExtractor={ride => ride._id}
+                            />
+                        }
                     </View>
-                    {this.state.form
-                    ?<View>
-                    <Form>
-                    <Item>
-                    <Input placeholder="number of available seats?"
-                            label='seats'
-                            onChangeText={(seats) => this.setState({ seats })}
-                            value={seats}
-                             />
-                    </Item>
-                    <Item>
-                    <Input placeholder="Pick up time."
-                            label='rideTime'
-                            onChangeText={(rideTime) => this.setState({ rideTime })}
-                            value={rideTime}
-                             />
-                    </Item>
-                    <Item>
-                    <Input placeholder="Pick up location."
-                            label='location'
-                            onChangeText={(rideLocation) => this.setState({ rideLocation })}
-                            value={rideLocation}
-                             />
-                    </Item>
-                    <Item>
-                    <Input placeholder="Notes."
-                            label='description'
-                            onChangeText={(description) => this.setState({ description })}
-                            value={description}
-                             />
-                    </Item>
-                    
-                    </Form>
-                    <Button bordered onPress={() => this.submitRide()}
-                    style={{margin:20}}>
-                        <Text>Submit Ride!</Text>
-                    </Button>
-                    </View>
-                    :
-                    <FlatList
-                        data={this.state.rides}
-                        renderItem={this._renderItem}
-                        horizontal={false}
-                        keyExtractor={club => club._id}
-                    />
-                    }
-                </View>
                 </Modal>
-            </View>
             </Container>
         );
     }
@@ -234,38 +257,38 @@ export default class EventProfile extends Component {
 
 
 const styles = StyleSheet.create({
-    aboutText:{
+    aboutText: {
         marginLeft: 10,
         marginTop: 20,
         justifyContent: 'center',
         fontWeight: 'bold'
     },
-    editButton:{
-        backgroundColor:'white',
+    editButton: {
+        backgroundColor: 'white',
         margin: 10,
         alignSelf: 'flex-end',
         fontSize: 40
     },
-    modalStyle:{
+    modalStyle: {
         backgroundColor: 'white',
-        padding: 10,
+        padding: 4,
         marginTop: 50,
         marginRight: 20,
         marginBottom: 30,
         marginLeft: 20,
-        borderRadius: 10
+        borderRadius: 6
     },
-    modalButtons:{
+    modalButtons: {
         flexDirection: 'row',
         justifyContent: 'space-between'
     },
-    modalButton:{
-        color:'black',
-        fontSize:40,
+    modalButton: {
+        color: 'black',
+        fontSize: 40,
         margin: 10
     },
-    listStyle:{
-        height: HEIGHT/8,
-        marginTop: 3
-    }
+    listStyle: {
+        height: HEIGHT / 8,
+        marginTop: 6
+    },
 });

@@ -19,8 +19,10 @@ exports.createRide = (req, res) => {
     location: location,
     description: description
   });
+
+  // Events.findById(eventID, 'rides').populate('rides').findOne({ driverID: _id })
   
-  newRide.save().then( ride => {
+  newRide.save().then(ride => {
     Events.addEventRide(eventID, ride._id);
     if(!ride) {
       return res.status(400).json({'Error' : 'No such ride exists'});
@@ -41,24 +43,19 @@ exports.joinRide = (req, res) => {
       return res.status(400).json({ 'Error': 'Ride is full!' }); //DNE, doesnt exist
     } else {
       Rides.addRider(rideID, _id);
-      return res.status(201).json({ 'ride': ride });
+      return res.status(201).json({ 'ride': ride, 'newRider': _id });
     }
   })
 };
 
 exports.getRides = (req, res) => {
-  Events.findById(req.params.eventID).select("rides")
-  .populate('rides')
+  Events.findById(req.params.eventID, 'rides').populate('rides')
   .populate({ path: 'rides', populate: { path: 'driverID', select: 'name image' } })
   .populate({ path: 'rides', populate: { path: 'ridersID', select: 'name image' } })
   .then((event) => {
-    console.log(event);
-    if(!event){
+    if(!event)
       return res.status(400).json({ 'Error': 'Ride DNE!' });
-    }
-    else{
+    else
       return res.status(201).json({ 'rides': event.rides });
-    }
   });
-
 };

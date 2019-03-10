@@ -50,11 +50,8 @@ export default class ClubEvents extends Component {
 class ShowEvents extends Component {
   constructor(props) {
     super(props);
-    
-    /*Font.loadAsync({
-      Roboto: require("native-base/Fonts/Roboto.ttf"),
-      Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
-    });*/
+
+    props.navigation.setParams({ refreshEvents: this.getEvents });    
 
     this._mounted = false;
 
@@ -84,7 +81,7 @@ class ShowEvents extends Component {
       <View style={{ marginRight: 6 }}>
         <FontAwesome
           name="plus" size={32} color={'black'}
-          onPress={() => navigation.navigate('CreateClubEvent')} />
+          onPress={() => navigation.navigate('CreateClubEvent', { refreshEvents: navigation.state.params.refreshEvents })} />
       </View>);
 
     return {
@@ -99,7 +96,7 @@ class ShowEvents extends Component {
     }
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this._mounted = true;
     this.willFocus = this.props.navigation.addListener('willFocus', () => {
       if (this._mounted)
@@ -111,7 +108,7 @@ class ShowEvents extends Component {
     this._mounted = false;
   }
 
-  getClubEvents() {
+  getClubEvents = async () => {
     const { _id } = this.props.screenProps;
     this.setState({ loading: true })
     axios.get(`http://localhost:3000/api/events/${_id}`)
@@ -302,24 +299,17 @@ class CreateClubEvent extends Component {
     } catch (error) {console.log('library handle failed'); console.log(error);}
   }
 
-  createEvent = () => {
+  createEvent = async () => {
     const { _id } = this.props.screenProps;
-    console.log('org id', _id)
     const { name, date, time, description, location, imageURL } = this.state;
-    console.log('imageurl', imageURL)
-    axios.post('http://localhost:3000/api/events/'+_id+'/new', {
-      name,
-      date,
-      time,
-      description,
-      location,
-      imageURL
-    }).then((response) => {
-      console.log('creatEvent success')
-      console.log('response', response.status)
-    })
-    .catch((err) => { console.log('creatEvent failed'); console.log(err) });
-    this.props.navigation.navigate('ShowEvents');
+    await axios.post('http://localhost:3000/api/events/'+_id+'/new', {
+      name, date, time, description, location, imageURL
+    });
+    var func = this.props.navigation.getParam('refreshEvents');
+    if (func) {
+      await func();
+      this.props.navigation.navigate('ShowEvents');
+    } else this.props.navigation.navigate('ShowEvents');
   }
 
   render() {

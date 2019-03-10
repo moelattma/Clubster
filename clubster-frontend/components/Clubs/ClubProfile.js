@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, TouchableWithoutFeedback, StyleSheet, View, Dimensions, Image, ScrollView } from 'react-native';
+import { TouchableOpacity, TouchableWithoutFeedback, StyleSheet, View, Dimensions, ScrollView } from 'react-native';
 import axios from 'axios';
 import converter from 'base64-arraybuffer';
 import InformationCard from '../User/Cards/InformationCard';
@@ -27,20 +27,18 @@ export default class ClubProfile extends Component {
             isLoading: true,
             joinable: false,
             img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==',
-            noteStatus: true
+            noteStatus: true,
+            photos: []
         }
     }
 
-    componentDidMount() {
-        axios.post("http://localhost:3000/api/organizations/isMember", { orgID: this.state.organizationID }).then((response) => {
+    async componentWillMount() {
+        await axios.post("http://localhost:3000/api/organizations/isMember", { orgID: this.state.organizationID }).then((response) => {
             this.setState({ joinable: (!response.data.isMember) });
+            const { image, name, president, description, _id, photos } = response.data.organization;
 
-            const { imageId, name, president, description, _id } = response.data.organization;
-
-            this.setState({ name, president, description, _id });
-            if(imageId)
-                this.setState({ img: 'data:image/jpeg;base64,' + converter.encode(imageId.img.data.data) });
-            this.setState({ isLoading: false });
+            this.setState({ img: 'https://s3.amazonaws.com/clubster-123/' + image, 
+                            name, president, description, _id, photos, isLoading: false });
         });
     }
 
@@ -84,7 +82,7 @@ export default class ClubProfile extends Component {
               <Container>
                 <ScrollView>
                   <TouchableWithoutFeedback >
-                      <Image source={{ uri: this.state.img }} style={{ height: 200 }} />
+                      <Thumbnail source={{ uri: this.state.img }} style={{ height: 200, width: WIDTH, borderRadius: 0 }} />
                   </TouchableWithoutFeedback>
                   <InformationCard clubInfo={this.state} />
                   <Gallery clubInfo={this.state} />

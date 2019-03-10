@@ -31,7 +31,7 @@ exports.changeEventPicture = (req, res) => {
 		if(!event) {
 		  return res.status(404).json({ 'Error': 'error' });
 		} else {
-		  return res.status(201).json({'image': event.image});
+		  return res.status(201).json({ 'image': req.body.imageURL });
 		}
 	  });
 };

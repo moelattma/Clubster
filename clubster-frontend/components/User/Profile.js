@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { AsyncStorage, View, ScrollView, StyleSheet,
      Image, TouchableOpacity, TextInput, Dimensions } from 'react-native';
-import { Font, ImagePicker, Permissions } from 'expo';
+import Expo, { Font, ImagePicker, Permissions } from 'expo';
 import axios from 'axios';
 import Modal from "react-native-modal";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -11,7 +11,7 @@ import { accessKeyId, secretAccessKey } from '../../keys/keys';
 import v1 from 'uuid/v1';
 import { RNS3 } from 'react-native-aws3';
 import ClubList from './Cards/ClubList';
-import { Container, Button, Text } from 'native-base';
+import { Thumbnail, Content, Container, Button, Text } from 'native-base';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 
@@ -22,6 +22,7 @@ const SELECT_CLUBS = 2;
 export default class Profile extends Component {
     constructor() {
         super();
+
         this.state = {
             show: false,
             result: null,
@@ -33,7 +34,25 @@ export default class Profile extends Component {
             errors: {},
             images: [],
             selected: SELECT_ABOUT,
+            _loading: true
         }
+    }
+
+    async componentWillMount() {
+        axios.get('http://localhost:3000/api/profile').then((response) => {
+            const { name, image, major, biography, hobbies, photos } = response.data.profile;
+            if (response.data.profile) {
+                this.setState({ name: name, major: major ? major: '', photos: photos, biography: biography ? biography : '',
+                    hobbies: hobbies ? hobbies.join(" ") : '', img: 'https://s3.amazonaws.com/clubster-123/' + image });
+            }
+        });
+
+        await Expo.Font.loadAsync({
+            Roboto: require("native-base/Fonts/Roboto.ttf"),
+            Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf"),
+            Ionicons: require("@expo/vector-icons/fonts/Ionicons.ttf"),
+        });
+        this.setState({ _loading: false });
     }
 
     handleAboutAction = () => { if (this.state.selected != SELECT_ABOUT) this.setState({ selected: SELECT_ABOUT }) }
@@ -121,16 +140,6 @@ export default class Profile extends Component {
         } catch (error) { console.log(error); }
     };
 
-    componentWillMount() {
-        axios.get('http://localhost:3000/api/profile').then((response) => {
-            const { name, image, major, biography, hobbies, photos } = response.data.profile;
-            if (response.data.profile) {
-                this.setState({ name: name, major: major ? major: '', photos: photos, biography: biography ? biography : '',
-                    hobbies: hobbies ? hobbies.join(" ") : '', img: 'https://s3.amazonaws.com/clubster-123/' + image });
-            }
-        });
-    };
-
     async photoSubmit() {
       await this.askPermissionsAsync();
       try {
@@ -186,6 +195,8 @@ export default class Profile extends Component {
 
 
     render() {
+        if (this.state._loading)
+            return <Expo.AppLoading/>;
 
         return (
             <ScrollView>
@@ -205,14 +216,13 @@ export default class Profile extends Component {
                         />
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity key={this.state.img} style={styles.avatar}
-                    onPress={() => this.changePicture()}>
-                    <Image style={styles.imageAvatar} source={{ uri: this.state.img }} />
+                <TouchableOpacity style={styles.avatar} onPress={this.changePicture}>
+                    <Thumbnail style={styles.imageAvatar} source={{ uri: this.state.img }} />
                 </TouchableOpacity>
                 <View style={{height: 100}}></View>
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
-                        <Button bordered style={styles.buttonText} 
+                        <Button bordered activeOpacity={0.5} style={styles.buttonText} 
                         onPress={this.handleAboutAction.bind(this)}>
                             <Text>About</Text>
                         </Button>
@@ -220,10 +230,10 @@ export default class Profile extends Component {
                         onPress={this.handlePhotoAction.bind(this)}>
                             <Text>Photos</Text>
                         </Button>
-                        <Button bordered style={styles.buttonText} transparent 
+                        <Button bordered style={styles.buttonText} 
                         onPress={this.handleClubsAction.bind(this)}>
                             <Text>Clubs</Text>
-                        </Button>
+                        </Button >
                         </View>
 
                 {(this.state.selected == SELECT_ABOUT)
@@ -274,9 +284,6 @@ const styles = StyleSheet.create({
         borderColor: '#338293',
         margin: 10,
         width: '27%'
-    },
-    buttonText: {
-        margin: 10,
     },
     header: {
         backgroundColor: "#00BFFF",

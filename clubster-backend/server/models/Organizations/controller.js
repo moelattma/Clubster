@@ -182,7 +182,7 @@ exports.changeClubPicture = (req, res) => {
 		if (!organization) {
 			return res.status(404).json({ 'Error': 'error', 'image': null });
 		} else {
-			return res.status(201).json({ 'image': organization.image });
+			return res.status(201).json({ 'image': req.body.imageURL });
 		}
 	});
 };

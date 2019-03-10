@@ -71,7 +71,7 @@ exports.changePhoto = (req, res) => {
     if (!user) {
       return res.status(404).json({ 'Error': 'error' });
     } else {
-      return res.status(201).json({ 'image': user.image });
+      return res.status(201).json({ 'image': req.body.imageURL });
     }
   });
 };

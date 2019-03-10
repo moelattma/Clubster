@@ -12,7 +12,7 @@ router.post('/:eventID/createRide', passport.authenticate('jwt', {session:false}
 });
 
 //post join ride
-router.post('/:eventID/:rideID/joinRide', passport.authenticate('jwt', {session:false}), (req, res) => {
+router.post('/:rideID/joinRide', passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.joinRide(req, res); 
 });
 
