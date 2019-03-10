@@ -61,27 +61,27 @@ export default class SideGraph extends React.Component {
     const x = d3.scale.scaleBand()
         .rangeRound([0, width])
         .padding(0.1)
-        .domain(data.map(d => d.letter))
+        .domain(data.map(d => d.people)) // not sure about this
 
-    const maxFrequency = max(data, d => d.frequency)
+    const maxLikes = max(data, d => d.Likes) // use likes since this is most likely going to to largest
 
     const y = d3.scale.scaleLinear()
         .rangeRound([height, 0])
-        .domain([0, maxFrequency])
+        .domain([0, maxLikes])
 
-    const firstLetterX = x(data[0].letter)
-    const secondLetterX = x(data[1].letter)
-    const lastLetterX = x(data[data.length - 1].letter)
-    const labelDx = (secondLetterX - firstLetterX) / 2
+    const events = x(data.events)
+    const likes = x(data.totalLikes)
+    const comments = x(data.totalComments)
+    const labelDx = (likes - events) / 2
 
-    const bottomAxis = [firstLetterX - labelDx, lastLetterX + labelDx]
+    const bottomAxis = [events - labelDx, comments + labelDx]
 
     const bottomAxisD = d3.shape.line()
                             .x(d => d + labelDx)
                             .y(() => 0)
                             (bottomAxis)
 
-    const leftAxis = ticks(0, maxFrequency, 5)
+    const leftAxis = ticks(0, maxLikes, 5)
 
     const leftAxisD = d3.shape.line()
                         .x(() => bottomAxis[0] + labelDx)
@@ -139,7 +139,7 @@ export default class SideGraph extends React.Component {
                         data.map((d, i) => (
                             <TouchableWithoutFeedback key={i} >
                                 <Shape
-                                    d={this.createBarChart(x(d.letter), y(d.frequency) - height, x.bandwidth(), height - y(d.frequency))}
+                                    d={this.createBarChart(x(d.letter), y(d.Likes) - height, x.bandwidth(), height - y(d.Likes))}
                                     fill={this.getRandomColor()}
                                     >
                                 </Shape>

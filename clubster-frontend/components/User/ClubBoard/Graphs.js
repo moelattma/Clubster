@@ -54,7 +54,7 @@ export default class Graphs extends Component {
 
     return (
       <Container>
-          <EventAttendance events = {events} />
+          <SideGraph events = {events} />
       </Container>
     );
   }

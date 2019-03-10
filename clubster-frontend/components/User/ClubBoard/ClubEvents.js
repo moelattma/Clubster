@@ -24,6 +24,7 @@ const EVENT_WIDTH = WIDTH * 9 / 10;
 const EVENT_HEIGHT = HEIGHT * 3 / 7;
 
 export default class ClubEvents extends Component {
+  
   componentWillMount() {
     this._navListenerFocus = this.props.navigation.addListener('willFocus', () => {
       this.props.screenProps.clubBoardNav.setParams({ hideHeader: true });
@@ -50,10 +51,10 @@ class ShowEvents extends Component {
   constructor(props) {
     super(props);
     
-    Font.loadAsync({
+    /*Font.loadAsync({
       Roboto: require("native-base/Fonts/Roboto.ttf"),
       Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf")
-    });
+    });*/
 
     this._mounted = false;
 
@@ -68,6 +69,15 @@ class ShowEvents extends Component {
       time: ''
     }
   }
+
+  /*async componentWillMount() {
+    await Expo.Font.loadAsync({
+      Roboto: require("native-base/Fonts/Roboto.ttf"),
+      Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf"),
+      Ionicons: require("@expo/vector-icons/fonts/Ionicons.ttf"),
+    });
+    this.setState({ loading: false });
+  }*/
 
   static navigationOptions = ({ navigation, screenProps }) => {
     rightHeader = (
@@ -220,6 +230,9 @@ class ShowEvents extends Component {
   }
 
   render() {
+    if (this.state.loading) {
+      return <Expo.AppLoading />;
+    }
     return (
       <FlatList
         data={this.state.clubEvents}
