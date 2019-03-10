@@ -5,21 +5,11 @@ import axios from 'axios';
 import { ART } from 'react-native';
 import Svg, { G, Line, Path, Rect, Text } from 'react-native-svg'
 import { max, ticks } from 'd3-array'
-import { line } from 'd3-shape'
-import { path } from 'd3-path'
+import * as d3 from 'd3'
 
 const colours = { black: 'black', blue: 'steelblue', brown: 'brown' }
 
 const { Group, Shape, Surface } = ART;
-
-/*export default class SideGraph extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      data: []
-    };
-  }
-}*/
 
 _handleData = (item) => {
   axios.post(`http://localhost:3000/api/SideGraphs`).then((response) => {

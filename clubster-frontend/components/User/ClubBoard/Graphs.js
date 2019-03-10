@@ -20,7 +20,7 @@ export default class Graphs extends Component {
     }
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this._mounted = true;
     this.willFocus = this.props.navigation.addListener('willFocus', () => {
       if (this._mounted)
@@ -53,9 +53,10 @@ export default class Graphs extends Component {
     }
 
     return (
-      <Container>
-          <SideGraph events = {events} />
-      </Container>
+      <Text>Graphs</Text>
+      // <Container>
+      //     <SideGraph events = {events} />
+      // </Container>
     );
   }
 

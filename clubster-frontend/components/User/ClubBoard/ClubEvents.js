@@ -17,7 +17,6 @@ import Comments from './Comments';
 import v1 from 'uuid/v1';
 import {accessKeyId, secretAccessKey} from '../../../keys/keys';
 import { RNS3 } from 'react-native-aws3';
-//import { addLikerToEvent } from '../../../../clubster-backend/server/models/Events/controller';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const EVENT_WIDTH = WIDTH * 9 / 10;
@@ -67,15 +66,6 @@ class ShowEvents extends Component {
     }
   }
 
-  /*async componentWillMount() {
-    await Expo.Font.loadAsync({
-      Roboto: require("native-base/Fonts/Roboto.ttf"),
-      Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf"),
-      Ionicons: require("@expo/vector-icons/fonts/Ionicons.ttf"),
-    });
-    this.setState({ loading: false });
-  }*/
-
   static navigationOptions = ({ navigation, screenProps }) => {
     rightHeader = (
       <View style={{ marginRight: 6 }}>
@@ -99,8 +89,9 @@ class ShowEvents extends Component {
   componentWillMount() {
     this._mounted = true;
     this.willFocus = this.props.navigation.addListener('willFocus', () => {
-      if (this._mounted)
-        this.getClubEvents();
+      if (this.props.navigation.state.params.newEvent) {
+        this.setState({ clubEvents: this.state.clubEvents.concat(this.props.navigation.state.params.newEvent) })
+      } else if (this._mounted) this.getClubEvents();
     });
   }
 
@@ -232,7 +223,7 @@ class ShowEvents extends Component {
     }
     return (
       <FlatList
-        data={this.state.clubEvents}
+        data={this.state.clubEvents.reverse().slice(0, 40)}
         renderItem={this._renderItem}
         keyExtractor={clubEvent => clubEvent._id}
         ItemSeparatorComponent={this.renderSeparator}
@@ -302,14 +293,17 @@ class CreateClubEvent extends Component {
   createEvent = async () => {
     const { _id } = this.props.screenProps;
     const { name, date, time, description, location, imageURL } = this.state;
+    var newEvent;
     await axios.post('http://localhost:3000/api/events/'+_id+'/new', {
       name, date, time, description, location, imageURL
-    });
+    }).then(response => {
+      newEvent = response.data.event;
+    }).catch(error => console.log(error + 'ruh roh'));
     var func = this.props.navigation.getParam('refreshEvents');
     if (func) {
       await func();
-      this.props.navigation.navigate('ShowEvents');
-    } else this.props.navigation.navigate('ShowEvents');
+      this.props.navigation.navigate('ShowEvents', { newEvent: newEvent });
+    } else this.props.navigation.navigate('ShowEvents', { newEvent: newEvent });
   }
 
   render() {

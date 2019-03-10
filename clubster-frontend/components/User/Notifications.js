@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, FlatList, Dimensions, Image } from 'react-native'
+import { TouchableOpacity, StyleSheet, Text, View, FlatList, Dimensions, Image, ScrollView } from 'react-native'
 import axios from 'axios';
 
 const { width: WIDTH } = Dimensions.get('window');
@@ -105,7 +105,7 @@ export default class Notifications extends Component {
 
     render() {
         return (
-            <View style={styles.notificationPage}>
+            <ScrollView style={styles.notificationPage}>
                 <FlatList
                     data={this.state.notifications.reverse().slice(0, 20)}
                     renderItem={this._renderItem}
@@ -114,7 +114,7 @@ export default class Notifications extends Component {
                     refreshing={this.state.refreshing}
                     onRefresh={() => this._getNotifications()}
                 />
-            </View>
+            </ScrollView>
         );
     }
 }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { View, Dimensions, FlatList, TouchableOpacity, TouchableWithoutFeedback, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Dimensions, FlatList, TouchableOpacity, TouchableWithoutFeedback, 
+         StyleSheet, Image, ScrollView, AsyncStorage } from 'react-native';
 import axios from 'axios';
 import { ImagePicker, Permissions } from 'expo';
 import v1 from 'uuid/v1';
@@ -12,6 +13,8 @@ import InformationCard from '../Cards/InformationCard';
 import ImageGrid from '../Cards/ImageGrid';
 import Gallery from '../Cards/Gallery';
 import Modal from 'react-native-modal';
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import AntDesign from 'react-native-vector-icons/AntDesign'
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 
@@ -29,6 +32,7 @@ export default class EventProfile extends Component {
             rideTime: '',
             rideLocation: '',
             description: '',
+            userID: null
         }
     }
 
@@ -71,15 +75,14 @@ export default class EventProfile extends Component {
         } catch (error) { console.log(error); }
     }
 
-    openModal() {
-        const event = this.props.navigation.getParam('event', null);
-        axios.get(`http://localhost:3000/api/${event._id}/rides`)
+    openRidesModal() {
+        axios.get(`http://localhost:3000/api/${this.event._id}/rides`)
             .then(response => {
                 this.setState({
                     isModalVisible: true,
-                    rides: response.data.rides
+                    rides: response.data.rides,
+                    userID: response.data.userID
                 })
-                console.log(response.data.rides)
             })
             .catch(err => { console.log(err) })
     }
@@ -97,32 +100,69 @@ export default class EventProfile extends Component {
     }
 
     submitRide() {
-        const event = this.props.navigation.getParam('event', null);
+        const { userID } = this.state;
+        var skip = false;
+        var removeFromRide;
+
+        if (userID) {
+            this.state.rides.map(ride => {
+                if (ride.driverID._id == userID)
+                    skip = true;
+                ride.ridersID.map(rider => {
+                    if (rider._id == userID)
+                        removeFromRide = ride._id;
+                });
+            })
+        } else console.log('userid is null')
+        if (skip) {
+            this.closeModal();
+            return;
+        }
         const { seats, rideTime, rideLocation, description } = this.state;
-        axios.post(`http://localhost:3000/api/${event._id}/createRide`, {
+        axios.post(`http://localhost:3000/api/${this.event._id}/createRide`, {
             passengerSeats: seats,
             time: rideTime,
             location: rideLocation,
             description: description,
+            rideRemove: removeFromRide
         }).then((response) => {
             if (response.status == 201 || response.status == 200) {
+                var newRide = response.data.ride;
+                newRide.driverID = response.data.driver;
                 this.setState({
                     form: false,
-                    rides: response.data.ride
+                    rides: this.state.rides.concat(newRide)
                 });
+                if (removeFromRide)
+                    this.closeModal();
             }
         })
         .catch((err) => { console.log('error creating new ride'); console.log(err) });
     }
 
-    addRider = (item) => {
-        console.log('add to this ride ' + item);
-        axios.post(`http://localhost:3000/api/${item._id}/joinRide`).then(response => {
-            console.log(response.status.ride);
-        });
+    addRider = async (item) => {
+        const { userID } = this.state;
+        var skip = false;
+        var removeFromRide;
+        if (userID) {
+            this.state.rides.map(ride => {
+                if (ride.driverID._id == userID) {
+                    skip = true;
+                } else {
+                    ride.ridersID.map(rider => {
+                        if (rider._id == userID) 
+                            removeFromRide = ride._id;
+                    })
+                }                    
+            });
+        } else console.log('userid is null')
+        if (skip) return;
+        await axios.post(`http://localhost:3000/api/${item._id}/joinRide`, { rideRemove: removeFromRide });
+        this.closeModal();
     }
 
     _renderItem = ({ item }) => {
+        const { passengerSeats, ridersID } = item;
         return (
             <View>
                 <ListItem thumbnail style={styles.listStyle}>
@@ -138,9 +178,11 @@ export default class EventProfile extends Component {
                                 keyExtractor={rider => rider._id}
                             />
                         </Body>
-                        <Right >
-                            <Icon onPress={() => this.addRider(item)} name="ios-add" style={{ color: 'black', fontSize: 24 }} />
-                        </Right>
+                        {passengerSeats > ridersID.length ? 
+                            <Right >
+                                <Icon onPress={() => this.addRider(item)} name="ios-add" style={{ marginLeft: 6, color: 'black', fontSize: 24 }} />
+                            </Right> : null
+                        }
                     </ScrollView>
                 </ListItem>
                 <Text style={{ textAlign: 'center' }}>{item.time} | {item.location} | {item.description}</Text>
@@ -176,17 +218,17 @@ export default class EventProfile extends Component {
                         <Image source={{ uri: this.state.eventImage }} style={{ height: 200 }} />
                     </TouchableWithoutFeedback>
                     <InformationCard eventInfo={eventInfo} />
-                    <CommentCard eventInfo={eventInfo} />
-                    <Gallery eventInfo={eventInfo} />
                     <Content padder>
-                        <Card>
-                            <CardItem footer bordered>
-                                <TouchableOpacity onPress={() => this.openModal()}>
-                                    <Text>See Rides</Text>
-                                </TouchableOpacity>
-                            </CardItem>
+                        <Card >
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 10, marginBottom: 10}}>
+                                <AntDesign name='like1' size={28} />
+                                <FontAwesome name='comment' size={28} />
+                                <FontAwesome onPress={() => this.openRidesModal()} name='car' size={28} />
+                            </View>
                         </Card>
                     </Content>
+                    <CommentCard eventInfo={eventInfo} />
+                    <Gallery eventInfo={eventInfo} />
                 </ScrollView>
 
                 <Modal isVisible={this.state.isModalVisible}
@@ -206,28 +248,28 @@ export default class EventProfile extends Component {
                             ? <View>
                                 <Form>
                                     <Item>
-                                        <Input placeholder="number of available seats?"
+                                        <Input placeholder="Number of available seats?"
                                             label='seats'
                                             onChangeText={(seats) => this.setState({ seats })}
                                             value={seats}
                                         />
                                     </Item>
                                     <Item>
-                                        <Input placeholder="Pick up time."
+                                        <Input placeholder="Pick up time"
                                             label='rideTime'
                                             onChangeText={(rideTime) => this.setState({ rideTime })}
                                             value={rideTime}
                                         />
                                     </Item>
                                     <Item>
-                                        <Input placeholder="Pick up location."
+                                        <Input placeholder="Pick up location"
                                             label='location'
                                             onChangeText={(rideLocation) => this.setState({ rideLocation })}
                                             value={rideLocation}
                                         />
                                     </Item>
                                     <Item>
-                                        <Input placeholder="Notes."
+                                        <Input placeholder="Notes"
                                             label='description'
                                             onChangeText={(description) => this.setState({ description })}
                                             value={description}
@@ -241,12 +283,16 @@ export default class EventProfile extends Component {
                                 </Button>
                             </View>
                             :
-                            <FlatList
+                            (
+                                this.state.rides == undefined || this.state.rides.length == 0 ? 
+                                <Text style={styles.noRidesText}> There are no rides for this event </Text>
+                                :
+                                <FlatList
                                 data={this.state.rides}
                                 renderItem={this._renderItem}
                                 horizontal={false}
                                 keyExtractor={ride => ride._id}
-                            />
+                            />)   
                         }
                     </View>
                 </Modal>
@@ -291,4 +337,8 @@ const styles = StyleSheet.create({
         height: HEIGHT / 8,
         marginTop: 6
     },
+    noRidesText: {
+        textAlignVertical: 'center',
+        textAlign: 'center',
+    }
 });

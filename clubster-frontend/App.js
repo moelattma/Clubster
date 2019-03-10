@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import { AppRegistry, StyleSheet } from 'react-native';
 import {SafeAreaView} from 'react-navigation';
 import { AdminNavigator, LoginNavigator } from './components/router';
+console.ignoredYellowBox = ['Remote debugger'];
+import { YellowBox } from 'react-native';
+YellowBox.ignoreWarnings([
+    'Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, `pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. Did you mean to put these under `headers`?'
+]);
 
 export default class Clubster extends Component {
   render() {

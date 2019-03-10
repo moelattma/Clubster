@@ -58,9 +58,10 @@ const Organization = new Schema({
     ref: 'events',
     time: Date.now()
   }],
-  photos: [{
-    type: String
-  }],
+  gallery: {
+    type: Schema.Types.ObjectId,   //Specifiers
+    ref: 'Galleries',
+  },
   totalComments: {
     type: Number
   }
@@ -98,8 +99,8 @@ Organization.statics.modifyActiveScore = async function(organizationID, memberID
 }
 
 Organization.statics.addMemberToClub = async function(organizationID, memberID) {
+  await this.findByIdAndUpdate(organizationID, { $push: { members: { member: memberID, activeScore: 0 } } });
   await this.findByIdAndUpdate(organizationID, {$set:{}}).populate('members.member').populate('events').then((organization) => {
-    console.log("Yiiii", organization);
     for(let i = 0;i<organization.members.length;i++) {
       organization.updateInfoByIndex(i);
     }

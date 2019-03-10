@@ -31,9 +31,9 @@ export default class MembersList extends Component {
   }
 
   renderTrash = (item) => {
-    if (this.state.admins.indexOf(`${item._id}`) == -1 && this.state.idOfUser == this.state.president) {
+    if (this.state.admins.indexOf(`${item.member._id}`) == -1 && this.state.idOfUser == this.state.president) {
       return (
-        <TouchableOpacity style={styles.btn} onPress={() => { this.deleteUser(item._id) }}>
+        <TouchableOpacity style={styles.btn} onPress={() => { this.deleteUser(item.member._id) }}>
           <MaterialIcons
             name="delete-forever"
             size={35}
@@ -58,9 +58,9 @@ export default class MembersList extends Component {
           <Text style={styles.nm}>
                 {item.member.name}
           </Text>
-          {this.state.president == item._id ? 
+          {this.state.president == item.member._id ? 
             <Text style={styles.memberText} >President</Text> :
-            (this.state.admins.indexOf(item._id) > -1) ? 
+            (this.state.admins.indexOf(item.member._id) > -1) ? 
               <Text style={styles.memberText}>Admin</Text> : 
               <Text style={styles.memberText}>Member</Text>
           }

@@ -9,7 +9,7 @@ const Events = require('../Events/model');
 
 exports.createRide = (req, res) => {
   const { eventID } = req.params;
-  const { passengerSeats, time, location, description } = req.body;
+  const { passengerSeats, time, location, description, rideRemove } = req.body;
   const { _id } = req.user;
   let newRide = new Rides({
     driverID: _id,
@@ -19,23 +19,34 @@ exports.createRide = (req, res) => {
     location: location,
     description: description
   });
-
-  // Events.findById(eventID, 'rides').populate('rides').findOne({ driverID: _id })
   
+  if (rideRemove) {
+    Rides.findByIdAndUpdate(rideRemove).then(ride => {
+      if (ride)
+        Rides.removeRider(rideID, _id);
+    })
+  }
   newRide.save().then(ride => {
     Events.addEventRide(eventID, ride._id);
-    if(!ride) {
+    if (!ride) 
       return res.status(400).json({'Error' : 'No such ride exists'});
-    }
-    else{
-      return res.status(201).json({ 'ride': ride });
-    }
+    else
+      return res.status(201).json({ 'ride': ride, 'driver': req.user });
   })
 };
 
 exports.joinRide = (req, res) => {
   const { rideID } = req.params;
   const { _id } = req.user;
+  const { rideRemove } = req.body;
+  if (rideRemove) {
+    console.log(rideRemove);
+    Rides.findByIdAndUpdate(rideRemove).then(ride => {
+      console.log(ride);
+      if (ride) 
+        Rides.removeRider(rideID, _id);
+    })
+  }
   Rides.findByIdAndUpdate(rideID).then((ride) => {
     if (!ride){
       return res.status(400).json({ 'Error': 'No such ride exists' }); //DNE, doesnt exist
@@ -43,7 +54,7 @@ exports.joinRide = (req, res) => {
       return res.status(400).json({ 'Error': 'Ride is full!' }); //DNE, doesnt exist
     } else {
       Rides.addRider(rideID, _id);
-      return res.status(201).json({ 'ride': ride, 'newRider': _id });
+      return res.status(201).json({ 'newRider': req.user });
     }
   })
 };
@@ -56,6 +67,6 @@ exports.getRides = (req, res) => {
     if(!event)
       return res.status(400).json({ 'Error': 'Ride DNE!' });
     else
-      return res.status(201).json({ 'rides': event.rides });
+      return res.status(201).json({ 'rides': event.rides, 'userID': req.user._id });
   });
 };

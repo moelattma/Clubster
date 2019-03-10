@@ -3,6 +3,7 @@ import { createStackNavigator, createSwitchNavigator, createMaterialTopTabNaviga
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Octicons from 'react-native-vector-icons/Octicons';
 
 import Login from './Login/Login';
 import SignUp from './Login/SignUp';
@@ -132,7 +133,7 @@ export const AdminNavigator = createMaterialTopTabNavigator(
             screen: Graphs,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <MaterialCommunityIcons name='wechat' size={27} color={tintColor} /> 
+                    <Octicons name='graph' size={27} color={tintColor} /> 
                 ),
             }
         }

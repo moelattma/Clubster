@@ -5,7 +5,7 @@ const organizationRoutes = require('./models/Organizations/routes');
 const eventRoutes = require('./models/Events/routes');
 const ridesRoutes = require('./models/Rides/routes');
 const conversationRoutes = require('./models/Conversations/routes');
-const conversationController = require('./models/Conversations/controller');
+const galleriesRoutes = require('./models/Galleries/routes');
 const messageRoutes = require('./models/Messages/routes');
 const notificationRoutes = require('./models/Notifications/routes');
 const Conversations = require('./models/Conversations/model');
@@ -37,7 +37,9 @@ require('./utils/passport')(passport);
 
 app.use('/api', [loginRoutes, organizationRoutes,
   notificationRoutes, eventRoutes, ridesRoutes,
-  conversationRoutes, messageRoutes, graphRoutes]);
+  conversationRoutes, messageRoutes, graphRoutes,
+  galleriesRoutes
+]);
 
 const PORT = process.env.PORT || 3000;
 const server = require("http").createServer(app);

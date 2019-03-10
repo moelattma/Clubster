@@ -51,7 +51,7 @@ exports.findUser = (req, res) => {
       bcrypt.compare(password, user.password).then(same => {
         // both password and username are correct and sends success token to server
         if (same) {
-          const payload = { _id: user._id, name: user.name, avatar: user.avatar };
+          const payload = { _id: user._id, name: user.name, image: user.image };
           jwt.sign(payload, 'secret', { expiresIn: 3600 }, (err, token) => {
             res.json({
               success: true,

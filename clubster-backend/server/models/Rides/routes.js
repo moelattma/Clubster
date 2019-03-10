@@ -17,7 +17,7 @@ router.post('/:rideID/joinRide', passport.authenticate('jwt', {session:false}), 
 });
 
 //get all rides for a specific event
-router.get('/:eventID/rides', (req, res) => {
+router.get('/:eventID/rides', passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.getRides(req, res);
 });
 

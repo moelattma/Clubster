@@ -22,7 +22,6 @@ export default class Login extends React.Component {
           if (response.status == 200) {
             // Set token to ls\
             AsyncStorage.setItem('jwtToken', response.data.token);
-            console.log(response.data.token);
             axios.defaults.headers.common['Authorization'] = response.data.token;
             this.props.navigation.navigate('ClubsterNavigation');               //Navigate to Clubs page if successful
           }

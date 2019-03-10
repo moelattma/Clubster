@@ -74,15 +74,15 @@ class ShowClubs extends Component {
       ),
       headerTitle: (
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }} >
-          <Button transparent onPress={() => navigation.setParams({ showAdmin: false })}>
-            <Text style={[{ fontSize: 20, fontWeight: 'bold' }, navigation.state.params &&
-              !navigation.state.params.showAdmin ? { color: '#0064c8' } : {}]} >Member</Text>
-          </Button>
-          <Text style={{ fontSize: 32, fontWeight: 'bold' }} >|</Text>
           <Button transparent onPress={() => navigation.setParams({ showAdmin: true })} >
             <Text style={[{ fontSize: 20, fontWeight: 'bold' }, !navigation.state.params ||
               navigation.state.params.showAdmin ? { color: '#0064c8' } : {}]} >Admin</Text>
           </Button>
+          <Text style={{ fontSize: 32, fontWeight: 'bold' }} >|</Text>
+          <Button transparent onPress={() => navigation.setParams({ showAdmin: false })}>
+            <Text style={[{ fontSize: 20, fontWeight: 'bold' }, navigation.state.params &&
+              !navigation.state.params.showAdmin ? { color: '#0064c8' } : {}]} >Member</Text>
+          </Button>          
         </View>
       )
     };
