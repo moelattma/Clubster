@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { TouchableOpacity, TouchableWithoutFeedback, StyleSheet, View, Dimensions, ScrollView } from 'react-native';
 import axios from 'axios';
-import converter from 'base64-arraybuffer';
 import InformationCard from '../User/Cards/InformationCard';
 import Gallery from '../User/Cards/Gallery';
-import { Container, Card, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text } from 'native-base';
+import { Container, Button, Thumbnail, Text } from 'native-base';
 
 const { width: WIDTH } = Dimensions.get('window');
 
@@ -68,13 +67,13 @@ export default class ClubProfile extends Component {
             let joins = null;
             if (this.state.joinable) {
                 joins = (
-                    <View style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 10, alignSelf: 'center', justifyContent: 'space-evenly', width: WIDTH }}>
-                        <TouchableOpacity onPress={() => this.handleJoin(organizationID, JOIN_MEM)} style={styles.joinButton} >
-                            <Text style={styles.joinText}> Join as Member! </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => this.handleJoin(organizationID, JOIN_ADMIN)} style={styles.joinButton} >
-                            <Text style={styles.joinText}> Join as Admin! </Text>
-                        </TouchableOpacity>
+                    <View style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 30, alignSelf: 'center', justifyContent: 'space-evenly', width: WIDTH }}>
+                        <Button info onPress={() => this.handleJoin(organizationID, JOIN_MEM)}>
+                            <Text> Join as member! </Text>
+                        </Button>
+                        <Button light onPress={() => this.handleJoin(organizationID, JOIN_ADMIN)}>
+                            <Text> Join as admin! </Text>
+                        </Button>
                     </View>
                 );
             }
