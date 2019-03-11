@@ -18,4 +18,4 @@ const Galleries = new Schema({
 /*
 * Export so that other js files can use this schema
 */
-module.exports = mongoose.model('Galleries', Galleries);
+module.exports = mongoose.model('galleries', Galleries);

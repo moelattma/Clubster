@@ -55,8 +55,9 @@ const User = new Schema({
   hobbies: {
     type: [String]
   },
-  photos:  {
-    type: [String]
+  gallery: {
+    type: Schema.Types.ObjectId,   //Specifiers
+    ref: 'galleries',
   },
 });
 

@@ -60,7 +60,7 @@ const Organization = new Schema({
   }],
   gallery: {
     type: Schema.Types.ObjectId,   //Specifiers
-    ref: 'Galleries',
+    ref: 'galleries',
   },
   totalComments: {
     type: Number

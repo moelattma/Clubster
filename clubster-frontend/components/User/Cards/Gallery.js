@@ -1,6 +1,6 @@
 // Gallery.js
 import React, { Component } from 'react';
-import { Dimensions, View } from 'react-native';
+import { FlatList, Dimensions } from 'react-native';
 import PropTypes from 'prop-types';
 import { Font, ImagePicker, Permissions, Constants } from 'expo';
 import ImageViewer from 'ImageViewer';
@@ -12,42 +12,18 @@ import v1 from 'uuid/v1';
 import axios from 'axios';
 import { RNS3 } from 'react-native-aws3';
 
+const { WIDTH, HEIGHT } = Dimensions.get('window');
+
 export default class Gallery extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      index: 0,
-      shown: false,
-      images:[]
-    };
-    this.openLightbox = (index) => {
-      this.setState({
-        index,
-        shown: true,
-      });
-    };
-    this.hideLightbox = () => {
-      this.setState({
-        index: 0,
-        shown: false,
-      });
-    };
-  }
 
-  componentDidMount() {
-    let photos;
-    if(this.props && this.props.eventInfo) {
-      photos = (this.props.eventInfo.photos.length > 0) ? this.props.eventInfo.photos : ['s3/2391cac0-3c9d-11e9-8f51-8972130a1d1d.jpeg'];
-    } else if(this.props && this.props.userPhotos) {
-      console.log('gallery 2', this.props.userPhotos.images)
-      photos = (this.props.userPhotos.images.length > 0) ? this.props.userPhotos.images : ['s3/2391cac0-3c9d-11e9-8f51-8972130a1d1d.jpeg'];
-    } else if(this.props && this.props.clubPhotos) {
-      console.log('gallery 3', this.props.clubPhotos.photos)
-      photos = (this.props.clubPhotos.photos.length > 0) ? this.props.clubPhotos.photos : ['s3/2391cac0-3c9d-11e9-8f51-8972130a1d1d.jpeg'];
-    } else {
-      photos = ['s3/2391cac0-3c9d-11e9-8f51-8972130a1d1d.jpeg'];
-    }
-    this.setState({images: photos})
+    const { galleryID, photos } = props;
+
+    this.state = {
+      galleryID: galleryID,
+      photos: photos
+    };
   }
 
   askPermissionsAsync = async () => {
@@ -55,8 +31,7 @@ export default class Gallery extends Component {
       await Permissions.askAsync(Permissions.CAMERA_ROLL);
   };
 
-
-  onSubmit = async () => {
+  onSubmit = async (item = null) => {
     await this.askPermissionsAsync();
     try {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -82,25 +57,64 @@ export default class Gallery extends Component {
             successActionStatus: 201
         }
         var imageURL;
+        var removeImageURL = item;
         await RNS3.put(file, options).then((response) => {
             imageURL = response.body.postResponse.key;
         }).catch((err) => { console.log(err) });
-        const url = this.props.eventInfo._id;
-        axios.post(`http://localhost:3000/api/events/${url}/photo`,  { imageURL: imageURL }).then((response) => {
-          this.setState({images: response.data.photos});
+        axios.post(`http://localhost:3000/api/galleries/${this.state.galleryID}/newPhoto`, { imageURL, removeImageURL }).then((response) => {
+          const { photos } = this.state;
+          var newPhotos = [];
+          if (removeImageURL) {
+            photos.map((photo, indx) => {
+              if (indx > 6 ) {}
+              else if (photo != removeImageURL) 
+                newPhotos.push(photo);
+              else newPhotos.push(imageURL);
+            });
+          } else {
+            photos.map(photo => {
+              newPhotos.push(photo);
+            });
+            if (newPhotos.length == 6 && !newPhotos[5].addPhotoIcon)
+              console.log("too many photos!");
+            newPhotos[newPhotos.length - 1] = imageURL;
+            if (newPhotos.length < 6)
+              newPhotos.push({ addPhotoIcon: true })
+          }
+          this.setState({ photos: newPhotos });
+          this.props.onUpdatePhotos(newPhotos);
         })
     } catch (error) { console.log(error); }
-
   }
-  render() {
-    const { images } = this.state;
-    const { index, shown } = this.state;
+
+  _renderItem = ({ item, index }) => {
+    if (item.addPhotoIcon)
+      return <FontAwesome name="plus" size={18} color={'black'} onPress = {() => this.onSubmit()} />;
     return (
-        <Card>
-          <CardItem header bordered>
-            <Text>Photos: <FontAwesome name="plus" size={18} color={'black'} onPress = {() => {this.onSubmit()}} /></Text>
-          </CardItem>
-          <View
+      <GalleryImage
+        index={index}
+        key={index}
+        uri={'https://s3.amazonaws.com/clubster-123/' + item}
+        onPress={() => this.onSubmit(item)}
+      />
+    )
+  }
+
+  render() {
+    return (
+      <FlatList
+        contentContainerStyle={{ width: WIDTH, alignItems: 'center', alignContent: 'center', justifyContent: 'center' }}
+        data={this.state.photos}
+        renderItem={this._renderItem}
+        numColumns={3}
+        keyExtractor={photo => photo}
+        horizontal={false}  
+      />
+    );
+  }
+}
+
+/*<View
             style={{
               flexDirection: 'row',
               flexWrap: 'wrap',
@@ -121,11 +135,4 @@ export default class Gallery extends Component {
               onClose={this.hideLightbox}
               index={index}
             />
-          </View>
-        </Card>
-    );
-  }
-}
-Gallery.propTypes = {
-  images: PropTypes.array,
-};
+          </View>*/
