@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { View, Dimensions, FlatList, TouchableOpacity, TouchableWithoutFeedback, 
+import { View, Dimensions, FlatList, TouchableOpacity, TouchableWithoutFeedback,
          StyleSheet, Image, ScrollView, AsyncStorage } from 'react-native';
 import axios from 'axios';
 import { ImagePicker, Permissions } from 'expo';
 import v1 from 'uuid/v1';
 import { accessKeyId, secretAccessKey } from '../../../keys/keys';
 import { RNS3 } from 'react-native-aws3';
-import { Container, Card, CardItem, Form, Content, ListItem, Thumbnail, Item, 
+import { Container, Card, CardItem, Form, Content, ListItem, Thumbnail, Item,
          Text, Button, Icon, Left, Body, Right, Input } from 'native-base';
 import CommentCard from '../Cards/CommentCard';
 import InformationCard from '../Cards/InformationCard';
@@ -15,6 +15,8 @@ import Gallery from '../Cards/Gallery';
 import Modal from 'react-native-modal';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import AntDesign from 'react-native-vector-icons/AntDesign'
+import LikerModal from '../../Modals/LikerModal';
+import AttendingModal from '../../Modals/AttendingModal';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 
@@ -32,7 +34,9 @@ export default class EventProfile extends Component {
             rideTime: '',
             rideLocation: '',
             description: '',
-            userID: null
+            userID: null,
+            showGoing: false,
+            shoeLikers: false
         }
     }
 
@@ -150,10 +154,10 @@ export default class EventProfile extends Component {
                     skip = true;
                 } else {
                     ride.ridersID.map(rider => {
-                        if (rider._id == userID) 
+                        if (rider._id == userID)
                             removeFromRide = ride._id;
                     })
-                }                    
+                }
             });
         } else console.log('userid is null')
         if (skip) return;
@@ -178,7 +182,7 @@ export default class EventProfile extends Component {
                                 keyExtractor={rider => rider._id}
                             />
                         </Body>
-                        {passengerSeats > ridersID.length ? 
+                        {passengerSeats > ridersID.length ?
                             <Right >
                                 <Icon onPress={() => this.addRider(item)} name="ios-add" style={{ marginLeft: 6, color: 'black', fontSize: 24 }} />
                             </Right> : null
@@ -191,8 +195,8 @@ export default class EventProfile extends Component {
     }
 
     _renderRider = ({ item }) => {
-        return ( 
-            <ListItem thumbnail> 
+        return (
+            <ListItem thumbnail>
                 <Thumbnail small source={{ uri: 'https://s3.amazonaws.com/clubster-123/' + item.image  }}/>
             </ListItem>
         );
@@ -221,8 +225,8 @@ export default class EventProfile extends Component {
                     <Content padder>
                         <Card >
                             <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 10, marginBottom: 10}}>
-                                <AntDesign name='like1' size={28} />
-                                <FontAwesome name='comment' size={28} />
+                                <AntDesign name='like1' size={28} onPress={() => this.setState({showLikers:true, showGoing:false})}/>
+                                <FontAwesome name='comment' size={28} onPress={() => this.setState({showLikers:false, showGoing:true})}/>
                                 <FontAwesome onPress={() => this.openRidesModal()} name='car' size={28} />
                             </View>
                         </Card>
@@ -230,6 +234,32 @@ export default class EventProfile extends Component {
                     <CommentCard eventInfo={eventInfo} />
                     <Gallery eventInfo={eventInfo} />
                 </ScrollView>
+
+                <Modal isVisible={this.state.showLikers}
+                    style={styles.modalStyle}>
+                    <View style={{ flex: 1, margin: 2 }}>
+                    <TouchableOpacity onPress={() => this.setState({showLikers: false})}>
+                        <Icon name="ios-arrow-dropleft"
+                            style={styles.modalButton} />
+                    </TouchableOpacity>
+                        <Text> Likers! </Text>
+                    </View>
+                </Modal>
+
+                <Modal isVisible={this.state.showGoing}
+                    style={styles.modalStyle}>
+                    <View style={{ flex: 1, margin: 2 }}>
+                    <View style={styles.modalButtons}>
+                        <TouchableOpacity onPress={() => this.setState({showGoing: false})}>
+                            <Icon name="ios-arrow-dropleft"
+                                style={styles.modalButton} />
+                        </TouchableOpacity>
+                    </View>
+                        <Text> Going! </Text>
+                    </View>
+                </Modal>
+
+
 
                 <Modal isVisible={this.state.isModalVisible}
                     style={styles.modalStyle}>
@@ -284,7 +314,7 @@ export default class EventProfile extends Component {
                             </View>
                             :
                             (
-                                this.state.rides == undefined || this.state.rides.length == 0 ? 
+                                this.state.rides == undefined || this.state.rides.length == 0 ?
                                 <Text style={styles.noRidesText}> There are no rides for this event </Text>
                                 :
                                 <FlatList
@@ -292,7 +322,7 @@ export default class EventProfile extends Component {
                                 renderItem={this._renderItem}
                                 horizontal={false}
                                 keyExtractor={ride => ride._id}
-                            />)   
+                            />)
                         }
                     </View>
                 </Modal>

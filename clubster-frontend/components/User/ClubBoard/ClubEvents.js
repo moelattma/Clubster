@@ -23,7 +23,7 @@ const EVENT_WIDTH = WIDTH * 9 / 10;
 const EVENT_HEIGHT = HEIGHT * 3 / 7;
 
 export default class ClubEvents extends Component {
-  
+
   componentWillMount() {
     this._navListenerFocus = this.props.navigation.addListener('willFocus', () => {
       this.props.screenProps.clubBoardNav.setParams({ hideHeader: true });
@@ -50,7 +50,7 @@ class ShowEvents extends Component {
   constructor(props) {
     super(props);
 
-    props.navigation.setParams({ refreshEvents: this.getEvents });    
+    props.navigation.setParams({ refreshEvents: this.getEvents });
 
     this._mounted = false;
 
@@ -90,7 +90,7 @@ class ShowEvents extends Component {
     this._mounted = true;
     this.willFocus = this.props.navigation.addListener('willFocus', () => {
       if (this.props.navigation.state.params.newEvent) {
-        this.setState({ clubEvents: this.state.clubEvents.concat(this.props.navigation.state.params.newEvent) })
+        this.setState({ clubEvents: this.state.clubEvents.unshift(this.props.navigation.state.params.newEvent) })
       } else if (this._mounted) this.getClubEvents();
     });
   }
@@ -105,7 +105,7 @@ class ShowEvents extends Component {
     axios.get(`http://localhost:3000/api/events/${_id}`)
       .then((response) => {
         if (this._mounted) {
-          this.setState({ clubEvents: response.data.events, idOfUser: response.data.idOfUser });
+          this.setState({ clubEvents: response.data.events.reverse().slice(0, 40), idOfUser: response.data.idOfUser });
           this.setState({ loading: false })
         }
       })
@@ -113,6 +113,7 @@ class ShowEvents extends Component {
   }
 
   _handleGoing = (item) => {
+    console.log(item);
     for (var i = 0; i < this.state.clubEvents.length; i++) {
       if (this.state.clubEvents[i]._id === item._id)
         break;
@@ -120,6 +121,7 @@ class ShowEvents extends Component {
     var clubEvents = this.state.clubEvents;
     var id = this.state.idOfUser;
     axios.post(`http://localhost:3000/api/events/${item._id}`).then((response) => {
+      console.log('this is i ', clubEvents[i]);
       clubEvents[i].going = response.data.event.going;
       this.setState({clubEvents:clubEvents});
     })
@@ -150,7 +152,7 @@ class ShowEvents extends Component {
     var eventURL;
     if (item.host.image)
       eventURL = 'https://s3.amazonaws.com/clubster-123/' + item.image;
-    else 
+    else
       eventURL = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC';
 
     return (
@@ -223,7 +225,7 @@ class ShowEvents extends Component {
     }
     return (
       <FlatList
-        data={this.state.clubEvents.reverse().slice(0, 40)}
+        data={this.state.clubEvents}
         renderItem={this._renderItem}
         keyExtractor={clubEvent => clubEvent._id}
         ItemSeparatorComponent={this.renderSeparator}
@@ -363,7 +365,7 @@ class CreateClubEvent extends Component {
         </TouchableOpacity>
       }
       </Content>
-      
+
 
 
       <Button bordered
@@ -443,6 +445,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     borderRadius: 2,
     width: WIDTH/1.5,
-    height: HEIGHT/3 
+    height: HEIGHT/3
   },
 });
