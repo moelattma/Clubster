@@ -43,7 +43,7 @@ exports.isMember = (req, res) => {
 		const { members } = organization;
 		var isMember = false;
 		members.forEach(element => {
-			if (userID.equals(element.member)) isMember = true; 
+			if (userID.equals(element.member)) isMember = true;
 		});
 		var noteStatus;
 		Notification.findOne({ $and: [{ idOfSender: req.user._id }, { idOfOrganization: orgID }, { $or: [{ type: "ORG_JOIN_ADMIN" }, { type: "ORG_JOIN_MEMBER" }] }] }).then((notification) => {
@@ -136,9 +136,10 @@ exports.addOrg = (req, res) => {
 exports.retrieveOrg = (req, res) => {
 	const { orgID } = req.params;
 
-	Organization.findOne({ _id: orgID }).populate('imageId').then((organization) => {
-		if (organization)
-			return res.status(201).json({ 'org': organization });
+	Organization.findOne({ _id: orgID }).populate('imageId').populate('events', 'going name').then((organization) => {
+		if (organization) {
+			return res.status(201).json({ 'org': organization, 'idOfUser': req.user._id });
+		}
 		else
 			return res.status(400).json({ 'err': 'err' });
 	});

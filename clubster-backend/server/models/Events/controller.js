@@ -113,7 +113,9 @@ exports.addEvent = (req, res) => {
 					likers: [req.user._id],
 					comments: [],
 					image: imageURL,
-					value: 5
+					value: 5,
+					totalComments: 0,
+					totalLikes: 0
 				});
 				//write clubEvent to db
 				clubEvent.save().then((event) => {
@@ -163,6 +165,7 @@ exports.addLikerToEvent = (req, res) => {
 						if (error) {
 							console.log(error);
 						} else {
+							Organization.increaseLikes(event.organization);
 							return res.status(201).json({ event });
 						}
 					});

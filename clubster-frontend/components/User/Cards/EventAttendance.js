@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component} from 'react';
 import { StyleSheet, View, ART, Dimensions, TouchableWithoutFeedback } from 'react-native';
 
 const {
@@ -36,6 +36,8 @@ import {
     scaleBand,
     scaleTime
 }  from 'd3-scale';
+import { ImagePicker, Permissions, Constants } from 'expo';
+import { Font, AppLoading } from "expo";
 
 import { Container, Header, Content, Card, CardItem, Body,List } from "native-base";
 
@@ -54,14 +56,27 @@ const data = [
     {frequency: 3, letter: 'f'}
 ];
 
-export default class EventAttendance extends React.Component {
+export default class EventAttendance extends Component {
 
     constructor(props) {
         super(props);
         this.createBarChart = this.createBarChart.bind(this);
         this.drawLine = this.drawLine.bind(this);
         this.getRandomColor = this.getRandomColor.bind(this);
-    };
+        this.state = {
+          events: []
+        }
+    }
+
+    componentDidMount() {
+      console.log('Hi from events ', this.props);
+      let activeMembers = 0;
+      if(!this.props.club && !this.props.club.events) {
+        return <Expo.AppLoading />;
+      }
+      this.setState({events: this.props.club.events});
+      console.log('Events  ', this.props.club.events);
+    }
 
     getRandomColor() {
         return '#' + Math.random().toString(16).substr(-6);
@@ -80,29 +95,37 @@ export default class EventAttendance extends React.Component {
     }
 
     render() {
+        if(this.props.club.events == undefined) {
+          return null;
+        }
         const screen = Dimensions.get('window');
-        const margin = {top: 50, right: 25, bottom: 200, left: 25}
+        const margin = {top: 25, right: 25, bottom: 25, left: 25}
         const width = screen.width - margin.left - margin.right
-        const height = screen.height - margin.top - margin.bottom
+        const height = (screen.height - margin.top - margin.bottom)/3
 
         const x = d3.scale.scaleBand()
             .rangeRound([0, width])
             .padding(0.1)
-            .domain(data.map(d => d.letter))
+            .domain(this.props.club.events.map(d => d.name))
 
-        const maxFrequency = max(data, d => d.frequency)
+        const maxFrequency = max(this.props.club.events, d => d.going.length)
 
         const y = d3.scale.scaleLinear()
             .rangeRound([height, 0])
             .domain([0, maxFrequency])
+        if(this.props.club.events.length < 2) {
+          return(
+            <Text> Need more than 1 event to see progress! </Text>
+          )
+        }
 
-        const firstLetterX = x(data[0].letter)
-        const secondLetterX = x(data[1].letter)
-        const lastLetterX = x(data[data.length - 1].letter)
+        const firstLetterX = x(this.props.club.events[0].name)
+        const secondLetterX = x(this.props.club.events[1].name)
+        const lastLetterX = x(this.props.club.events[this.props.club.events.length - 1].name)
         const labelDx = (secondLetterX - firstLetterX) / 2
 
         const bottomAxis = [firstLetterX - labelDx, lastLetterX + labelDx]
-
+        console.log('labeldx ', labelDx);
         const bottomAxisD = d3.shape.line()
                                 .x(d => d + labelDx)
                                 .y(() => 0)
@@ -120,15 +143,15 @@ export default class EventAttendance extends React.Component {
         return(
             <Content>
             <Card>
-            <Surface width={screen.width} height={screen.height}>
+            <Surface width={screen.width} height={screen.height/3+30}>
                 <Group x={margin.left} y={margin.top}>
                     <Group x={0} y={height}>
                         <Group key={-1}>
                             <Shape d={bottomAxisD} stroke={colours.black} key="-1"/>
                               {
-                                data.map((d, i) =>(
+                                this.props.club.events.map((d, i) =>(
                                     <Group
-                                        x={x(d.letter) + labelDx}
+                                        x={x(d.name) + labelDx}
                                         y={0}
                                         key={i + 1}
                                     >
@@ -138,7 +161,7 @@ export default class EventAttendance extends React.Component {
                                           fill={colours.black}
                                           font="18px helvetica"
                                         >
-                                          {d.letter}
+                                          {d.name.substring(0,2)}
                                         </Text>
                                     </Group>
                                 ))
@@ -163,10 +186,10 @@ export default class EventAttendance extends React.Component {
                             }
                         </Group>
                         {
-                            data.map((d, i) => (
+                            this.props.club.events.map((d, i) => (
                                 <TouchableWithoutFeedback key={i} >
                                     <Shape
-                                        d={this.createBarChart(x(d.letter), y(d.frequency) - height, x.bandwidth(), height - y(d.frequency))}
+                                        d={this.createBarChart(x(d.name), y(d.going.length) - height, x.bandwidth(), height - y(d.going.length))}
                                         fill={this.getRandomColor()}
                                         >
                                     </Shape>

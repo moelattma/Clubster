@@ -4,12 +4,16 @@ import { View, Dimensions, FlatList, TouchableOpacity, StyleSheet, Image, ART } 
 import { Container, Header, Content, Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 import SideGraph from '../Cards/SideGraph';
 import EventAttendance from '../Cards/EventAttendance';
+import ActiveChart from '../Cards/ActiveChart';
 import axios from 'axios';
+import { ImagePicker, Permissions, Constants } from 'expo';
+import { Font, AppLoading } from "expo";
+
 export default class Graphs extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      clubEvents: [],
+      club: [],
       loading: false,
       idOfUser: '',
       name: '',
@@ -24,7 +28,7 @@ export default class Graphs extends Component {
     this._mounted = true;
     this.willFocus = this.props.navigation.addListener('willFocus', () => {
       if (this._mounted)
-        this.getClubEvents();
+        this.getOrganization();
     });
   }
 
@@ -32,31 +36,37 @@ export default class Graphs extends Component {
     this._mounted = false;
   }
 
-  getClubEvents() {
+  async getOrganization() {
     const { _id } = this.props.screenProps;
+    console.log('hiiii ', _id);
     this.setState({ loading: true })
-    axios.get(`http://localhost:3000/api/events/${_id}`)
+    await axios.get(`http://localhost:3000/api/organizations/getOrg/${_id}`)
       .then((response) => {
         if (this._mounted) {
-          this.setState({ clubEvents: response.data.events, idOfUser: response.data.idOfUser });
+          console.log(response.data.org);
+          this.setState({ club: response.data.org, idOfUser: response.data.idOfUser });
           this.setState({ loading: false })
         }
       })
       .catch((err) => { console.log('getClubEvents failed'); console.log(err) });
+    console.log('this is state ', this.state );
   }
   render() {
-    var events = this.state.clubEvents;
-    if(this.state.clubEvents.length<2) {
-      events.push({name:"hi", going:["harry"]});
-      events.push({name:"hiyu", going:["ui"]});
-      this.setState({clubEvents:events});
+    // var club = this.state.club;
+    // if(this.state.club.length<2) {
+    //   club.push({name:"hi", going:["harry"]});
+    //   club.push({name:"hiyu", going:["ui"]});
+    //   this.setState({club:club});
+    // }
+    if (this.state.loading) {
+      return <Expo.AppLoading />;
     }
-
     return (
-      <Text>Graphs</Text>
-      // <Container>
-      //     <SideGraph events = {events} />
-      // </Container>
+      <Container>
+          <SideGraph club = {this.state.club} />
+          <ActiveChart club = {this.state.club} />
+          <EventAttendance club = {this.state.club} />
+      </Container>
     );
   }
 

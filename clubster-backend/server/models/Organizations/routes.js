@@ -37,7 +37,7 @@ router.post('/organizations/isMember', passport.authenticate('jwt', {session:fal
 	controller.isMember(req, res);
 });
 
-router.get('/organizations/getOrg/:orgID', (req, res) => {
+router.get('/organizations/getOrg/:orgID', passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.retrieveOrg(req, res);
 });
 

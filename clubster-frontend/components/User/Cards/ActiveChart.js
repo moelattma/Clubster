@@ -1,31 +1,72 @@
-import React, { Component } from 'react';
-import { Container, Header, Content, Card, CardItem, Text, Body } from "native-base";
-import { View, Dimensions, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import axios from 'axios';
-import Pie from 'react-native-pie'
+import React, { Component } from 'react'
+import {
+  StyleSheet,
+  View,
+  Text,
+} from 'react-native'
+import Pie from 'react-native-pie';
+import { ImagePicker, Permissions, Constants } from 'expo';
+import { Font, AppLoading } from "expo";
 
 export default class ActiveChart extends Component {
-    constructor(props) {
-      super(props);
-      this.state = {
-        chart: []
-      };
+  constructor (props) {
+    super(props);
+    this.state = {
+      activePercentage: 0
     }
+  }
 
-    componentDidMount() {
+  componentDidMount() {
+    console.log('Hi', this.props);
+    let activeMembers = 0;
+    if(!this.props.club.members) {
+      return <Expo.AppLoading />;
     }
+    for(let i = 0;i<this.props.club.members.length;i++) {
+      if(this.props.club.members[i].activeScore >= 5) {
+        activeMembers++;
+      }
+    }
+    let percentage = Math.floor((activeMembers / this.props.club.members.length) * 100);
+    this.setState({activePercentage: percentage});
 
-    render() {
-      <View>
+  }
+  render() {
+    console.log('activePercentage ', this.state.activePercentage);
+    let percentage = this.state.activePercentage;
+    return (
+      <View style={styles.container}>
+        <View>
           <Pie
             radius={50}
             innerRadius={45}
-            series={[60]}
+            series={[percentage]}
             colors={['#f00']}
             backgroundColor='#ddd' />
           <View style={styles.gauge}>
-            <Text style={styles.gaugeText}>60%</Text>
+            <Text style={styles.gaugeText}>{percentage}%</Text>
           </View>
         </View>
-    }
+      </View>
+    )
+  }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  gauge: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  gaugeText: {
+    backgroundColor: 'transparent',
+    color: '#000',
+    fontSize: 24,
+  },
+})

@@ -64,6 +64,9 @@ const Organization = new Schema({
   },
   totalComments: {
     type: Number
+  },
+  totalLikes: {
+    type: Number
   }
 });
 
@@ -114,6 +117,11 @@ Organization.statics.addMemberToClub = async function(organizationID, memberID) 
 Organization.statics.increaseComments = async function(organizationID) {
   await this.update({_id:organizationID}, { $inc: {totalComments:1 }});
 }
+
+Organization.statics.increaseLikes = async function(organizationID) {
+  await this.update({_id:organizationID}, { $inc: {totalLikes:1 }});
+}
+
 Organization.statics.updateInfoByIndex = async function(eventID) {
   await this.update({_id:eventID}, { $inc: {value:-1 }});
 }
