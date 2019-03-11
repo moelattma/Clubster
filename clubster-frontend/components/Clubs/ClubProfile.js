@@ -88,7 +88,6 @@ export default class ClubProfile extends Component {
                   <Gallery clubInfo={this.state} />
                 </ScrollView>
                   {joins}
-
                 </Container>
             );
         }

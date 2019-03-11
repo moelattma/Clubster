@@ -7,6 +7,7 @@
 const Organization = require('./model');
 const User = require('../Users/model');
 const Notification = require('../Notifications/model');
+const Galleries = require('../Galleries/model');
 const mongoose = require('mongoose');
 
 /* To get the current user's profile, do not pass in a profileID to the body
@@ -101,29 +102,36 @@ exports.addOrg = (req, res) => {
 				if (organization) {
 					return res.status(400).json({ 'Error': 'Organization already exists' });
 				} else {
-					// Make new organization and save into the Organizations Collection
-					let newOrg = new Organization({
-						name: name,
-						president: president,
-						admins: [],
-						description: description,
-						image: imageURL
-					});
+					let newGallery = new Galleries({
+						photos: []
+					})
 
-					newOrg.save().then((organization) => {
-						User.clubAdminPushing(organization._id, user._id);
-						Organization.addAdminToClub(organization._id, req.user._id);
-						if (organization) {
-							Organization.findOne({ _id: organization._id }).then((newOrganization) => {
-								if (!newOrganization) {
-									return res.status(400).json({ 'Error': 'No organizations found' });
-								} else {
-									return res.status(201).json({ 'organization': newOrganization });
-								}
-							});
-						}
-					}).catch((err) => { console.log(err); return res.status(400).json({ 'Error': err }) });
+					newGallery.save().then(newGal => {
+						// Make new organization and save into the Organizations Collection
+						let newOrg = new Organization({
+							name: name,
+							president: president,
+							admins: [],
+							description: description,
+							image: imageURL,
+							gallery: newGal._id
+						});
+
+						newOrg.save().then((organization) => {
+							User.clubAdminPushing(organization._id, user._id);
+							Organization.addAdminToClub(organization._id, req.user._id);
+							if (organization) {
+								Organization.findOne({ _id: organization._id }).then((newOrganization) => {
+									if (!newOrganization) {
+										return res.status(400).json({ 'Error': 'No organizations found' });
+									} else {
+										return res.status(201).json({ 'organization': newOrganization });
+									}
+								});
+							}
+						}).catch((err) => { console.log(err); return res.status(400).json({ 'Error': err }) });
 					// Push the new user onto the db if successful, else display error
+					})
 				}
 			}).catch(err => console.log(err));
 		}
@@ -135,8 +143,19 @@ exports.addOrg = (req, res) => {
 
 exports.retrieveOrg = (req, res) => {
 	const { orgID } = req.params;
+	Organization.findByIdAndUpdate(orgID).then(organization => {
+		if (organization && !organization.gallery) {
+			let newGallery = new Galleries({
+				photos: []
+			});
+			newGallery.save().then(newGal => {
+				organization.gallery = newGal._id;
+				organization.save();
+			})
+		}
+	});
 
-	Organization.findOne({ _id: orgID }).populate('imageId').populate('events', 'going name').then((organization) => {
+	Organization.findOne({ _id: orgID })..populate('gallery').populate('imageId').populate('events', 'going name').then((organization) => {
 		if (organization) {
 			return res.status(201).json({ 'org': organization, 'idOfUser': req.user._id });
 		}

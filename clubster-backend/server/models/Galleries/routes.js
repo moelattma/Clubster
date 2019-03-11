@@ -2,7 +2,9 @@
 
 const router = require('express').Router();
 const controller = require('./controller');
-const passport = require('passport');
-const multer = require('multer');
+
+router.post('/galleries/:galleryID/newPhoto', (req, res) => {
+	controller.newPhoto(req, res);
+});
 
 module.exports = router;

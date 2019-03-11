@@ -6,6 +6,7 @@
 
 //Import Node.js libraries.
 const User = require('./model');              //import User Schema
+const Galleries = require('../Galleries/model')
 const bcrypt = require('bcrypt');             //bcrypt library is useful for salting, hashing passwords
 const jwt = require('jsonwebtoken');          //jwt is used for making a token for logged in users
 
@@ -19,21 +20,26 @@ exports.createUser = (req, res) => {
       if (user) { // If the user already exists, reject duplicate account
         return res.status(400).json({ 'Error': 'User already exists' });
       } else {
-
-        // Creates a new User
-        let newUser = new User({
-          username: username,
-          name: name,
-          email: email,
-          password: password
+        let newGallery = new Galleries({
+          photos: []
         });
+        newGallery.save().then(newGal => {
+          // Creates a new User
+          let newUser = new User({
+            username: username,
+            name: name,
+            email: email,
+            password: password,
+            gallery: newGal._id
+          });
 
-        // Hashes the user's chosen password to make it more secure
-        bcrypt.hash(password, numberOfSaltIterations, function (err, hash) {
-          if (err) throw err;
-          newUser.password = hash;
-          newUser.save().then(user => res.status(201).json({ 'user': user })).catch(err => console.log(err)); // Push the new user onto the db if successful, else display error
-        });
+          // Hashes the user's chosen password to make it more secure
+          bcrypt.hash(password, numberOfSaltIterations, function (err, hash) {
+            if (err) throw err;
+            newUser.password = hash;
+            newUser.save().then(user => res.status(201).json({ 'user': user })).catch(err => console.log(err)); // Push the new user onto the db if successful, else display error
+          });
+        })
       }
     });
   } else {
@@ -93,22 +99,19 @@ exports.submitProfile = (req, res) => {
 };
 
 exports.retrieveProfile = (req, res) => {
-  User.findById(req.user._id).select('-username -email -password -photos').then((user) => {
+  if (!req.user.gallery) {
+    let newGallery = new Galleries({
+      photos: []
+    });
+    newGallery.save().then(newGal => {
+      User.findByIdAndUpdate(req.user._id).then(user => {
+        user.gallery = newGal._id;
+        user.save();
+      });
+    });
+  }
+  
+  User.findById(req.user._id).select('-username -email -password').populate('gallery').then((user) => {
     return res.status(201).json({ 'profile': user });
   });
 };
-
-exports.addPhotoToEvent = (req, res) => {
-	const { imageURL } = req.body;
-	const { userID } = req.params;
-	User.findOneAndUpdate(
-		{ _id:  userID },
-		{ $push: { photos: imageURL } },
-		function (error, user) {
-			if (error) {
-				console.log(error);
-			} else {
-				return res.status(201).json({ 'photos': user.photos });
-			}
-		});
-}

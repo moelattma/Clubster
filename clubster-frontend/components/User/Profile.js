@@ -32,7 +32,8 @@ export default class Profile extends Component {
             hobbies: '',
             biography: '',
             errors: {},
-            images: [],
+            photos: [],
+            galleryID: null,
             selected: SELECT_ABOUT,
             _loading: true,
             userClubs: [],
@@ -40,12 +41,15 @@ export default class Profile extends Component {
         }
     }
 
+    onUpdatePhotos(photos) { this.setState({ photos }) };
+
     async componentWillMount() {
         axios.get('http://localhost:3000/api/profile').then((response) => {
-            const { name, image, major, biography, hobbies, photos } = response.data.profile;
+            const { name, image, major, biography, hobbies, gallery } = response.data.profile;
             if (response.data.profile) {
-                this.setState({ name: name, major: major ? major: '', photos: photos, biography: biography ? biography : '',
-                    hobbies: hobbies ? hobbies.join(" ") : '', img: 'https://s3.amazonaws.com/clubster-123/' + image });
+                this.setState({ name: name, major: major ? major: '', biography: biography ? biography : '', galleryID: gallery._id,
+                    hobbies: hobbies ? hobbies.join(" ") : '', img: 'https://s3.amazonaws.com/clubster-123/' + image, 
+                    photos: gallery.photos.length > 5 ? gallery.photos.slice(0, 6) : gallery.photos.concat({ addPhotoIcon: true })});
             }
         });
 
@@ -281,7 +285,8 @@ export default class Profile extends Component {
                     ? <InformationCard userInfo = {this.state} />
                     //photos tab
                     : ((this.state.selected == SELECT_PHOTOS)
-                        ? <Gallery userPhotos = {this.state} />
+                        ? <Gallery photos={this.state.photos} galleryID={this.state.galleryID} 
+                                   onUpdatePhotos={this.onUpdatePhotos.bind(this)} />
                         //clubs tab
                         :
                         <ClubList userClubs = {this.state.userClubs} />
