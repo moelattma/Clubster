@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { TouchableOpacity, StyleSheet, View, FlatList, Dimensions, ScrollView } from 'react-native';
 import { Content, Button, Text, Thumbnail } from 'native-base';
 import axios from 'axios';
+import { awsLink } from '../../keys/keys';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const itemWidth = WIDTH * 13 / 20;
@@ -34,19 +35,22 @@ export default class Notifications extends Component {
 
     _renderItem = ({ item }) => {
         return (
-            <View style={{ flexDirection: 'row', height: HEIGHT/10, margin:5 }}>
+            <View style={{ flexDirection: 'row', height: HEIGHT/10, margin: 5, padding: 5 }}>
                 <View style={{ flexDirection: 'row' }}>
                 <TouchableOpacity>
-                <Thumbnail source={{ uri: this.state.img }}></Thumbnail>
+                    {item.idOfSender.image
+                    ?<Thumbnail source={{ uri: awsLink + item.idOfSender.image }}>
+                    </Thumbnail>
+                    :<Thumbnail source={{ uri: this.state.img }}></Thumbnail>
+                    }
                 </TouchableOpacity>
                 <View style={{ width: WIDTH/2, alignItems: 'center', marginLeft:4, marginRight:4 }}>
                     <Text 
-                    style={{ fontSize: 16, textAlignHorizontal: 'center', textAlign: 'left' }}>
+                    style={{ fontSize: 16, textAlign: 'left' }}>
                         {item.message} 
                      </Text>
                 </View>
                 </View>
-                
                 {this._renderButtons(item)}
             </View>
         );
@@ -56,13 +60,13 @@ export default class Notifications extends Component {
         if (item) {
             return (
                 <View style={{ flexDirection: 'column', justifyContent:'space-between' }}>
-                    <Button small light
+                    <Button small light style={styles.buttonStyle}
                     onPress={() => this.handleAccept(item)}>
                         <Text>Accept</Text>
                     </Button>
-                    <Button small danger style={{height:35}}
+                    <Button small danger style={styles.buttonStyle}
                     onPress={() => this.handleReject(item)}>
-                        <Text>Reject</Text>
+                        <Text style={{color: '#fff'}}>Reject</Text>
                     </Button>
                 </View>
             );
@@ -107,7 +111,7 @@ export default class Notifications extends Component {
     renderSeparator = () => {
         return (
             <View
-                style={{ height: 1, width: '100%', backgroundColor: '#338293' }}>
+                style={{ height: 1, width: '100%', backgroundColor: '#3498db' }}>
             </View>
         )
     }
@@ -141,44 +145,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
         marginBottom: 5
     },
-    acceptReject: {
-        marginLeft: 5,
-        marginTop: 5,
-        marginBottom: 5,
-        marginRight: 5,
-        width: 65,
-        height: 30,
-        backgroundColor: '#338293',
-        alignSelf: 'center',
-    },
-    acceptRejectText: {
-        marginLeft: 8,
-        marginRight: 8,
-        marginTop: 6,
-        marginBottom: 6,
-        textAlignVertical: 'center',
-        textAlign: 'center',
-        fontSize: 14,
-        color: '#fff'
-    },
-    avatar: {
-        width: 50,
-        height: 50,
-        borderRadius: 50,
-        borderWidth: 4,
-        borderColor: "white",
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        marginTop: 25,
-        marginRight: 10,
-        marginBottom: 10
-    },
-    imageAvatar: {
-        width: 50,
-        height: 50,
-        borderColor: "white",
-        borderRadius: 50,
-        alignSelf: 'center',
-        position: 'relative'
+    buttonStyle: {
+        width: WIDTH / 4,
+        justifyContent: 'center'
     }
 });

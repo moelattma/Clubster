@@ -21,7 +21,10 @@ const REJECT_JOIN = "REJECT_JOIN";
 * gets all notifications based on the userid
 */
 exports.grabNotifications = (req, res) => {
-	Notification.find({ idOfReceivers: { $in: [req.user._id] } }).populate('idOfOrganization').then((notifications) => {
+	Notification.find({ idOfReceivers: { $in: [req.user._id] } })
+	.populate('idOfOrganization')
+	.populate('idOfSender')
+	.then((notifications) => {
 		if (!notifications) {
 			return res.status(400).json({ 'Error': 'No notifications found' });
 		} else {
