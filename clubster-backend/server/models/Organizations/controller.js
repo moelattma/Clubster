@@ -155,7 +155,7 @@ exports.retrieveOrg = (req, res) => {
 		}
 	});
 
-	Organization.findOne({ _id: orgID })..populate('gallery').populate('imageId').populate('events', 'going name').then((organization) => {
+	Organization.findOne({ _id: orgID }).populate('gallery').populate('imageId').populate('events', 'going name').then((organization) => {
 		if (organization) {
 			return res.status(201).json({ 'org': organization, 'idOfUser': req.user._id });
 		}

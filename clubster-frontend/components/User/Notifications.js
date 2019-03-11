@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, StyleSheet, Text, View, FlatList, Dimensions, Image, ScrollView } from 'react-native'
+import { TouchableOpacity, StyleSheet, View, FlatList, Dimensions, ScrollView } from 'react-native';
+import { Content, Button, Text, Thumbnail } from 'native-base';
 import axios from 'axios';
 
-const { width: WIDTH } = Dimensions.get('window');
+const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const itemWidth = WIDTH * 13 / 20;
 
 const ACCEPT_ADMIN = "ACCEPT_ADMIN";
@@ -33,28 +34,36 @@ export default class Notifications extends Component {
 
     _renderItem = ({ item }) => {
         return (
-            <View style={{ flex: 1, flexDirection: 'row', height: 100  }}>
-                <TouchableOpacity style={styles.avatar}>
-                    <Image style={styles.imageAvatar} source={{ uri: this.state.img }} />
+            <View style={{ flexDirection: 'row', height: HEIGHT/10, margin:5 }}>
+                <View style={{ flexDirection: 'row' }}>
+                <TouchableOpacity>
+                <Thumbnail source={{ uri: this.state.img }}></Thumbnail>
                 </TouchableOpacity>
-                <View style={{ flexDirection: 'row', alignSelf: 'stretch', width: (item.isActive ? itemWidth : WIDTH), alignItems: 'center' }}>
-                    <Text style={{ fontSize: 18, textAlignVertical: 'center', textAlign: 'left' }}> {item.message} </Text>
+                <View style={{ width: WIDTH/2, alignItems: 'center', marginLeft:4, marginRight:4 }}>
+                    <Text 
+                    style={{ fontSize: 16, textAlignHorizontal: 'center', textAlign: 'left' }}>
+                        {item.message} 
+                     </Text>
                 </View>
+                </View>
+                
                 {this._renderButtons(item)}
             </View>
         );
     }
 
     _renderButtons = (item) => {
-        if (item.isActive) {
+        if (item) {
             return (
-                <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'flex-end' }}>
-                    <TouchableOpacity style={styles.acceptReject} onPress={() => this.handleAccept(item)}>
-                        <Text style={styles.acceptRejectText}> Accept </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.acceptReject} onPress={() => this.handleReject(item)}>
-                        <Text style={styles.acceptRejectText}> Reject </Text>
-                    </TouchableOpacity>
+                <View style={{ flexDirection: 'column', justifyContent:'space-between' }}>
+                    <Button small light
+                    onPress={() => this.handleAccept(item)}>
+                        <Text>Accept</Text>
+                    </Button>
+                    <Button small danger style={{height:35}}
+                    onPress={() => this.handleReject(item)}>
+                        <Text>Reject</Text>
+                    </Button>
                 </View>
             );
         }
