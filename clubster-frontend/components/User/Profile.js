@@ -3,7 +3,7 @@ import { AsyncStorage, View, ScrollView, StyleSheet,
      Image, TouchableOpacity, TextInput, Dimensions } from 'react-native';
 import Expo, { Font, ImagePicker, Permissions } from 'expo';
 import axios from 'axios';
-import Modal from "react-native-modal";
+import Modal from 'react-native-modal';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Gallery from './Cards/Gallery';
 import InformationCard from './Cards/InformationCard';
@@ -11,7 +11,7 @@ import { accessKeyId, secretAccessKey } from '../../keys/keys';
 import v1 from 'uuid/v1';
 import { RNS3 } from 'react-native-aws3';
 import ClubList from './Cards/ClubList';
-import { Thumbnail, Content, Container, Button, Text } from 'native-base';
+import { Thumbnail, Button, Text, Form, Item, Input } from 'native-base';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 
@@ -262,16 +262,16 @@ export default class Profile extends Component {
                 </TouchableOpacity>
                 <View style={{height: 100}}></View>
 
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
-                        <Button bordered activeOpacity={0.5} style={styles.buttonText} 
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', margin: 10 }}>
+                        <Button bordered activeOpacity={0.5}
                         onPress={this.handleAboutAction.bind(this)}>
                             <Text>About</Text>
                         </Button>
-                        <Button bordered style={styles.buttonText} 
+                        <Button bordered
                         onPress={this.handlePhotoAction.bind(this)}>
                             <Text>Photos</Text>
                         </Button>
-                        <Button bordered style={styles.buttonText} 
+                        <Button bordered
                         onPress={this.handleClubsAction.bind(this)} onLongPress={() => {
                                 this.getClubs();
                                 this.handleClubsAction();
@@ -298,20 +298,58 @@ export default class Profile extends Component {
                             <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
                                 Edit Profile
                             </Text>
-                            <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="Major" onChangeText={(major) => this.setState({ major })} value={this.state.major} />
-                            <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="Hobbies (seperated by ,)" onChangeText={hobbies => this.setState({ hobbies })} value={this.state.hobbies} />
-                            <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="Facebook" onChangeText={(facebook) => this.setState({ facebook })} value={this.state.facebook} />
-                            <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="Instagram" onChangeText={(instagram) => this.setState({ instagram })} value={this.state.instagram} />
-                            <TextInput style={{ alignSelf: 'stretch', padding: 3 }} placeholder="LinkedIn" onChangeText={(linkedIn) => this.setState({ linkedIn })} value={this.state.linkedIn} />
-                            <TextInput multiline={true} numberOfLines={6} style={{ width: 350 }} placeholder="Decribe yourself!" onChangeText={(biography) => this.setState({ biography })} value={this.state.biography} />
-
-                            <TouchableOpacity onPress={() => { this.submitProfile() }}>
-                                <Text style={styles.SubmitBtn}>Save</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity onPress={() => { this.setState({ show: false }) }}>
-                                <Text style={styles.closeText}>Cancel</Text>
-                            </TouchableOpacity>
+                            <Form>
+                            <Item>
+                                <Input placeholder="major"
+                                label='major'
+                                onChangeText={(major) => this.setState({ major })}
+                                value={this.state.major}
+                                />
+                            </Item>
+                            <Item>
+                                <Input placeholder="Hobbies"
+                                label='Hobbies'
+                                onChangeText={(hobbies) => this.setState({ hobbies })}
+                                value={this.state.hobbies}
+                                />
+                            </Item>
+                            <Item>
+                                <Input placeholder="Facebook"
+                                label='Facebook'
+                                onChangeText={(facebook) => this.setState({ facebook })}
+                                value={this.state.facebook}
+                                />
+                            </Item>
+                            <Item>
+                                <Input placeholder="Instagram"
+                                label='Facebook'
+                                onChangeText={(instagram) => this.setState({ instagram })}
+                                value={this.state.instagram}
+                                />
+                            </Item>
+                            <Item>
+                                <Input placeholder="LinkedIn"
+                                label='LinkedIn'
+                                onChangeText={(linkedIn) => this.setState({ linkedIn })}
+                                value={this.state.linkedIn}
+                                />
+                            </Item>
+                            <Item>
+                                <Input placeholder="Describe yourself"
+                                label=''
+                                onChangeText={(biography) => this.setState({ biography })}
+                                value={this.state.biography}
+                                />
+                            </Item>
+                            </Form>  
+                            <Button block onPress={() => { this.submitProfile() }}
+                             style={styles.button}>
+                                <Text style={{color: '#fff'}}> Submit </Text>
+                            </Button>
+                            <Button block danger onPress={() => { this.setState({ show: false }) }}
+                            style={styles.button}>
+                                <Text style={{color: '#fff'}}> Cancel </Text>
+                            </Button>
                         </View>
                     </Modal>
                 </View>
@@ -323,12 +361,9 @@ export default class Profile extends Component {
 
 const styles = StyleSheet.create({
     button: {
-        backgroundColor: '#E0E0E0',
-        borderRadius: 20,
-        borderWidth: 1.5,
-        borderColor: '#338293',
         margin: 10,
-        width: '27%'
+        maxWidth: WIDTH,
+        minWidth: WIDTH/2,
     },
     header: {
         backgroundColor: "#00BFFF",
@@ -369,22 +404,7 @@ const styles = StyleSheet.create({
     },
     modalView: {
         backgroundColor: "#fff",
-        height: 500,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    closeText: {
-        backgroundColor: '#ff6666',
-        color: '#fff',
-        fontWeight: 'bold',
-        padding: 5
-    },
-    SubmitBtn: {
-        backgroundColor: 'skyblue',
-        color: '#fff',
-        fontWeight: 'bold',
-        margin: 5,
-        padding: 5
+        padding: 30
     },
     header: {
         backgroundColor: 'lightgreen',
@@ -408,7 +428,6 @@ const styles = StyleSheet.create({
         borderWidth: 16,
         position: 'absolute',
     },
-
     profilepic: {
         flex: 1,
         width: null,
