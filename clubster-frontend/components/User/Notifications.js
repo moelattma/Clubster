@@ -57,7 +57,7 @@ export default class Notifications extends Component {
     }
 
     _renderButtons = (item) => {
-        if (item) {
+        if (item.isActive) {
             return (
                 <View style={{ flexDirection: 'column', justifyContent:'space-between' }}>
                     <Button small light style={styles.buttonStyle}
@@ -79,6 +79,7 @@ export default class Notifications extends Component {
             { _id: item._id, orgID: item.idOfOrganization, joinerID: item.idOfSender, joinType, accepted: true })
             .then((res) => {
                 if (res.status == 201)
+                console.log('response', response.status)
                     item.isActive = false;
             }).catch((err) => console.log(err));
 
