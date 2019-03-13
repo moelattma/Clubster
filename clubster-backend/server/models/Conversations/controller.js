@@ -20,7 +20,6 @@ exports.findMessages = (req, res) => {
 				return res.status(201).json({conversation:conversation, userId: req.user._id});
 			});
     } else {
-			console.log('MARRRIO');
       return res.status(201).json({conversation:conversation, userId: req.user._id});
     }
   });

@@ -89,9 +89,7 @@ class ShowEvents extends Component {
   componentWillMount() {
     this._mounted = true;
     this.willFocus = this.props.navigation.addListener('willFocus', () => {
-      if (this.props.navigation.state.params.newEvent) {
-        this.setState({ clubEvents: this.state.clubEvents.unshift(this.props.navigation.state.params.newEvent) })
-      } else if (this._mounted) this.getClubEvents();
+       if (this._mounted) this.getClubEvents();
     });
   }
 

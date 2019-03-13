@@ -25,7 +25,7 @@ export default class Chat extends Component {
         }));
       });
       axios.get(`http://localhost:3000/api/conversations/${screenProps._id}`).then((response) => {
-        this.setState({ messages: response.data.conversation.messages });
+        this.setState({ messages: response.data.conversation.messages.reverse() });
         this.setState({ userId: response.data.userId });
         console.log(this.state.userId);
       }).catch((err) => console.log(err));
