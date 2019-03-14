@@ -7,6 +7,18 @@ import Modal from "react-native-modal";
 
 
 export default class LikerModal extends Component {
+  componentDidMount (){
+
+  }
+
+  GetLikers = (item) => {
+    axios.get(`http://localhost:3000/api/events/${event._id}/likers`).then((response) => {
+        this.setState({ messages: response.data.conversation.messages });
+        this.setState({ userId: response.data.userId });
+        //console.log(this.state.userId);
+      }).catch((err) => console.log(err));
+  }
+
   render () {
       console.log('Why 2');
       return (

@@ -115,7 +115,7 @@ export default class EventAttendance extends Component {
             .domain([0, maxFrequency])
         if(this.props.club.events.length < 2) {
           return(
-            <Text> Need more than 1 event to see progress! </Text>
+            <View><Text> Need more than 1 event to see progress! </Text></View>
           )
         }
 
@@ -150,7 +150,7 @@ export default class EventAttendance extends Component {
                             <Shape d={bottomAxisD} stroke={colours.black} key="-1"/>
                               {
                                 this.props.club.events.map((d, i) =>(
-                                    <Group
+                                       <Group
                                         x={x(d.name) + labelDx}
                                         y={0}
                                         key={i + 1}

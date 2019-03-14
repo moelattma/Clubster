@@ -65,7 +65,7 @@ export default class Graphs extends Component {
       <Container>
           <SideGraph club = {this.state.club} />
           <ActiveChart club = {this.state.club} />
-          <EventAttendance club = {this.state.club} />
+          
       </Container>
     );
   }
