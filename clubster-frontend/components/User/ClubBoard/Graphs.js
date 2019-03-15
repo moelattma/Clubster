@@ -52,7 +52,7 @@ export default class Graphs extends Component {
     console.log('this is state ', this.state );
   }
   render() {
-    // var club = this.state.club;
+     var club = this.state.club;
     // if(this.state.club.length<2) {
     //   club.push({name:"hi", going:["harry"]});
     //   club.push({name:"hiyu", going:["ui"]});
@@ -65,7 +65,6 @@ export default class Graphs extends Component {
       <Container>
           <SideGraph club = {this.state.club} />
           <ActiveChart club = {this.state.club} />
-          
       </Container>
     );
   }

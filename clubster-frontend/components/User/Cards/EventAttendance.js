@@ -96,7 +96,12 @@ export default class EventAttendance extends Component {
 
     render() {
         if(this.props.club.events == undefined) {
-          return null;
+          return <View><Text> Need more than 1 event to see progress! </Text></View>;
+        }
+        if(this.props.club.events.length < 2) {
+          return(
+            <View><Text> Need more than 1 event to see progress! </Text></View>
+          )
         }
         const screen = Dimensions.get('window');
         const margin = {top: 25, right: 25, bottom: 25, left: 25}
@@ -113,11 +118,7 @@ export default class EventAttendance extends Component {
         const y = d3.scale.scaleLinear()
             .rangeRound([height, 0])
             .domain([0, maxFrequency])
-        if(this.props.club.events.length < 2) {
-          return(
-            <View><Text> Need more than 1 event to see progress! </Text></View>
-          )
-        }
+
 
         const firstLetterX = x(this.props.club.events[0].name)
         const secondLetterX = x(this.props.club.events[1].name)

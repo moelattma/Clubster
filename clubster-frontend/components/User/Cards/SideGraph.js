@@ -6,7 +6,7 @@ import {
   Animated,
   StyleSheet,
   TouchableHighlight,
-  Dimensions
+  Dimensions,
 } from 'react-native';
 import { ImagePicker, Permissions, Constants } from 'expo';
 import { Font, AppLoading } from "expo";
@@ -78,12 +78,14 @@ export default class SideGraph extends Component {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
-    marginTop: 6
+    marginTop: 6,
+    height: Dimensions.get('window').height/2
   },
   // Item
   item: {
     flexDirection: 'column',
     marginBottom: 35,
+    marginTop: 20,
     paddingHorizontal: 10
   },
   label: {
