@@ -121,6 +121,7 @@ exports.addEvent = (req, res) => {
 				clubEvent.save().then((event) => {
 					// Add event's id to organization's events array
 					Organization.addEventToClub(organizationID, event._id);
+					Organization.increaseLikes(event.organization);
 					// Find the Event whose id = event's id and populate it's image
 					Events.findOne({ _id: event._id }).populate('host').then((event) => {
 						return res.status(201).json({ 'event': event }); //return 201, all good
