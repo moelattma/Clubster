@@ -15,8 +15,6 @@ import Gallery from '../Cards/Gallery';
 import Modal from 'react-native-modal';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import AntDesign from 'react-native-vector-icons/AntDesign'
-import LikerModal from '../../Modals/LikerModal';
-import AttendingModal from '../../Modals/AttendingModal';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 
@@ -27,16 +25,18 @@ export default class EventProfile extends Component {
         this.event = this.props.navigation.getParam('event', null);
         this.state = {
             eventImage: this.event.image ? 'https://s3.amazonaws.com/clubster-123/' + this.event.image : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAU1QTFRFNjtAQEVK////bG9zSk9T/v7+/f39/f3+9vf3O0BETlJWNzxB/Pz8d3t+TFFVzM3O1NXX7u/vUldbRElNs7W3v8HCmZyeRkpPW19j8vLy7u7vvsDC9PT1cHR3Oj9Eo6WnxsjJR0tQOD1Bj5KVgYSHTVFWtri50dLUtLa4YmZqOT5D8vPzRUpOkZOWc3Z64uPjr7Gzuru95+jpX2NnaGxwPkNHp6mrioyPlZeadXh8Q0hNPEBFyszNh4qNc3d6eHx/OD1Cw8XGXGBkfoGEra+xxcbIgoaJu72/m52ggoWIZ2tu8/P0wcLE+vr7kZSXgIOGP0NIvr/BvL6/QUZKP0RJkpWYpKaoqKqtVVldmJqdl5qcZWhstbe5bHB0bnJ1UVVZwsTF5ubnT1RYcHN3oaSm3N3e3NzdQkdLnJ+h9fX1TlNX+Pj47/DwwsPFVFhcEpC44wAAAShJREFUeNq8k0VvxDAQhZOXDS52mRnKzLRlZmZm+v/HxmnUOlFaSz3su4xm/BkGzLn4P+XimOJZyw0FKufelfbfAe89dMmBBdUZ8G1eCJMba69Al+AABOOm/7j0DDGXtQP9bXjYN2tWGQfyA1Yg1kSu95x9GKHiIOBXLcAwUD1JJSBVfUbwGGi2AIvoneK4bCblSS8b0RwwRAPbCHx52kH60K1b9zQUjQKiULbMDbulEjGha/RQQFDE0/ezW8kR3C3kOJXmFcSyrcQR7FDAi55nuGABZkT5hqpk3xughDN7FOHHHd0LLU9qtV7r7uhsuRwt6pEJJFVLN4V5CT+SErpXt81DbHautkpBeHeaqNDRqUA0Uo5GkgXGyI3xDZ/q/wJMsb7/pwADAGqZHDyWkHd1AAAAAElFTkSuQmCC',
-            isModalVisible: false,
+            likersModal: false,
+            goingModal: false,
+            ridersModal: false,
             form: false,
+            likers: [],
+            going: [],
             rides: [],
             seats: '',
             rideTime: '',
             rideLocation: '',
             description: '',
             userID: null,
-            showGoing: false,
-            shoeLikers: false
         }
     }
 
@@ -79,29 +79,80 @@ export default class EventProfile extends Component {
         } catch (error) { console.log(error); }
     }
 
+    // Likers
+    openLikersModal() {
+        axios.get(`http://localhost:3000/api/events/${this.event._id}/likers`)
+            .then(response => {
+                this.setState({ 
+                    likersModal: true,
+                    likers: response.data.likers
+                })
+            }).catch(err => { console.log(err) });
+    }
+
+    closeLikersModal() { this.setState({ likersModal: false }) }
+
+    _renderLike = ({ item }) => {
+        console.log(item);
+        return (
+            <ListItem thumbnail>
+                <Left>
+                    <Thumbnail source={{ uri: 'https://s3.amazonaws.com/clubster-123/' + item.image  }}/>
+                </Left>
+                <Body>
+                    <Text>{item.name}</Text>
+                </Body>
+            </ListItem>
+        );
+    }
+
+    // Going
+    openGoingModal() {
+        console.log(this.event);
+        axios.get(`http://localhost:3000/api/events/${this.event._id}/going`)
+            .then(response => {
+                console.log(response.data);
+                this.setState({ 
+                    goingModal: true,
+                    going: response.data.going
+                })
+            }).catch(err => { console.log(err) });
+    }
+
+    closeGoingModal() { this.setState({ goingModal: false }) }
+
+    _renderGoing = ({ item }) => {
+        return (
+            <ListItem thumbnail>
+                <Left>
+                    <Thumbnail source={{ uri: 'https://s3.amazonaws.com/clubster-123/' + item.image }}/>
+                </Left>
+                <Body>
+                    <Text>{item.name}</Text>
+                </Body>
+            </ListItem>
+        );
+    }
+
+    // Rides
     openRidesModal() {
         axios.get(`http://localhost:3000/api/${this.event._id}/rides`)
             .then(response => {
                 this.setState({
-                    isModalVisible: true,
+                    ridersModal: true,
                     rides: response.data.rides,
                     userID: response.data.userID
                 })
-            })
-            .catch(err => { console.log(err) })
+            }).catch(err => { console.log(err) });
     }
 
-    closeModal() {
+    closeRidesModal() {
         if (this.state.form)
             this.setState({ form: false });
-        else this.setState({ isModalVisible: false });
+        else this.setState({ ridersModal: false });
     }
 
-    dropDown() {
-        this.setState({
-            form: true
-        })
-    }
+    addRideDropDown() { this.setState({ form: true }) }
 
     submitRide() {
         const { userID } = this.state;
@@ -119,7 +170,7 @@ export default class EventProfile extends Component {
             })
         } else console.log('userid is null')
         if (skip) {
-            this.closeModal();
+            this.closeRidesModal();
             return;
         }
         const { seats, rideTime, rideLocation, description } = this.state;
@@ -138,7 +189,7 @@ export default class EventProfile extends Component {
                     rides: this.state.rides.concat(newRide)
                 });
                 if (removeFromRide)
-                    this.closeModal();
+                    this.closeRidesModal();
             }
         })
         .catch((err) => { console.log('error creating new ride'); console.log(err) });
@@ -162,10 +213,10 @@ export default class EventProfile extends Component {
         } else console.log('userid is null')
         if (skip) return;
         await axios.post(`http://localhost:3000/api/${item._id}/joinRide`, { rideRemove: removeFromRide });
-        this.closeModal();
+        this.closeRidesModal();
     }
 
-    _renderItem = ({ item }) => {
+    _renderRide = ({ item }) => {
         const { passengerSeats, ridersID } = item;
         return (
             <View>
@@ -225,9 +276,9 @@ export default class EventProfile extends Component {
                     <Content padder>
                         <Card >
                             <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 10, marginBottom: 10}}>
-                                <AntDesign name='like1' size={28} onPress={() => this.setState({showLikers:true, showGoing:false})}/>
-                                <FontAwesome name='comment' size={28} onPress={() => this.setState({showLikers:false, showGoing:true})}/>
-                                <FontAwesome onPress={() => this.openRidesModal()} name='car' size={28} />
+                                <AntDesign.Button color='#59cbbd' backgroundColor='white' name='like1' size={28} onPress={() => this.openLikersModal()}/>
+                                <FontAwesome.Button color='#59cbbd' backgroundColor='white' name='users' size={28} onPress={() => this.openGoingModal()}/>
+                                <FontAwesome.Button color='#59cbbd' backgroundColor='white' name='car' size={28} onPress={() => this.openRidesModal()} />
                             </View>
                         </Card>
                     </Content>
@@ -235,41 +286,57 @@ export default class EventProfile extends Component {
                     <Gallery eventInfo={eventInfo} />
                 </ScrollView>
 
-                <Modal isVisible={this.state.showLikers}
+                <Modal isVisible={this.state.likersModal}
                     style={styles.modalStyle}>
                     <View style={{ flex: 1, margin: 2 }}>
-                    <TouchableOpacity onPress={() => this.setState({showLikers: false})}>
-                        <Icon name="ios-arrow-dropleft"
-                            style={styles.modalButton} />
-                    </TouchableOpacity>
-                        <Text> Likers! </Text>
-                    </View>
-                </Modal>
-
-                <Modal isVisible={this.state.showGoing}
-                    style={styles.modalStyle}>
-                    <View style={{ flex: 1, margin: 2 }}>
-                    <View style={styles.modalButtons}>
-                        <TouchableOpacity onPress={() => this.setState({showGoing: false})}>
+                        <TouchableOpacity onPress={() => this.closeLikersModal()}>
                             <Icon name="ios-arrow-dropleft"
                                 style={styles.modalButton} />
                         </TouchableOpacity>
-                    </View>
-                        <Text> Going! </Text>
+                        {!this.state.likers || this.state.likers.length == 0 ?
+                            <Text style={styles.noneText}> No one likes this event </Text> 
+                            :
+                            <FlatList
+                                data={this.state.likers}
+                                renderItem={this._renderLike}
+                                horizontal={false}
+                                keyExtractor={liker => liker._id}
+                            />
+                        }
                     </View>
                 </Modal>
 
-
-
-                <Modal isVisible={this.state.isModalVisible}
+                <Modal isVisible={this.state.goingModal}
                     style={styles.modalStyle}>
                     <View style={{ flex: 1, margin: 2 }}>
                         <View style={styles.modalButtons}>
-                            <TouchableOpacity onPress={() => this.closeModal()}>
+                            <TouchableOpacity onPress={() => this.closeGoingModal()}>
                                 <Icon name="ios-arrow-dropleft"
                                     style={styles.modalButton} />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => this.dropDown()}>
+                        </View>
+                        {!this.state.going || this.state.going.length == 0 ?
+                            <Text style={styles.noneText}> No one is going to this event </Text> 
+                            :
+                            <FlatList
+                                data={this.state.going}
+                                renderItem={this._renderGoing}
+                                horizontal={false}
+                                keyExtractor={going => going._id}
+                            />
+                        }
+                    </View>
+                </Modal>
+
+                <Modal isVisible={this.state.ridersModal}
+                    style={styles.modalStyle}>
+                    <View style={{ flex: 1, margin: 2 }}>
+                        <View style={styles.modalButtons}>
+                            <TouchableOpacity onPress={() => this.closeRidesModal()}>
+                                <Icon name="ios-arrow-dropleft"
+                                    style={styles.modalButton} />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => this.addRideDropDown()}>
                                 <Icon name="ios-add"
                                     style={styles.modalButton} />
                             </TouchableOpacity>
@@ -315,11 +382,11 @@ export default class EventProfile extends Component {
                             :
                             (
                                 this.state.rides == undefined || this.state.rides.length == 0 ?
-                                <Text style={styles.noRidesText}> There are no rides for this event </Text>
+                                <Text style={styles.noneText}> There are no rides for this event </Text>
                                 :
                                 <FlatList
                                 data={this.state.rides}
-                                renderItem={this._renderItem}
+                                renderItem={this._renderRide}
                                 horizontal={false}
                                 keyExtractor={ride => ride._id}
                             />)
@@ -367,7 +434,7 @@ const styles = StyleSheet.create({
         height: HEIGHT / 8,
         marginTop: 6
     },
-    noRidesText: {
+    noneText: {
         textAlignVertical: 'center',
         textAlign: 'center',
     }

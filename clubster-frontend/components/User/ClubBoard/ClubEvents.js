@@ -50,7 +50,7 @@ class ShowEvents extends Component {
   constructor(props) {
     super(props);
 
-    props.navigation.setParams({ refreshEvents: this.getEvents });
+    props.navigation.setParams({ addEvent: this.addEvent });
 
     this._mounted = false;
 
@@ -71,7 +71,7 @@ class ShowEvents extends Component {
       <View style={{ marginRight: 6 }}>
         <FontAwesome
           name="plus" size={32} color={'black'}
-          onPress={() => navigation.navigate('CreateClubEvent', { refreshEvents: navigation.state.params.refreshEvents })} />
+          onPress={() => navigation.navigate('CreateClubEvent', { addEvent: navigation.state.params.addEvent })} />
       </View>);
 
     return {
@@ -88,14 +88,10 @@ class ShowEvents extends Component {
 
   componentWillMount() {
     this._mounted = true;
-    this.willFocus = this.props.navigation.addListener('willFocus', () => {
-       if (this._mounted) this.getClubEvents();
-    });
+    if (this._mounted) this.getClubEvents();
   }
 
-  componentWillUnmount() {
-    this._mounted = false;
-  }
+  componentWillUnmount() { this._mounted = false; }
 
   getClubEvents = async () => {
     const { _id } = this.props.screenProps;
@@ -103,23 +99,28 @@ class ShowEvents extends Component {
     axios.get(`http://localhost:3000/api/events/${_id}`)
       .then((response) => {
         if (this._mounted) {
-          this.setState({ clubEvents: response.data.events.reverse().slice(0, 40), idOfUser: response.data.idOfUser });
+          this.setState({ clubEvents: response.data.events, idOfUser: response.data.idOfUser });
           this.setState({ loading: false })
         }
       })
       .catch((err) => { console.log('getClubEvents failed'); console.log(err) });
   }
 
+  addEvent = async (newEvent) => {
+    this.setState({ loading: true });
+    var events = this.state.clubEvents;
+    events.unshift(newEvent);
+    this.setState({ clubEvents: events, loading: false });
+  }
+
   _handleGoing = (item) => {
-    console.log(item);
     for (var i = 0; i < this.state.clubEvents.length; i++) {
       if (this.state.clubEvents[i]._id === item._id)
         break;
     }
     var clubEvents = this.state.clubEvents;
     var id = this.state.idOfUser;
-    axios.post(`http://localhost:3000/api/events/${item._id}`).then((response) => {
-      console.log('this is i ', clubEvents[i]);
+    axios.post(`http://localhost:3000/api/events/${item._id}/going`).then((response) => {
       clubEvents[i].going = response.data.event.going;
       this.setState({clubEvents:clubEvents});
     })
@@ -218,7 +219,7 @@ class ShowEvents extends Component {
   }
 
   render() {
-    if (this.state.loading) {
+    if (this.state.loading || !this.state.clubEvents) {
       return <Expo.AppLoading />;
     }
     return (
@@ -299,15 +300,14 @@ class CreateClubEvent extends Component {
     }).then(response => {
       newEvent = response.data.event;
     }).catch(error => console.log(error + 'ruh roh'));
-    var func = this.props.navigation.getParam('refreshEvents');
+    var func = this.props.navigation.getParam('addEvent');
     if (func) {
-      await func();
-      this.props.navigation.navigate('ShowEvents', { newEvent: newEvent });
-    } else this.props.navigation.navigate('ShowEvents', { newEvent: newEvent });
+      await func(newEvent);
+      this.props.navigation.navigate('ShowEvents');
+    } else this.props.navigation.navigate('ShowEvents');
   }
 
   render() {
-
     const { name, date, time, description, location } = this.state;
 
     return (
@@ -363,8 +363,6 @@ class CreateClubEvent extends Component {
         </TouchableOpacity>
       }
       </Content>
-
-
 
       <Button bordered
             onPress={this.createEvent}

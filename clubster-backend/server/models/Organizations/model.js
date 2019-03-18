@@ -79,9 +79,8 @@ Organization.methods.updateInfoByIndex = function(index) {
       if(this.members[i].activeScore > 0 && this.admins[i].admin == this.members[index].member) {
           this.admins[i].activeScore= this.admins[i].activeScore - 1;
       }
-      i = i + 1;
+      ++i;
     }
-    this.save()
 }
 
 Organization.statics.modifyActiveScore = async function(organizationID, memberID, value, type) {
@@ -122,6 +121,14 @@ Organization.statics.increaseLikes = async function(organizationID) {
   await this.update({_id:organizationID}, { $inc: {totalLikes:1 }});
 }
 
+Organization.statics.decreaseComments = async function(organizationID) {
+  await this.update({_id:organizationID}, { $inc: {totalComments:-1 }});
+}
+
+Organization.statics.decreaseLikes = async function(organizationID) {
+  await this.update({_id:organizationID}, { $inc: {totalLikes:-1 }});
+}
+
 Organization.statics.updateInfoByIndex = async function(eventID) {
   await this.update({_id:eventID}, { $inc: {value:-1 }});
 }
@@ -150,11 +157,8 @@ Organization.statics.addEventToClub = async function(organizationID, eventID) {
       }
     }
   });
-  await this.findByIdAndUpdate(organizationID, { $push: { events: eventID } });
-
+  await this.findByIdAndUpdate(organizationID, { $push: { events: { $each: [eventID], $position: 0 } } });
 }
-
-
 
 /*
 * Export so that other js files can use this schema

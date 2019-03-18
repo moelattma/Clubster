@@ -29,8 +29,12 @@ router.post('/events/:organizationID/new', passport.authenticate('jwt', {session
 	controller.addEvent(req, res); // If url is of the form ../events/jewiofheifjwof/new the addEvent method will run
 });
 
-router.post('/events/:eventID', passport.authenticate('jwt', {session:false}), (req, res) => {
-	controller.addMemberToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
+router.post('/events/:eventID/going', passport.authenticate('jwt', {session:false}), (req, res) => {
+	controller.handleGoing(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
+});
+
+router.get('/events/:eventID/going', passport.authenticate('jwt', {session:false}), (req, res) => {
+	controller.getGoing(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
 router.post('/events/:eventID/photo', passport.authenticate('jwt', {session:false}), (req, res) => {
@@ -38,7 +42,7 @@ router.post('/events/:eventID/photo', passport.authenticate('jwt', {session:fals
 });
 
 router.post('/events/:eventID/likers', passport.authenticate('jwt', {session:false}), (req, res) => {
-	controller.addLikerToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
+	controller.handleLike(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
 router.post('/events/:eventID/comments', passport.authenticate('jwt', {session:false}), (req, res) => {

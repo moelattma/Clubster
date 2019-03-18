@@ -25,7 +25,7 @@ export default class CommentCard extends Component {
        let url = 'https://s3.amazonaws.com/clubster-123/' + data.userID.image;
       //  console.log(data);
        return (
-         <ListItem avatar>
+         <ListItem avatar key={data._id}>
            <Left>
              <Thumbnail source={{ uri:url}} />
            </Left>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { TouchableOpacity, StyleSheet, View, FlatList, Dimensions, ScrollView } from 'react-native';
-import { Content, Button, Text, Thumbnail } from 'native-base';
+import { Button, Text, Thumbnail } from 'native-base';
 import axios from 'axios';
 import { awsLink } from '../../keys/keys';
 

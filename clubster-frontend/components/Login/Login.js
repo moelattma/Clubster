@@ -7,8 +7,8 @@ const { width: WIDTH } = Dimensions.get('window');
 
 export default class Login extends React.Component {
   state = {
-    username: 'arturo',
-    password: '12121212'
+    username: 'mohamedzak',
+    password: 'mohamed123'
   };
 
   handleLogin = () => {

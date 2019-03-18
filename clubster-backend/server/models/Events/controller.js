@@ -39,10 +39,9 @@ exports.changeEventPicture = (req, res) => {
 /*
 * Method to add a member to an event. This function is called when you tap the star on the event.
 */
-exports.addMemberToEvent = (req, res) => {
+exports.handleGoing = (req, res) => {
 	const { eventID } = req.params;	// grabs the eventID from url
 	const idOfAttender = req.user._id;	// grabs of id of user from passport instance.
-	console.log('jk');
 	// Checks if Event exists. If it does, add idOfAttender to the event whose id = evetID's member array
 	Events.findByIdAndUpdate(eventID).then((event) => {
 		if (event) {
@@ -60,8 +59,6 @@ exports.addMemberToEvent = (req, res) => {
 						if (error) {
 							console.log(error);
 						} else {
-							console.log(event);
-							console.log(('hi', event.organization,idOfAttender, event.value));
 							Organization.modifyActiveScore(event.organization,idOfAttender, event.value, -1);
 							return res.status(201).json({ event });
 						}
@@ -75,8 +72,6 @@ exports.addMemberToEvent = (req, res) => {
 						if (error) {
 							console.log(error);
 						} else {
-							console.log(event.organization);
-							console.log(('hi', event.organization,idOfAttender, event.value));
 							Organization.modifyActiveScore(event.organization,idOfAttender, event.value, 1);
 							return res.status(201).json({ event });
 						}
@@ -138,16 +133,27 @@ exports.addEvent = (req, res) => {
 
 exports.getLikers = (req, res) => {
 	const { eventID } = req.params;	// grabs the eventID from url
-	Events.findByIdAndUpdate(eventID).populate('likers').then((event) => {
+	Events.findById(eventID).select('likers').populate({ path: 'likers', select: 'name image' }).then((event) => {
 		if (!event) {
 			return res.status(400).json({ 'Error': 'No events found' });
 		} else {
-			return res.status(201).json({ event });
+			return res.status(201).json({ 'likers': event.likers });
 		}
 	});
 }
 
-exports.addLikerToEvent = (req, res) => {
+exports.getGoing = (req, res) => {
+	const { eventID } = req.params;	// grabs the eventID from url
+	Events.findById(eventID).select('going').populate({ path: 'going', select: 'name image' }).then((event) => {
+		if (!event) {
+			return res.status(400).json({ 'Error': 'No events found' });
+		} else {
+			return res.status(201).json({ 'going': event.going });
+		}
+	});
+}
+
+exports.handleLike = (req, res) => {
 	const { eventID } = req.params;	// grabs the eventID from url
 	const idOfAttender = req.user._id;
 	Events.findByIdAndUpdate(eventID).then((event) => {
@@ -166,7 +172,7 @@ exports.addLikerToEvent = (req, res) => {
 						if (error) {
 							console.log(error);
 						} else {
-							Organization.increaseLikes(event.organization);
+							Organization.decreaseLikes(event.organization);
 							return res.status(201).json({ event });
 						}
 					});
@@ -179,6 +185,7 @@ exports.addLikerToEvent = (req, res) => {
 						if (error) {
 							console.log(error);
 						} else {
+							Organization.increaseLikes(event.organization);
 							return res.status(201).json({ event });
 						}
 					});
@@ -224,7 +231,6 @@ exports.addCommentToEvent = (req, res) => {
 	});
 	comment.save().then((comment) => {
 			if(comment){
-				console.log(comment);
 				Events.findOneAndUpdate(
 					{ _id: eventID },
 					{ $push: { comments: comment._id } },
