@@ -202,10 +202,8 @@ exports.getComments = (req, res) => {
 	//Find the orgnaization with id = organizationID and populate it's array of events along with each event's image.
 	Events.findByIdAndUpdate(eventID).populate({path: 'comments', populate: {path: 'userID'}}).then((event) => {
 		if (!event) {
-			console.log('wwwow');
 			return res.status(400).json({ 'Error': 'No events found' });	//organization is null, DNE
 		} else {
-			console.log(event.comments);
 			return res.status(201).json({ 'comments': event.comments, idOfUser: req.user._id }); //returns organization's events along with idOfUser
 		}
 	}).catch((err) => console.log(err));

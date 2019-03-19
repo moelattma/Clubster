@@ -4,6 +4,7 @@ import axios from 'axios';
 import InformationCard from '../User/Cards/InformationCard';
 import Gallery from '../User/Cards/Gallery';
 import { Container, Button, Thumbnail, Text } from 'native-base';
+import { DefaultImg } from '../router';
 
 const { width: WIDTH } = Dimensions.get('window');
 
@@ -25,7 +26,7 @@ export default class ClubProfile extends Component {
             description: '',
             isLoading: true,
             joinable: false,
-            img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAzCAYAAAA6oTAqAAAAEXRFWHRTb2Z0d2FyZQBwbmdjcnVzaEB1SfMAAABQSURBVGje7dSxCQBACARB+2/ab8BEeQNhFi6WSYzYLYudDQYGBgYGBgYGBgYGBgYGBgZmcvDqYGBgmhivGQYGBgYGBgYGBgYGBgYGBgbmQw+P/eMrC5UTVAAAAABJRU5ErkJggg==',
+            img: DefaultImg,            
             noteStatus: true,
             photos: []
         }
@@ -36,7 +37,7 @@ export default class ClubProfile extends Component {
             this.setState({ joinable: (!response.data.isMember) });
             const { image, name, president, description, _id, photos } = response.data.organization;
 
-            this.setState({ img: 'https://s3.amazonaws.com/clubster-123/' + image, 
+            this.setState({ img: (image ? 'https://s3.amazonaws.com/clubster-123/' + image : DefaultImg), 
                             name, president, description, _id, photos, isLoading: false });
         });
     }

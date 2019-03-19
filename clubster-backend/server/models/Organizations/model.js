@@ -84,19 +84,15 @@ Organization.methods.updateInfoByIndex = function(index) {
 }
 
 Organization.statics.modifyActiveScore = async function(organizationID, memberID, type) {
-  console.log(organizationID, memberID, type);
   let prevValue = 0;
   await this.findByIdAndUpdate(organizationID).then((organization)=> {
-    console.log(organization);
     for(let i = 0;i<organization.members.length;i++) {
-      console.log((organization.members[i].member).equals(memberID));
       if((organization.members[i].member).equals(memberID)) {
         prevValue = organization.members[i].activeScore;
         break;
       }
     }
   });
-  console.log('This is prev ', prevValue);
   (type == -1) ? prevValue -= 1 : prevValue += 1;
   if(prevValue < 0) {
     prevValue = 0;

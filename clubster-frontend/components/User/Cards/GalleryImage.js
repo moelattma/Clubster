@@ -9,7 +9,6 @@ export default class GalleryImage extends Component {
   render() {
     const { uri, index, onPress } = this.props;
 
-    //  console.log('GallerImage. uri, index, onPress ', uri, index, onPress);
     return (
       <Button
         onPress={() => onPress(index)}

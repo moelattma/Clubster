@@ -41,14 +41,12 @@ export default class Graphs extends Component {
 
   async getOrganization() {
     const { _id } = this.props.screenProps;
-    console.log('hiiii ', _id);
     this.setState({ loading: true });
     let eventLengths = [];
     let eventNames = [];
     await axios.get(`http://localhost:3000/api/organizations/getOrg/${_id}`)
       .then((response) => {
         if (this._mounted) {
-          console.log(response.data.org);
           this.setState({ club: response.data.org, idOfUser: response.data.idOfUser });
           this.setState({ loading: false })
         }
@@ -60,17 +58,10 @@ export default class Graphs extends Component {
       }
       this.setState({data:eventLengths});
       this.setState({names: eventNames});
-      console.log(this.state.data);
-    console.log('this is state ', this.state );
   }
   render() {
      var club = this.state.club;
      console.disableYellowBox = true;
-    // if(this.state.club.length<2) {
-    //   club.push({name:"hi", going:["harry"]});
-    //   club.push({name:"hiyu", going:["ui"]});
-    //   this.setState({club:club});
-    // }
     if (this.state.loading) {
       return <Expo.AppLoading />;
     }

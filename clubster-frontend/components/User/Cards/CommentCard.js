@@ -3,6 +3,7 @@ import { Container, Header, Content, Card, CardItem, Text, Body, List, ListItem,
 import { View, Dimensions, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import axios from 'axios';
 import Comments from '../ClubBoard/Comments';
+import { DefaultImg } from '../../router';
 export default class CommentCard extends Component {
   constructor(props) {
     super(props);
@@ -22,7 +23,7 @@ export default class CommentCard extends Component {
    _renderItem = () => {
      return (
        this.state.comments.map((data) => {
-       let url = 'https://s3.amazonaws.com/clubster-123/' + data.userID.image;
+       let url = (data.userID.image ? 'https://s3.amazonaws.com/clubster-123/' + data.userID.image : DefaultImg);
        return (
          <ListItem avatar key={data._id}>
            <Left>

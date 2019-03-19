@@ -23,7 +23,7 @@ exports.createRide = (req, res) => {
   if (rideRemove) {
     Rides.findByIdAndUpdate(rideRemove).then(ride => {
       if (ride)
-        Rides.removeRider(rideID, _id);
+        Rides.removeRider(ride._id, _id);
     })
   }
   newRide.save().then(ride => {

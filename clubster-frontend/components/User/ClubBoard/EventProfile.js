@@ -96,7 +96,7 @@ export default class EventProfile extends Component {
         return (
             <ListItem thumbnail>
                 <Left>
-                    <Thumbnail source={{ uri: 'https://s3.amazonaws.com/clubster-123/' + item.image  }}/>
+                    <Thumbnail source={{ uri: (item.image ? 'https://s3.amazonaws.com/clubster-123/' + item.image : DefaultImg)  }}/>
                 </Left>
                 <Body>
                     <Text>{item.name}</Text>
@@ -122,7 +122,7 @@ export default class EventProfile extends Component {
         return (
             <ListItem thumbnail>
                 <Left>
-                    <Thumbnail source={{ uri: 'https://s3.amazonaws.com/clubster-123/' + item.image }}/>
+                    <Thumbnail source={{ uri: (item.image ? 'https://s3.amazonaws.com/clubster-123/' + item.image : DefaultImg) }}/>
                 </Left>
                 <Body>
                     <Text>{item.name}</Text>
@@ -158,38 +158,46 @@ export default class EventProfile extends Component {
 
         if (userID) {
             this.state.rides.map(ride => {
-                if (ride.driverID._id == userID)
+                if (ride.driverID._id == userID) {
                     skip = true;
-                ride.ridersID.map(rider => {
-                    if (rider._id == userID)
+                    return;
+                } ride.ridersID.map(rider => {
+                    if (rider._id == userID) {
                         removeFromRide = ride._id;
+                        return;
+                    }
                 });
             })
         } else console.log('userid is null')
         if (skip) {
             this.closeRidesModal();
             return;
+        } else {
+            const { seats, rideTime, rideLocation, description } = this.state;
+            axios.post(`http://localhost:3000/api/${this.event._id}/createRide`, {
+                passengerSeats: seats,
+                time: rideTime,
+                location: rideLocation,
+                description: description,
+                rideRemove: removeFromRide
+            }).then((response) => {
+                if (response.status == 201 || response.status == 200) {
+                    var newRide = response.data.ride;
+                    newRide.driverID = response.data.driver;
+                    this.setState({
+                        form: false,
+                        rides: this.state.rides.concat(newRide),
+                        seats: '',
+                        rideTime: '',
+                        rideLocation: '',
+                        description: ''
+                    });
+                    if (removeFromRide)
+                        this.closeRidesModal();
+                }
+            })
+            .catch((err) => { console.log('error creating new ride'); console.log(err) });
         }
-        const { seats, rideTime, rideLocation, description } = this.state;
-        axios.post(`http://localhost:3000/api/${this.event._id}/createRide`, {
-            passengerSeats: seats,
-            time: rideTime,
-            location: rideLocation,
-            description: description,
-            rideRemove: removeFromRide
-        }).then((response) => {
-            if (response.status == 201 || response.status == 200) {
-                var newRide = response.data.ride;
-                newRide.driverID = response.data.driver;
-                this.setState({
-                    form: false,
-                    rides: this.state.rides.concat(newRide)
-                });
-                if (removeFromRide)
-                    this.closeRidesModal();
-            }
-        })
-        .catch((err) => { console.log('error creating new ride'); console.log(err) });
     }
 
     addRider = async (item) => {
@@ -225,7 +233,7 @@ export default class EventProfile extends Component {
                 <ListItem thumbnail style={styles.listStyle}>
                     <ScrollView horizontal>
                         <Left>
-                            <Thumbnail large source={{ uri: 'https://s3.amazonaws.com/clubster-123/' + item.driverID.image }} />
+                            <Thumbnail large source={{ uri: (item.driverID.image ? 'https://s3.amazonaws.com/clubster-123/' + item.driverID.image : DefaultImg) }} />
                         </Left>
                         <Body>
                             <FlatList
@@ -250,7 +258,7 @@ export default class EventProfile extends Component {
     _renderRider = ({ item }) => {
         return (
             <ListItem thumbnail>
-                <Thumbnail small source={{ uri: 'https://s3.amazonaws.com/clubster-123/' + item.image  }}/>
+                <Thumbnail small source={{ uri: (item.image ? 'https://s3.amazonaws.com/clubster-123/' + item.image : DefaultImg) }}/>
             </ListItem>
         );
     }

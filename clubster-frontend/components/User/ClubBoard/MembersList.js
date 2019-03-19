@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 
 import axios from 'axios';
+import { DefaultImg } from '../../router';
 
 
 export default class MembersList extends Component {
@@ -47,8 +48,7 @@ export default class MembersList extends Component {
   }
 
   renderItem = ({ item }) => {
-    if (item.member.image)
-      url = 'https://s3.amazonaws.com/clubster-123/' + item.member.image;
+    var url = (item.member.image ? 'https://s3.amazonaws.com/clubster-123/' + item.member.image : DefaultImg);
     return (
       <Card>
         <CardItem style={styles.cardStyle}>

@@ -145,11 +145,6 @@ class ShowEvents extends Component {
 
   _renderItem = ({ item }) => {
     var hostURL;
-    if (item.image)
-      hostURL = 'https://s3.amazonaws.com/clubster-123/' + item.host.image;
-    else
-      hostURL = DefaultImg;
-
     var eventURL;
     if (item.image != DefaultImg)  
       eventURL = 'https://s3.amazonaws.com/clubster-123/' + item.image;
