@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
     marginTop: 6,
-    height: Dimensions.get('window').height/2
+    height: Dimensions.get('window').height/3
   },
   // Item
   item: {
