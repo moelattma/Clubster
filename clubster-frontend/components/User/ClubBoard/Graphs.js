@@ -38,7 +38,6 @@ export default class Graphs extends Component {
 
   async getOrganization() {
     const { _id } = this.props.screenProps;
-    console.log('hiiii ', _id);
     this.setState({ loading: true })
     await axios.get(`http://localhost:3000/api/organizations/getOrg/${_id}`)
       .then((response) => {

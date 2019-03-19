@@ -23,7 +23,6 @@ export default class SideGraph extends Component {
   }
 
   componentDidMount() {
-    console.log('Hi', this.props);
     if(!this.props.club.members) {
       return <Expo.AppLoading />;
     }
@@ -36,7 +35,6 @@ export default class SideGraph extends Component {
   render () {
    const { members, comments, likes } = this.state;
    if(members == NaN) {
-     console.log('Hi!');
      return <Expo.AppLoading />;
    }
    if(members == NaN) {

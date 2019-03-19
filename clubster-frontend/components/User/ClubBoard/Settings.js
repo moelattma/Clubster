@@ -78,10 +78,8 @@ export default class Settings extends Component {
     };
 
     async componentWillMount() {
-        console.log('in componentwillmount!')
         const { _id } = this.props.screenProps;
         await axios.get(`http://localhost:3000/api/organizations/getOrg/${_id}`).then((response) => {
-            console.log(response.data.org)
             const { president, name, description, gallery, image } = response.data.org;
             this.setState({
                 president, name, description, img: 'https://s3.amazonaws.com/clubster-123/' + image,

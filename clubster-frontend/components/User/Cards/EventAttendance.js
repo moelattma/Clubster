@@ -69,7 +69,6 @@ export default class EventAttendance extends Component {
     }
 
     componentDidMount() {
-      console.log('Hi from events ', this.props);
       let activeMembers = 0;
       if(!this.props.club && !this.props.club.events) {
         return <Expo.AppLoading />;

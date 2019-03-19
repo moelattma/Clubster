@@ -17,7 +17,6 @@ export default class ActiveChart extends Component {
   }
 
   componentDidMount() {
-    console.log('Hi', this.props);
     let activeMembers = 0;
     if(!this.props.club.members) {
       return <Expo.AppLoading />;
@@ -32,7 +31,6 @@ export default class ActiveChart extends Component {
 
   }
   render() {
-    console.log('activePercentage ', this.state.activePercentage);
     let percentage = this.state.activePercentage;
     return (
       <View style={styles.container}>
