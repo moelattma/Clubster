@@ -83,17 +83,21 @@ Organization.methods.updateInfoByIndex = function(index) {
     }
 }
 
-Organization.statics.modifyActiveScore = async function(organizationID, memberID, value, type) {
+Organization.statics.modifyActiveScore = async function(organizationID, memberID, type) {
+  console.log(organizationID, memberID, type);
   let prevValue = 0;
-  await this.findByIdAndUpdate(organizationID).populate('members').then((organization)=> {
+  await this.findByIdAndUpdate(organizationID).then((organization)=> {
+    console.log(organization);
     for(let i = 0;i<organization.members.length;i++) {
-      if(organization.members[i]._id == memberID) {
+      console.log((organization.members[i].member).equals(memberID));
+      if((organization.members[i].member).equals(memberID)) {
         prevValue = organization.members[i].activeScore;
         break;
       }
     }
   });
-  (type == -1) ? prevValue -= value : prevValue += value;
+  console.log('This is prev ', prevValue);
+  (type == -1) ? prevValue -= 1 : prevValue += 1;
   if(prevValue < 0) {
     prevValue = 0;
   }

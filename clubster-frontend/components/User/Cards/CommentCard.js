@@ -48,9 +48,6 @@ export default class CommentCard extends Component {
             <List>
               {this._renderItem()}
             </List>
-            <CardItem footer bordered onPress={() => this.props.navigation.navigate('Comments', { comments: this.state.comments })}>
-              <Text>See All</Text>
-            </CardItem>
           </Card>
         </Content>
     );
