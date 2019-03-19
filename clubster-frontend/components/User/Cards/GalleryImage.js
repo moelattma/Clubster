@@ -27,10 +27,8 @@ export default class GalleryImage extends Component {
           source= {{uri: uri}}
           style={{
             height: 160,
-            left: 5,
             position: 'absolute',
             resizeMode: 'cover',
-            top: 5,
             width: WIDTH / 3,
           }}
         />

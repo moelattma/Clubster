@@ -251,18 +251,3 @@ exports.addCommentToEvent = (req, res) => {
 			}
 	})
 }
-
-exports.addPhotoToEvent = (req, res) => {
-	const { imageURL } = req.body;
-	const { eventID } = req.params;
-	Events.findOneAndUpdate(
-		{ _id: eventID },
-		{ $push: { photos: imageURL } },
-		function (error, event) {
-			if (error) {
-				console.log(error);
-			} else {
-				return res.status(201).json({ 'photos':event.photos });
-			}
-		});
-}

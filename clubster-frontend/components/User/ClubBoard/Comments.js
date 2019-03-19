@@ -40,7 +40,6 @@ export default class Comments extends Component {
  _renderItem() {
    return this.state.comments.map((data, i) => {
      let url = 'https://s3.amazonaws.com/clubster-123/' + data.userID.image;
-    //  console.log(data);
      return (
        <ListItem key = {i} avatar>
          <Left>
