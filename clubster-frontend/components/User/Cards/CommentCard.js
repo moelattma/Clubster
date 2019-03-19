@@ -23,7 +23,6 @@ export default class CommentCard extends Component {
      return (
        this.state.comments.map((data) => {
        let url = 'https://s3.amazonaws.com/clubster-123/' + data.userID.image;
-      //  console.log(data);
        return (
          <ListItem avatar key={data._id}>
            <Left>

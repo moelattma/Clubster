@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { FlatList, Dimensions } from 'react-native';
 import { Font, ImagePicker, Permissions, Constants } from 'expo';
 import GalleryImage from './GalleryImage';
-import { Button } from "native-base";
+import { View } from "native-base";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { accessKeyId, secretAccessKey } from '../../../keys/keys';
 import v1 from 'uuid/v1';
@@ -74,8 +74,6 @@ export default class Gallery extends Component {
             photos.map(photo => {
               newPhotos.push(photo);
             });
-            if (newPhotos.length == 6 && !newPhotos[5].addPhotoIcon)
-              console.log("too many photos!");
             newPhotos[newPhotos.length - 1] = imageURL;
             if (newPhotos.length < 6)
               newPhotos.push({ addPhotoIcon: true })
@@ -90,9 +88,9 @@ export default class Gallery extends Component {
     if (item.addPhotoIcon) {
       if (this.props.isAdmin || this.props.isAdmin == undefined)
         return (
-          <Button style={{ justifyContent: 'center', alignSelf: 'center', alignContent: 'center', backgroundColor: 'transparent', borderRadius: 0, height: 160, width: WIDTH / 3 - 10 }} >
-            <FontAwesome style={{ alignSelf: 'center' }} name="plus" size={18} color={'black'} onPress={() => this.onSubmit()} />
-          </Button>
+          <View style={{ justifyContent: 'center', alignContent: 'center', alignItems: 'center', backgroundColor: 'transparent', height: 160, width: WIDTH / 3 - 10 }} >
+            <FontAwesome style={{ justifyContent: 'center', alignContent: 'center' }} name="plus" size={18} color={'black'} onPress={() => this.onSubmit()} />
+          </View>
         )
       else return null;
     } 

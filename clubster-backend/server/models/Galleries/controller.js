@@ -6,10 +6,7 @@ exports.replacePhoto = (req, res) => {
 		if (!gallery) {
 			return res.status(404).json({ 'Error': 'error', 'image': null });
 		} else {
-			Galleries.findById(req.params.galleryID).then((gallery) => {
-				console.log(gallery);
-				return res.status(201).json({ 'image': req.body.imageURL, 'imageRemoved': req.body.removeImageURL });
-			})
+			return res.status(201).json({ 'image': req.body.imageURL, 'imageRemoved': req.body.removeImageURL });
 		}
 	});
 };

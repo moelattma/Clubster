@@ -29,9 +29,7 @@ export default class Comments extends Component {
       text:text
     }).then((response) => {
       comments.push(response.data.comment);
-      console.log(comments);
       this.setState({comments: comments});
-
     });
   }
 

@@ -27,32 +27,27 @@ export default class Chat extends Component {
       axios.get(`http://localhost:3000/api/conversations/${screenProps._id}`).then((response) => {
         this.setState({ messages: response.data.conversation.messages.reverse() });
         this.setState({ userId: response.data.userId });
-        console.log(this.state.userId);
       }).catch((err) => console.log(err));
     }
 
     onSend(messages = []) {
       const { screenProps } = this.props;
-      console.log(screenProps);
       var text = messages[messages.length - 1].text;
 
       axios.post(`http://localhost:3000/api/messages/${screenProps._id}`, {
         text: text
       }).then((message) => {
         this.socket.emit('input', text);
-        console.log(message[0].text);
       }).catch((err) => console.log(err));
     }
 
     submitChatMessage(messages = []) {
       const { screenProps } = this.props;
-      console.log(screenProps);
       var text = messages[messages.length - 1].text;
       axios.post(`http://localhost:3000/api/messages/${screenProps._id}`, {
         text: text
       }).then((message) => {
         this.socket.emit("input", messages[0]);
-        console.log(this.state.messages);
       }).catch((err) => console.log(err));
     }
 

@@ -13,7 +13,7 @@ export default class GalleryImage extends Component {
     return (
       <Button
         onPress={() => onPress(index)}
-        style={{
+        style={{ 
           backgroundColor: 'transparent',
           borderRadius: 0,
           height: 160,

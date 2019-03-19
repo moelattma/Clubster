@@ -40,9 +40,7 @@ exports.joinRide = (req, res) => {
   const { _id } = req.user;
   const { rideRemove } = req.body;
   if (rideRemove) {
-    console.log(rideRemove);
     Rides.findByIdAndUpdate(rideRemove).then(ride => {
-      console.log(ride);
       if (ride) 
         Rides.removeRider(rideID, _id);
     })
