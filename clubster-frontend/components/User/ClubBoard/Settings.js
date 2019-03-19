@@ -147,7 +147,7 @@ export default class Settings extends Component {
                         source={{ uri: this.state.img }} />
                 </TouchableOpacity>
 
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', margin:7 }}>
                     <Button bordered style={styles.buttonText} onPress={() => this.aboutClicked()}>
                         <Text> About </Text>
                     </Button>

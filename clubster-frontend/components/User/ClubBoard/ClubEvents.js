@@ -146,7 +146,7 @@ class ShowEvents extends Component {
   _renderItem = ({ item }) => {
     var hostURL;
     var eventURL;
-    if (item.image != DefaultImg)  
+    if (item.image && item.image != null)  
       eventURL = 'https://s3.amazonaws.com/clubster-123/' + item.image;
     else
       eventURL = DefaultImg;
@@ -248,7 +248,7 @@ class CreateClubEvent extends Component {
       date: '',
       location: '',
       time: '',
-      imageURL: 'https://facebook.github.io/react/logo-og.png',
+      imageURL: null,
       uri: 'https://image.flaticon.com/icons/png/512/128/128423.png',
       isImageUploaded: false
     }
