@@ -11,6 +11,8 @@ import {
 import { ImagePicker, Permissions, Constants } from 'expo';
 import { Font, AppLoading } from "expo";
 
+const { WIDTH } = Dimensions.get('window');
+
 export default class SideGraph extends Component {
   constructor (props) {
     super(props)
@@ -33,15 +35,15 @@ export default class SideGraph extends Component {
   }
 
   render () {
-   const { members, comments, likes } = this.state;
-   if(members == NaN) {
-     return <Expo.AppLoading />;
-   }
-   if(members == NaN) {
-     this.setState({members:0});
-     this.setState({comments:0});
-     this.setState({likes:0});
-   }
+    const { members, comments, likes } = this.state;
+    if(members == NaN) {
+      return <Expo.AppLoading />;
+    }
+    if(members == NaN) {
+      this.setState({members:0});
+      this.setState({comments:0});
+      this.setState({likes:0});
+    }
 
    return (
      <View style={styles.container}>
@@ -49,21 +51,21 @@ export default class SideGraph extends Component {
        <View style={styles.item}>
          <Text style={styles.label}>Members: </Text>
          <View style={styles.data}>
-           {(members) ? <Animated.View style={[styles.bar, styles.rebounds, {width: members}]} /> : <Animated.View style={[styles.bar, styles.rebounds, {width: 0}]} />
+           {(members) ? <Animated.View style={[styles.bar, styles.rebounds, {width: members }]} /> : <Animated.View style={[styles.bar, styles.rebounds, {width: 0}]} />
            }
          </View>
        </View>
        <View style={styles.item}>
          <Text style={styles.label}>Comments: </Text>
          <View style={styles.data}>
-           {(comments) ? <Animated.View style={[styles.bar, styles.rebounds, {width: comments}]} /> : <Animated.View style={[styles.bar, styles.rebounds, {width: 0}]} />
+           {(comments) ? <Animated.View style={[styles.bar, styles.rebounds, {width: comments }]} /> : <Animated.View style={[styles.bar, styles.rebounds, {width: 0}]} />
            }
          </View>
        </View>
        <View style={styles.item}>
          <Text style={styles.label}>Likes </Text>
          <View style={styles.data}>
-           {(likes) ? <Animated.View style={[styles.bar, styles.rebounds, {width: 1}]} /> : <Animated.View style={[styles.bar, styles.rebounds, {width: 0}]} />
+           {(likes) ? <Animated.View style={[styles.bar, styles.rebounds, {width: likes }]} /> : <Animated.View style={[styles.bar, styles.rebounds, {width: 0}]} />
            }
          </View>
        </View>

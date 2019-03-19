@@ -59,7 +59,7 @@ exports.handleGoing = (req, res) => {
 						if (error) {
 							console.log(error);
 						} else {
-							Organization.modifyActiveScore(event.organization,idOfAttender, event.value, -1);
+							Organization.modifyActiveScore(event.organization,idOfAttender, -1);
 							return res.status(201).json({ event });
 						}
 					});
@@ -72,7 +72,7 @@ exports.handleGoing = (req, res) => {
 						if (error) {
 							console.log(error);
 						} else {
-							Organization.modifyActiveScore(event.organization,idOfAttender, event.value, 1);
+							Organization.modifyActiveScore(event.organization,idOfAttender, 1);
 							return res.status(201).json({ event });
 						}
 					});
@@ -115,6 +115,7 @@ exports.addEvent = (req, res) => {
 				//write clubEvent to db
 				clubEvent.save().then((event) => {
 					// Add event's id to organization's events array
+					Organization.modifyActiveScore(event.organization._id,req.user._id, 1);
 					Organization.addEventToClub(organizationID, event._id);
 					Organization.increaseLikes(event.organization);
 					// Find the Event whose id = event's id and populate it's image
@@ -250,19 +251,4 @@ exports.addCommentToEvent = (req, res) => {
 				return res.status(400).json({ 'Error': 'No comments found' });
 			}
 	})
-}
-
-exports.addPhotoToEvent = (req, res) => {
-	const { imageURL } = req.body;
-	const { eventID } = req.params;
-	Events.findOneAndUpdate(
-		{ _id: eventID },
-		{ $push: { photos: imageURL } },
-		function (error, event) {
-			if (error) {
-				console.log(error);
-			} else {
-				return res.status(201).json({ 'photos':event.photos });
-			}
-		});
 }

@@ -11,7 +11,6 @@ export default class InformationCard extends Component {
   render() {
     let info = (this.props.eventInfo) ? (this.props.eventInfo) : (this.props.userInfo) ? (this.props.userInfo): (this.props.clubInfo);
     let eventNum = (info == this.props.eventInfo) ? 1 : (info == this.props.clubInfo) ? 2: 0;
-    // console.log('InformationCard. eventNum ', eventNum);
     if(eventNum === 1) {
       return(
         <Content padder>
@@ -51,7 +50,6 @@ export default class InformationCard extends Component {
       return(
         <Content padder>
           <Card>
-
             <CardItem>
               <Text>Name: {info.name}</Text>
             </CardItem>
@@ -64,7 +62,6 @@ export default class InformationCard extends Component {
             <CardItem>
               <Text>Bio: {info.biography}</Text>
             </CardItem>
-
           </Card>
         </Content>
       )

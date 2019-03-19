@@ -38,7 +38,7 @@ exports.isMember = (req, res) => {
 	const { orgID } = req.body;
 	let userID = req.user._id;
 
-	Organization.findByIdAndUpdate(orgID).populate('imageId').then((organization) => {
+	Organization.findByIdAndUpdate(orgID).then((organization) => {
 		if (!organization)
 			return res.status(400).json({ 'Error': 'No organization found' })
 		const { members } = organization;
@@ -46,11 +46,11 @@ exports.isMember = (req, res) => {
 		members.forEach(element => {
 			if (userID.equals(element.member)) isMember = true;
 		});
-		var noteStatus;
-		Notification.findOne({ $and: [{ idOfSender: req.user._id }, { idOfOrganization: orgID }, { $or: [{ type: "ORG_JOIN_ADMIN" }, { type: "ORG_JOIN_MEMBER" }] }] }).then((notification) => {
-			(notification && notification.isActive) ? noteStatus = true : noteStatus = false;
-		})
-		return res.status(201).json({ 'isMember': isMember || noteStatus, 'organization': organization });
+		if (!isMember) {
+			Notification.findOne({ $and: [{ idOfSender: req.user._id }, { idOfOrganization: orgID }, { $or: [{ type: "ORG_JOIN_ADMIN" }, { type: "ORG_JOIN_MEMBER" }] }] }).then((notification) => {
+				return res.status(201).json({ 'isMember': (notification && notification.isActive), 'organization': organization });
+			})
+		} else return res.status(201).json({ 'isMember': isMember, 'organization': organization });
 	});
 }
 
@@ -155,7 +155,7 @@ exports.retrieveOrg = (req, res) => {
 		}
 	});
 
-	Organization.findOne({ _id: orgID }).populate('gallery').populate('imageId').populate('events', 'going name').then((organization) => {
+	Organization.findOne({ _id: orgID }).populate('gallery').populate('events', 'going name').then((organization) => {
 		if (organization) {
 			return res.status(201).json({ 'org': organization, 'idOfUser': req.user._id });
 		}

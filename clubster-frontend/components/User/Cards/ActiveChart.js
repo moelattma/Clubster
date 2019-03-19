@@ -22,7 +22,7 @@ export default class ActiveChart extends Component {
       return <Expo.AppLoading />;
     }
     for(let i = 0;i<this.props.club.members.length;i++) {
-      if(this.props.club.members[i].activeScore >= 5) {
+      if(this.props.club.events.length != 0 && this.props.club.members[i].activeScore >= 0.6*this.props.club.events.length) {
         activeMembers++;
       }
     }
@@ -34,6 +34,7 @@ export default class ActiveChart extends Component {
     let percentage = this.state.activePercentage;
     return (
       <View style={styles.container}>
+        <Text style={{ marginBottom: 5, fontWeight: 'bold', fontSize:18 }} >Member Activity</Text>
         <View>
           <Pie
             radius={50}

@@ -152,6 +152,15 @@ class ShowClubs extends Component {
 
   render() {
     if (!this.props.navigation.state.params || this.props.navigation.state.params.showAdmin) {
+      if (!this.state.loading && (!this.state.clubsAdmin || this.state.clubsAdmin.length == 0))
+        return (
+            <ScrollView refreshControl={<RefreshControl
+              refreshing={this.state.loading}
+              onRefresh={this.getUserClubs}
+            />}>
+            <Text style={[{ flex: 1 }, styles.noneText ]}>You are not an admin of any clubs</Text>
+            </ScrollView>
+        )
       return (
         <ScrollView refreshControl={<RefreshControl
           refreshing={this.state.loading}
@@ -169,6 +178,15 @@ class ShowClubs extends Component {
       )
     }
     else {
+      if (!this.state.loading && (!this.state.clubsMember || this.state.clubsMember.length == 0))
+        return (
+          <ScrollView refreshControl={<RefreshControl
+            refreshing={this.state.loading}
+            onRefresh={this.getUserClubs}
+          />}>
+            <Text style={[{ flex: 1 }, styles.noneText ]}>You are not a member of any clubs</Text>
+          </ScrollView>
+        )
       return (
         <ScrollView refreshControl={<RefreshControl
           refreshing={this.state.loading}
@@ -446,5 +464,12 @@ const styles = StyleSheet.create({
   },
   meetupCardMetaDate: {
     fontSize: 13
+  },
+  noneText: {
+      textAlign: 'center',
+      textAlignVertical: 'center',
+      color: 'black',
+      fontSize: 16,
+      marginTop: 10
   }
 });

@@ -30,7 +30,6 @@ export default class Comments extends Component {
     }).then((response) => {
       comments.push(response.data.comment);
       this.setState({comments: comments});
-
     });
   }
 

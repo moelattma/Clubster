@@ -5,7 +5,6 @@ const Message = require('./model');
 exports.insertMessage = (req, res) => {
   const { text } = req.body;
 	const {groupId} = req.params;
-  console.log(groupId);
   let newMessage = new Message({
     text: text,
     createdAt: Date.now(),
@@ -31,7 +30,6 @@ exports.insertMessage = (req, res) => {
 
       });
     }
-    console.log('JIIOHIO ', conversation);
     newMessage.save().then((messageObj) => {
       Conversations.addMessage(messageObj, conversation._id);
       Message.findOne({_id: messageObj._id}).populate('user').then((message) => {

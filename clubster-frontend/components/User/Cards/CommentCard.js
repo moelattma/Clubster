@@ -23,7 +23,6 @@ export default class CommentCard extends Component {
      return (
        this.state.comments.map((data) => {
        let url = 'https://s3.amazonaws.com/clubster-123/' + data.userID.image;
-      //  console.log(data);
        return (
          <ListItem avatar key={data._id}>
            <Left>
@@ -49,9 +48,6 @@ export default class CommentCard extends Component {
             <List>
               {this._renderItem()}
             </List>
-            <CardItem footer bordered onPress={() => this.props.navigation.navigate('Comments', { comments: this.state.comments })}>
-              <Text>See All</Text>
-            </CardItem>
           </Card>
         </Content>
     );
