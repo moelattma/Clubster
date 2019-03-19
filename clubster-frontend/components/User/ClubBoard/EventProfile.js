@@ -10,7 +10,6 @@ import { Container, Card, CardItem, Form, Content, ListItem, Thumbnail, Item,
          Text, Button, Icon, Left, Body, Right, Input } from 'native-base';
 import CommentCard from '../Cards/CommentCard';
 import InformationCard from '../Cards/InformationCard';
-import ImageGrid from '../Cards/ImageGrid';
 import Gallery from '../Cards/Gallery';
 import Modal from 'react-native-modal';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -94,7 +93,6 @@ export default class EventProfile extends Component {
     closeLikersModal() { this.setState({ likersModal: false }) }
 
     _renderLike = ({ item }) => {
-        console.log(item);
         return (
             <ListItem thumbnail>
                 <Left>
@@ -109,10 +107,8 @@ export default class EventProfile extends Component {
 
     // Going
     openGoingModal() {
-        console.log(this.event);
         axios.get(`http://localhost:3000/api/events/${this.event._id}/going`)
             .then(response => {
-                console.log(response.data);
                 this.setState({ 
                     goingModal: true,
                     going: response.data.going
@@ -204,17 +200,22 @@ export default class EventProfile extends Component {
             this.state.rides.map(ride => {
                 if (ride.driverID._id == userID) {
                     skip = true;
+                    return;
                 } else {
                     ride.ridersID.map(rider => {
-                        if (rider._id == userID)
+                        if (rider._id == userID) {
+                            if (ride._id == item._id) skip = true;
                             removeFromRide = ride._id;
+                            return;
+                        }
                     })
                 }
             });
         } else console.log('userid is null')
-        if (skip) return;
-        await axios.post(`http://localhost:3000/api/${item._id}/joinRide`, { rideRemove: removeFromRide });
-        this.closeRidesModal();
+        if (!skip) {
+            await axios.post(`http://localhost:3000/api/${item._id}/joinRide`, { rideRemove: removeFromRide });
+            this.closeRidesModal();
+        } else this.closeRidesModal();
     }
 
     _renderRide = ({ item }) => {

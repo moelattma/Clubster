@@ -1,11 +1,9 @@
 // Gallery.js
 import React, { Component } from 'react';
 import { FlatList, Dimensions } from 'react-native';
-import PropTypes from 'prop-types';
 import { Font, ImagePicker, Permissions, Constants } from 'expo';
-import ImageViewer from 'ImageViewer';
 import GalleryImage from './GalleryImage';
-import { Container, Header, Content, Card, CardItem, Text, Body } from "native-base";
+import { View } from "native-base";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { accessKeyId, secretAccessKey } from '../../../keys/keys';
 import v1 from 'uuid/v1';
@@ -61,7 +59,8 @@ export default class Gallery extends Component {
         await RNS3.put(file, options).then((response) => {
             imageURL = response.body.postResponse.key;
         }).catch((err) => { console.log(err) });
-        axios.post(`http://localhost:3000/api/galleries/${this.state.galleryID}/newPhoto`, { imageURL, removeImageURL }).then((response) => {
+        axios.post(`http://localhost:3000/api/galleries/${this.state.galleryID}/` + (item ? 'replacePhoto' : 'addPhoto'), 
+                                                                      { imageURL, removeImageURL }).then(() => {
           const { photos } = this.state;
           var newPhotos = [];
           if (removeImageURL) {
@@ -75,8 +74,6 @@ export default class Gallery extends Component {
             photos.map(photo => {
               newPhotos.push(photo);
             });
-            if (newPhotos.length == 6 && !newPhotos[5].addPhotoIcon)
-              console.log("too many photos!");
             newPhotos[newPhotos.length - 1] = imageURL;
             if (newPhotos.length < 6)
               newPhotos.push({ addPhotoIcon: true })
@@ -88,8 +85,15 @@ export default class Gallery extends Component {
   }
 
   _renderItem = ({ item, index }) => {
-    if (item.addPhotoIcon)
-      return <FontAwesome name="plus" size={18} color={'black'} onPress = {() => this.onSubmit()} />;
+    if (item.addPhotoIcon) {
+      if (this.props.isAdmin || this.props.isAdmin == undefined)
+        return (
+          <View style={{ justifyContent: 'center', alignContent: 'center', alignItems: 'center', backgroundColor: 'transparent', height: 160, width: WIDTH / 3 - 10 }} >
+            <FontAwesome style={{ justifyContent: 'center', alignContent: 'center' }} name="plus" size={18} color={'black'} onPress={() => this.onSubmit()} />
+          </View>
+        )
+      else return null;
+    } 
     return (
       <GalleryImage
         index={index}
@@ -113,26 +117,3 @@ export default class Gallery extends Component {
     );
   }
 }
-
-/*<View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-            }}
-          >
-            {this.state.images.map((image, idx) => {
-                return (<GalleryImage
-                  index={idx}
-                  key={idx}
-                  onPress={this.showLightbox}
-                  uri={'https://s3.amazonaws.com/clubster-123/' + image}
-                />
-              )}
-            )}
-            <ImageViewer
-              shown={shown}
-              imageUrls={images}
-              onClose={this.hideLightbox}
-              index={index}
-            />
-          </View>*/

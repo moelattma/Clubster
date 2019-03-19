@@ -49,7 +49,7 @@ export default class Profile extends Component {
             const { name, image, major, biography, hobbies, gallery } = response.data.profile;
             if (response.data.profile) {
                 this.setState({ name: name, major: major ? major: '', biography: biography ? biography : '', galleryID: gallery._id,
-                    hobbies: hobbies ? hobbies.join(" ") : '', img: 'https://s3.amazonaws.com/clubster-123/' + image, 
+                    hobbies: hobbies ? hobbies.join(" ") : '', img: image ? 'https://s3.amazonaws.com/clubster-123/' + image : this.state.img, 
                     photos: gallery.photos.length > 5 ? gallery.photos.slice(0, 6) : gallery.photos.concat({ addPhotoIcon: true })});
             }
         });

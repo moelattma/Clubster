@@ -4,7 +4,6 @@ const PORT = process.env.PORT || 3000;
 
 exports.findMessages = (req, res) => {
 	const {groupId} = req.params;
-	console.log(groupId);
   Conversations.findOne({idOfClub: groupId}).populate({
          path    : 'messages',
          populate: [

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, StyleSheet, View, FlatList, Dimensions, ScrollView } from 'react-native';
+import { TouchableOpacity, StyleSheet, View, FlatList, Dimensions, ScrollView, RefreshControl } from 'react-native';
 import { Button, Text, Thumbnail } from 'native-base';
 import axios from 'axios';
 import { awsLink } from '../../keys/keys';
@@ -80,7 +80,6 @@ export default class Notifications extends Component {
             { _id: item._id, orgID: item.idOfOrganization, joinerID: item.idOfSender, joinType, accepted: true })
             .then((res) => {
                 if (res.status == 201)
-                console.log('response', response.status)
                     item.isActive = false;
             }).catch((err) => console.log(err));
 
@@ -120,14 +119,15 @@ export default class Notifications extends Component {
 
     render() {
         return (
-            <ScrollView style={styles.notificationPage}>
+            <ScrollView style={styles.notificationPage} refreshControl={<RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={() => this._getNotifications()}
+              />}>
                 <FlatList
                     data={this.state.notifications.reverse().slice(0, 20)}
                     renderItem={this._renderItem}
                     keyExtractor={(item) => item._id}
                     ItemSeparatorComponent={this.renderSeparator}
-                    refreshing={this.state.refreshing}
-                    onRefresh={() => this._getNotifications()}
                 />
             </ScrollView>
         );

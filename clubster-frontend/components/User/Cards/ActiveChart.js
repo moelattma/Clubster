@@ -17,13 +17,12 @@ export default class ActiveChart extends Component {
   }
 
   componentDidMount() {
-    console.log('Hi', this.props);
     let activeMembers = 0;
     if(!this.props.club.members) {
       return <Expo.AppLoading />;
     }
     for(let i = 0;i<this.props.club.members.length;i++) {
-      if(this.props.club.members[i].activeScore >= 5) {
+      if(this.props.club.events.length != 0 && this.props.club.members[i].activeScore >= 0.6*this.props.club.events.length) {
         activeMembers++;
       }
     }
@@ -32,10 +31,10 @@ export default class ActiveChart extends Component {
 
   }
   render() {
-    console.log('activePercentage ', this.state.activePercentage);
     let percentage = this.state.activePercentage;
     return (
       <View style={styles.container}>
+        <Text style={{ marginBottom: 5, fontWeight: 'bold', fontSize:18 }} >Member Activity</Text>
         <View>
           <Pie
             radius={50}

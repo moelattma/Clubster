@@ -17,7 +17,6 @@ exports.getSideGraphs = (req, res) => {
     ]
     Organization.aggregate(pipeline).exec((err, data) => {  
         if (err) console.log(err);
-        console.log("here ", data);
     });
 }
 

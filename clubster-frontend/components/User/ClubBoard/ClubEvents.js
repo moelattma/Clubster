@@ -156,6 +156,11 @@ class ShowEvents extends Component {
     else
       eventURL = DefaultImg;
 
+    if (item.host.image && item.host.image != null)
+      hostURL = 'https://s3.amazonaws.com/clubster-123/' + item.host.image;
+    else
+      hostURL = DefaultImg;
+
     return (
       <Card>
         <CardItem>

@@ -80,10 +80,8 @@ export default class Settings extends Component {
     };
 
     async componentWillMount() {
-        console.log('in componentwillmount!')
         const { _id } = this.props.screenProps;
         await axios.get(`http://localhost:3000/api/organizations/getOrg/${_id}`).then((response) => {
-            console.log(response.data.org)
             const { president, name, description, gallery, image } = response.data.org;
             this.setState({
                 president, name, description, img: 'https://s3.amazonaws.com/clubster-123/' + image,
@@ -137,9 +135,13 @@ export default class Settings extends Component {
     render() {
         return (
             <ScrollView>
-                <TouchableOpacity style={styles.editButton} onPress={this._showModal}>
-                    <FontAwesome name="edit" size={35} color={'black'} />
-                </TouchableOpacity>
+                {this.props.screenProps.isAdmin ? 
+                    <TouchableOpacity style={styles.editButton} onPress={this._showModal}>
+                        <FontAwesome name="edit" size={35} color={'black'} />
+                    </TouchableOpacity> 
+                    :
+                    null
+                }
 
                 <TouchableOpacity onPressIn={this.changePicture}>
                     <Thumbnail square style={{ height: 200, width: WIDTH }}
@@ -160,7 +162,8 @@ export default class Settings extends Component {
 
                 {(this.state.photosDisplay)
                     //Photos tab
-                    ? <Gallery galleryID={this.state.galleryID} photos={this.state.photos} onUpdatePhotos={this.onUpdatePhotos.bind(this)} />
+                    ? <Gallery galleryID={this.state.galleryID} photos={this.state.photos} isAdmin={this.props.screenProps.isAdmin} 
+                               onUpdatePhotos={this.onUpdatePhotos.bind(this)} />
                     //members tab
                     : ((this.state.members) ? <View>
                         <View style={{ margin: 10 }}>
