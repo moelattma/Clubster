@@ -12,6 +12,7 @@ import ClubsterNavigation from './User/ClubsterNavigation';
 import HomeNavigation from './Login/HomeNavigation';
 import AdminMemNavigation from './User/ClubBoard/AdminMemNavigation';
 
+import AgendaScreen from './User/AgendaScreen';
 import Notifications from './User/Notifications';
 import ClubsNavigation from './Clubs/ClubsNavigation';
 import Profile from './User/Profile';
@@ -70,6 +71,14 @@ export const HomeNavigator = createMaterialTopTabNavigator(
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }) => (
                     <MaterialIcons name={focused ? 'person' : 'person-outline'} size={30} color={tintColor} />
+                )
+            }
+        },
+        AgendaScreen: {
+            screen: AgendaScreen,
+            navigationOptions: {
+                tabBarIcon: ({ tintColor, focused }) => (
+                    <MaterialIcons name={focused ? 'calendar-today' : 'calendar-today'} size={30} color={tintColor} />
                 )
             }
         }
