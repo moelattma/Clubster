@@ -24,21 +24,7 @@ const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const CLUB_WIDTH = WIDTH * 4 / 10;
 const CLUB_HEIGHT = HEIGHT / 4;
 
-export default class ClubsPage extends Component {
-  static navigationOptions = ({ }) => {
-    return {
-      header: null
-    };
-  }
-
-  render() {
-    return (
-      <ClubPageNavigator screenProps={{ home: this.props.screenProps.home, clubPage: this.props.navigation }} />
-    );
-  }
-}
-
-class ShowClubs extends Component {
+export class ShowClubs extends Component {
   constructor(props) { // Initializing state
     super(props);
     
@@ -62,15 +48,15 @@ class ShowClubs extends Component {
       headerLeft: (
         <View style={{ marginLeft: 13 }}>
           <FontAwesome
-            name="plus" size={32} color={'black'}
+            name="plus" size={24} color={'black'}
             onPress={() => navigation.navigate('CreateClub', { refreshClubs: navigation.state.params.refreshClubs })} />
         </View>
       ),
       headerRight: (
         <View style={{ marginRight: 6 }}>
           <FontAwesome
-            name="search" size={32} color={'black'}
-            onPress={() => screenProps.clubPage.navigate('ClubSearch')} />
+            name="search" size={24} color={'black'}
+            onPress={() => navigation.navigate('ClubSearch')} />
         </View>
       ),
       headerTitle: (
@@ -207,7 +193,7 @@ class ShowClubs extends Component {
   }
 }
 
-class CreateClub extends Component {
+export class CreateClub extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -315,18 +301,6 @@ class CreateClub extends Component {
     );
   }
 }
-
-const ClubPageNavigator = createStackNavigator(
-  {
-    ShowClubs: { screen: ShowClubs },
-    CreateClub: { screen: CreateClub },
-  },
-  {
-    navigationOptions: {
-      headerBackImage: (<MaterialIcons name="arrow-back" size={32} color={'black'} />),
-    }
-  }
-)
 
 const styles = StyleSheet.create({
   eventContainer: {

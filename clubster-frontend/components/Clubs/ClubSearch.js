@@ -8,8 +8,10 @@ import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnai
 import { DefaultImg } from '../router';
 
 export default class SearchClubs extends PureComponent {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
+
+        props.navigation.setParams({ handleSearch: this.handleSearch });
 
         this.state = {
             loading: false,
@@ -19,6 +21,27 @@ export default class SearchClubs extends PureComponent {
             query: ""
         }
     }
+
+    static navigationOptions = ({ navigation }) => {
+        return {
+            header: (
+                <View style={styles.header}>
+                    <TouchableOpacity style={{ marginLeft: 14, marginRight: 4, marginTop: 3 }} onPress={() => navigation.navigate('ShowClubs')} >
+                        <MaterialIcons name="arrow-back" size={24} color={'black'} />
+                    </TouchableOpacity>
+                    <SearchBar
+                        containerStyle={{ flex: 1, alignSelf: 'center', backgroundColor: '#03A9F4', borderBottomWidth: 0 }}
+                        clearIcon
+                        placeholder="Search Clubs"
+                        lightTheme
+                        round
+                        onChangeText={text => navigation.state.params.handleSearch(text)}
+                        autoCorrect={false}
+                    />
+                </View>
+            ),
+        };
+      };
 
     componentWillMount() {
         this.getOrganizations();
@@ -40,25 +63,6 @@ export default class SearchClubs extends PureComponent {
         });
 
         this.setState({ query: text, organizations: data });
-    }
-
-    renderHeader = () => {
-        return (
-            <View style={styles.header}>
-                <TouchableOpacity style={{ marginLeft: 14, marginRight: 4, marginTop: 3 }} onPress={() => this.props.navigation.navigate('ClubPage')} >
-                    <MaterialIcons name="arrow-back" size={32} color={'black'} />
-                </TouchableOpacity>
-                <SearchBar
-                    containerStyle={{ flex: 1, alignSelf: 'center', backgroundColor: '#03A9F4', borderBottomWidth: 0 }}
-                    clearIcon
-                    placeholder="Search Clubs"
-                    lightTheme
-                    round
-                    onChangeText={this.handleSearch}
-                    autoCorrect={false}
-                />
-            </View>
-        );
     }
 
     renderSeparator = () => {
@@ -104,7 +108,7 @@ export default class SearchClubs extends PureComponent {
                 data={this.state.organizations.slice(0, 40)}
                 renderItem={this._renderItem}
                 keyExtractor={organization => organization.name}
-                ListHeaderComponent={this.renderHeader}
+                // ListHeaderComponent={this.renderHeader}
                 ItemSeparatorComponent={this.renderSeparator}
                 ListFooterComponent={this.renderFooter}
                 refreshing={this.state.loading}

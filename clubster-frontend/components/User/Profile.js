@@ -115,7 +115,7 @@ export default class Profile extends Component {
         try {
             await AsyncStorage.removeItem('jwtToken');
             delete axios.defaults.headers.common['Authorization'];
-            this.props.screenProps.logoutNavigation.navigate('Login');
+            this.props.navigation.navigate('Login');
         }
         catch (exception) {
             console.log(exception);

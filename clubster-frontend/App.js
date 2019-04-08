@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { AppRegistry, StyleSheet } from 'react-native';
 import {SafeAreaView} from 'react-navigation';
-import { AdminNavigator, LoginNavigator } from './components/router';
+import App from './components/router';
 console.ignoredYellowBox = ['Remote debugger'];
 import { YellowBox } from 'react-native';
 YellowBox.ignoreWarnings([
@@ -12,7 +12,7 @@ export default class Clubster extends Component {
   render() {
     return (
       <SafeAreaView forceInset={{ bottom: 'never' }} style={styles.SafeAreaView}>
-        <LoginNavigator/>
+        <App />
       </SafeAreaView>
     );
   }
