@@ -4,18 +4,21 @@ import axios from 'axios';
 import t from 'tcomb-form-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Modal from 'react-native-modal';
 import { createStackNavigator } from 'react-navigation';
 import tx from 'tcomb-additional-types';
 import { ImagePicker, Permissions, Constants } from 'expo';
 import { Font, AppLoading } from "expo";
 import converter from 'base64-arraybuffer';
-import { Container, Header, Content, Card,
-       CardItem, Thumbnail, Text, Button, Icon,
-        Left, Body, Right, Form, Item, Input } from 'native-base';
+import {
+  Container, Header, Content, Card,
+  CardItem, Thumbnail, Text, Button, Icon,
+  Left, Body, Right, Form, Item, Input
+} from 'native-base';
 import EventProfile from './EventProfile';
 import Comments from './Comments';
 import v1 from 'uuid/v1';
-import {accessKeyId, secretAccessKey} from '../../../keys/keys';
+import { accessKeyId, secretAccessKey } from '../../../keys/keys';
 import { RNS3 } from 'react-native-aws3';
 import { DefaultImg } from '../../router';
 
@@ -124,9 +127,9 @@ class ShowEvents extends Component {
     var id = this.state.idOfUser;
     axios.post(`http://localhost:3000/api/events/${item._id}/going`).then((response) => {
       clubEvents[i].going = response.data.event.going;
-      this.setState({clubEvents:clubEvents});
+      this.setState({ clubEvents: clubEvents });
     })
-    .catch((err) => {console.log('error getting Going'); console.log(err)});
+      .catch((err) => { console.log('error getting Going'); console.log(err) });
   }
 
   _handleLikers = (item) => {
@@ -138,15 +141,15 @@ class ShowEvents extends Component {
     var id = this.state.idOfUser;
     axios.post(`http://localhost:3000/api/events/${item._id}/likers`).then((response) => {
       clubEvents[i].likers = response.data.event.likers;
-      this.setState({clubEvents:clubEvents});
+      this.setState({ clubEvents: clubEvents });
     })
-    .catch((err) => {console.log('error posting to Likers'); console.log(err)});
+      .catch((err) => { console.log('error posting to Likers'); console.log(err) });
   }
 
   _renderItem = ({ item }) => {
     var hostURL;
     var eventURL;
-    if (item.image && item.image != null)  
+    if (item.image && item.image != null)
       eventURL = 'https://s3.amazonaws.com/clubster-123/' + item.image;
     else
       eventURL = DefaultImg;
@@ -191,8 +194,8 @@ class ShowEvents extends Component {
                   <Text>{item.likers.length} likes</Text>
                 </Button> :
                 <Button transparent onPress={() => this._handleLikers(item)}>
-                  <Icon name="thumbs-up" style={{color:'gray'}}/>
-                  <Text style={{color:'gray'}}>{item.likers.length} likes</Text>
+                  <Icon name="thumbs-up" style={{ color: 'gray' }} />
+                  <Text style={{ color: 'gray' }}>{item.likers.length} likes</Text>
                 </Button>
             }
           </Left>
@@ -210,8 +213,8 @@ class ShowEvents extends Component {
                   <Text>{item.going.length} going</Text>
                 </Button> :
                 <Button transparent onPress={() => this._handleGoing(item)}>
-                  <Icon name="star" style={{color:'gray'}}/>
-                  <Text style={{color:'gray'}}>{item.going.length} going</Text>
+                  <Icon name="star" style={{ color: 'gray' }} />
+                  <Text style={{ color: 'gray' }}>{item.going.length} going</Text>
                 </Button>
             }
           </Right>
@@ -250,7 +253,8 @@ class CreateClubEvent extends Component {
       time: '',
       imageURL: null,
       uri: 'https://image.flaticon.com/icons/png/512/128/128423.png',
-      isImageUploaded: false
+      isImageUploaded: false,
+      validModal: false
     }
   }
 
@@ -263,25 +267,25 @@ class CreateClubEvent extends Component {
     await this.askPermissionsAsync();
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
-          allowsEditing: true,
-          aspect: [4, 3],
-          base64: false,
+        allowsEditing: true,
+        aspect: [4, 3],
+        base64: false,
       });
-      if(result.cancelled)
+      if (result.cancelled)
         return;
       const key = `${v1()}.jpeg`;
       const file = {
-          uri: result.uri,
-          type: 'image/jpeg',
-          name: key
+        uri: result.uri,
+        type: 'image/jpeg',
+        name: key
       };
       const options = {
         keyPrefix: 's3/',
         bucket: 'clubster-123',
         region: 'us-east-1',
-        accessKey:accessKeyId,
+        accessKey: accessKeyId,
         secretKey: secretAccessKey,
-        successActionStatus:201
+        successActionStatus: 201
       }
       await RNS3.put(file, options).then((response) => {
         this.setState({
@@ -289,15 +293,15 @@ class CreateClubEvent extends Component {
           uri: 'https://s3.amazonaws.com/clubster-123/' + response.body.postResponse.key,
           isImageUploaded: true
         });
-      }).catch((err) => { console.log('upload image to aws failed');console.log(err) });
-    } catch (error) {console.log('library handle failed'); console.log(error);}
+      }).catch((err) => { console.log('upload image to aws failed'); console.log(err) });
+    } catch (error) { console.log('library handle failed'); console.log(error); }
   }
 
   createEvent = async () => {
     const { _id } = this.props.screenProps;
     const { name, date, time, description, location, imageURL } = this.state;
     var newEvent;
-    await axios.post('http://localhost:3000/api/events/'+_id+'/new', {
+    await axios.post('http://localhost:3000/api/events/' + _id + '/new', {
       name, date, time, description, location, imageURL
     }).then(response => {
       newEvent = response.data.event;
@@ -309,67 +313,118 @@ class CreateClubEvent extends Component {
     } else this.props.navigation.navigate('ShowEvents');
   }
 
+  // modal for when user enters invalid fields 
+  openValidModal() {
+    this.setState({
+      validModal: true
+    })
+  }
+
+  closeValidModal() { this.setState({ validModal: false }) }
+
+  validateInput = () => {
+    let errors = {};
+    if (this.state != null) {
+      const { name, date, time, location, description, imageURL } = this.state;
+
+      if (name == "")
+        errors['name'] = 'Please enter a name for the event'
+      if (date == "")
+        errors['date'] = 'Please enter a date'
+      if (time == "")
+        errors['time'] = 'Please enter a time'
+      if (location == "")
+        errors['location'] = 'Please enter a location'
+      if (description == "")
+        errors['description'] = 'Please enter a description'
+      this.setState({ errors });
+      if (Object.keys(errors).length == 0) {
+        this.createEvent();
+      }
+      else {
+        this.openValidModal();
+      }
+    }
+  }
+
   render() {
     const { name, date, time, description, location } = this.state;
+    let { errors = {} } = this.state;
 
     return (
       <Container>
-      <Form>
-        <Item>
-          <Input placeholder="Name"
-            label='name'
-            onChangeText={(name) => this.setState({ name })}
-            value={name}
-          />
-        </Item>
-        <Item>
-          <Input placeholder="Date"
-            label='date'
-            onChangeText={(date) => this.setState({ date })}
-            value={date}
-          />
-        </Item>
-        <Item>
-          <Input placeholder="Time"
-            label='time'
-            onChangeText={(time) => this.setState({ time })}
-            value={time}
-          />
-        </Item>
-        <Item>
-          <Input placeholder="Location"
-            label='location'
-            onChangeText={(location) => this.setState({ location })}
-            value={location}
-          />
-        </Item>
-        <Item>
-          <Input placeholder="Description"
-            label='description'
-            onChangeText={(description) => this.setState({ description })}
-            value={description}
-          />
-        </Item>
-      </Form>
-      <Content>
-      {this.state.isImageUploaded == false
-      ?
-      <TouchableOpacity onPress={this.useLibraryHandler}>
-        <Thumbnail square small style={styles.uploadIcon}
-            source={{uri: this.state.uri}} />
-      </TouchableOpacity>
-      :
-      <TouchableOpacity onPress={this.useLibraryHandler}>
-          <Thumbnail square style={styles.imageThumbnail}
-              source={{uri: this.state.uri}} />
-        </TouchableOpacity>
-      }
-      </Content>
+        <Modal isVisible={this.state.validModal}>
+          <View style={styles.modalStyle}>
+            <TouchableOpacity onPress={() => this.closeValidModal()}>
+              <Icon name="ios-arrow-dropleft"
+                style={styles.modalButton} />
+            </TouchableOpacity>
+            <Text style={styles.modalContent}>{errors.name}</Text>
+            <Text style={styles.modalContent}>{errors.date}</Text>
+            <Text style={styles.modalContent}>{errors.time}</Text>
+            <Text style={styles.modalContent}>{errors.location}</Text>
+            <Text style={styles.modalContent}>{errors.description}</Text>
+          </View>
+        </Modal>
 
-      <Button bordered
-            onPress={this.createEvent}
-            style={{ margin:20, width:160,
-          justifyContent:'center', alignSelf:'center'}}>
+        <Form>
+          <Item>
+            <Input placeholder="Name"
+              label='name'
+              onChangeText={(name) => this.setState({ name })}
+              value={name}
+            />
+          </Item>
+          <Item>
+            <Input placeholder="Date"
+              label='date'
+              onChangeText={(date) => this.setState({ date })}
+              value={date}
+            />
+          </Item>
+          <Item>
+            <Input placeholder="Time"
+              label='time'
+              onChangeText={(time) => this.setState({ time })}
+              value={time}
+            />
+          </Item>
+          <Item>
+            <Input placeholder="Location"
+              label='location'
+              onChangeText={(location) => this.setState({ location })}
+              value={location}
+            />
+          </Item>
+          <Item>
+            <Input placeholder="Description"
+              label='description'
+              onChangeText={(description) => this.setState({ description })}
+              value={description}
+            />
+          </Item>
+        </Form>
+        <Content>
+          {this.state.isImageUploaded == false
+            ?
+            <TouchableOpacity onPress={this.useLibraryHandler}>
+              <Thumbnail square small style={styles.uploadIcon}
+                source={{ uri: this.state.uri }} />
+            </TouchableOpacity>
+            :
+            <TouchableOpacity onPress={this.useLibraryHandler}>
+              <Thumbnail square style={styles.imageThumbnail}
+                source={{ uri: this.state.uri }} />
+            </TouchableOpacity>
+          }
+        </Content>
+
+        <Button bordered
+          onPress={this.validateInput}
+          style={{
+            margin: 20, width: 160,
+            justifyContent: 'center', alignSelf: 'center'
+          }}>
           <Text>Create Event!</Text>
         </Button>
 
@@ -434,7 +489,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 20
   },
-  uploadIcon:{
+  uploadIcon: {
     alignSelf: 'center',
     margin: 10,
   },
@@ -442,7 +497,27 @@ const styles = StyleSheet.create({
     margin: 20,
     alignSelf: 'center',
     borderRadius: 2,
-    width: WIDTH/1.5,
-    height: HEIGHT/3
+    width: WIDTH / 1.5,
+    height: HEIGHT / 3
+  },
+  modalStyle: {
+    flex: 1,
+    margin: 2,
+    backgroundColor: 'white',
+    padding: 4,
+    marginTop: 50,
+    marginRight: 20,
+    marginBottom: 30,
+    marginLeft: 20,
+    borderRadius: 6
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  modalButton: {
+    color: 'black',
+    fontSize: 40,
+    margin: 10
   },
 });
