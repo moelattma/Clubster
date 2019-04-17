@@ -5,6 +5,7 @@ import {
   StyleSheet
 } from 'react-native';
 import {Agenda} from 'react-native-calendars';
+var moment = require('moment-timezone');
 
 export default class AgendaScreen extends Component {
   constructor(props) {
@@ -41,9 +42,13 @@ export default class AgendaScreen extends Component {
   }
 
   loadItems(day) {
+    // input : 2019-04-17T08:48:00.000Z
+    // strTime = 2019-04-17
+    //1555541673
+    // 1555543473
     setTimeout(() => {
       for (let i = -15; i < 85; i++) {
-        const time = day.timestamp + i * 24 * 60 * 60 * 1000;
+        const time = 1555539518*1000;
         const strTime = this.timeToString(time);
         if (!this.state.items[strTime]) {
           this.state.items[strTime] = [];
@@ -51,7 +56,7 @@ export default class AgendaScreen extends Component {
           for (let j = 0; j < numItems; j++) {
             this.state.items[strTime].push({
               name: 'Item for ' + strTime,
-              height: Math.max(50, Math.floor(Math.random() * 150))
+              height: (1555541673 - 1555543473)/60
             });
           }
         }
@@ -83,8 +88,7 @@ export default class AgendaScreen extends Component {
   }
 
   timeToString(time) {
-    const date = new Date(time);
-    return date.toISOString().split('T')[0];
+    return moment.tz(time, "America/Los_Angeles").format().split('T')[0];
   }
 }
 

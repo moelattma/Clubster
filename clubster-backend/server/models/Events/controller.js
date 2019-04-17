@@ -94,6 +94,7 @@ exports.addEvent = (req, res) => {
 		//Find Organization whose id = organizationID
 		console.log(timeDisplay, timeDisplayEnd);
 		console.log(parseInt(timeDisplay.substring(0,timeDisplay.indexOf(":"))) + 12);
+		const startDate = selectedStartDate.split("T")[0].split("-");
 		if(selectedStartDate) {
 			year = selectedStartDate.split("T")[0].split("-")[0];
 			startMonth = selectedStartDate.split("T")[0].split("-")[1];
@@ -104,10 +105,10 @@ exports.addEvent = (req, res) => {
 			endMonth = selectedEndDate.split("T")[0].split("-")[1];
 			endDay = selectedEndDate.split("T")[0].split("-")[2];
 		}
-		var dateStart = (timeDisplay.indexOf("PM") == -1 || parseInt(timeDisplay.substring(0,timeDisplay.indexOf(":"))) > 12) ? new Date(parseInt(year), parseInt(startMonth) - 1, parseInt(startDay), parseInt(timeDisplay.substring(0,timeDisplay.indexOf(":"))), parseInt(timeDisplay.substring(timeDisplay.indexOf(":"), timeDisplay.indexOf(":") + 3)) + 12).getTime()/1000 : new Date(parseInt(year), parseInt(startMonth), parseInt(startDay), parseInt(timeDisplay.substring(0,timeDisplay.indexOf(":"))) + 12, parseInt(timeDisplay.substring(timeDisplay.indexOf(":") + 1, timeDisplay.indexOf(":") + 3))).getTime()/1000;
-		var dateEnd = (timeDisplay.indexOf("PM") == -1 || parseInt(timeDisplayEnd.substring(0,timeDisplayEnd.indexOf(":"))) > 12) ? new Date(parseInt(yearEnd), parseInt(endMonth) - 1, parseInt(endDay), parseInt(timeDisplay.substring(0,timeDisplayEnd.indexOf(":"))) + 12, parseInt(timeDisplayEnd.substring(timeDisplayEnd.indexOf(":") + 1, timeDisplayEnd.indexOf(":") + 3))).getTime()/1000 : new Date(parseInt(yearEnd), parseInt(endMonth), parseInt(endDay), parseInt(timeDisplayEnd.substring(0,timeDisplayEnd.indexOf(":"))), parseInt(timeDisplayEnd.substring(timeDisplayEnd.indexOf(":") + 1, timeDisplayEnd.indexOf(":") + 3))).getTime()/1000;
+		var dateStart = new Date(parseInt(year), parseInt(startMonth) - 1, parseInt(startDay), parseInt(timeDisplay.substring(0,timeDisplay.indexOf(":"))) + (timeDisplay.indexOf("PM") == -1) ? 0 : 12, parseInt(timeDisplay.substring(timeDisplay.indexOf(":") + 1, timeDisplay.indexOf(":") + 3))).getTime() / 1000;
+		var dateEnd = new Date(parseInt(yearEnd), parseInt(endMonth) - 1, parseInt(endDay), parseInt(timeDisplayEnd.substring(0,timeDisplayEnd.indexOf(":"))) + (timeDisplayEnd.indexOf("PM") == -1) ? 0 : 12, parseInt(timeDisplayEnd.substring(timeDisplayEnd.indexOf(":") + 1, timeDisplayEnd.indexOf(":") + 3))).getTime() / 1000;
 
-	console.log(typeof(dateStart));
+
 		Organization.findByIdAndUpdate(organizationID).then((organization) => {
 			if (!organization) {
 				return res.status(400).json({ 'Error': 'No such organization exists' }); //DNE, doesnt exist

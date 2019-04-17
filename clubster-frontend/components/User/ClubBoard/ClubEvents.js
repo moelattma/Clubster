@@ -290,34 +290,36 @@ class CreateClubEvent extends Component {
       (type == 1) ? this.setState({ showDate: false }) : (type == 2) ? this.setState({ showTime: false }) : this.setState({ showTime2: false });
   }
 
-  _handleDatePicked = (date, type) => {
-    console.log(type);
-    this.setState({ time:date })
-    console.log(this.state.time.toString().substring(this.state.time.toString().indexOf(":") - 2, this.state.time.toString().indexOf(":")));
-    let hour  = parseInt(this.state.time.toString().substring(this.state.time.toString().indexOf(":") - 2, this.state.time.toString().indexOf(":")));
-    let minutes  = parseInt(this.state.time.toString().substring(this.state.time.toString().indexOf(":") + 1, this.state.time.toString().indexOf(":") + 3));
+  _handleDatePicked = (date) => {
+    console.log(date.toString());
+    let hour  = parseInt(date.toString().substring(date.toString().indexOf(":") - 2, date.toString().indexOf(":")));
+    let minutes  = parseInt(date.toString().substring(date.toString().indexOf(":") + 1, date.toString().indexOf(":") + 3));
+    console.log(hour);
     let ifPM = (hour >= 12) ? " PM" : " AM";
-    hour -= (hour > 12) ? 12 : 0; //hour = 9, 3:09
+    if (hour == 0) hour = 12;
+    else hour -= (hour > 12) ? 12 : 0; //hour = 9, 3:09
     //strHour = (hour < 10) ? hour.toString() : hour.toString();
     strMinutes = (minutes < 10) ? "0" + minutes.toString() : minutes.toString();
     console.log("hour is: ", hour);
     console.log("minutes is: ", minutes);
-    this.setState({ timeDisplay: hour.toString() + ":" + strMinutes + ifPM });
+    this.setState({ timeDisplay: hour.toString() + ":" + strMinutes + ifPM, dateTimestampStart: date });
     this._hideDateTimePicker();
   };
 
-  _handleDatePickedTwo = (date, type) => {
-    this.setState({ time:date })
-    let hour  = parseInt(this.state.time.toString().substring(this.state.time.toString().indexOf(":") - 2, this.state.time.toString().indexOf(":")));
-    let minutes  = parseInt(this.state.time.toString().substring(this.state.time.toString().indexOf(":") + 1, this.state.time.toString().indexOf(":") + 3));
+  _handleDatePickedTwo = (date) => {
+    //04:00
+    console.log(date);
+    let hour  = parseInt(date.toString().substring(date.toString().indexOf(":") - 2, date.toString().indexOf(":")));
+    let minutes  = parseInt(date.toString().substring(date.toString().indexOf(":") + 1, date.toString().indexOf(":") + 3));
     let ifPM = (hour >= 12) ? " PM" : " AM";
-    hour -= (hour > 12) ? 12 : 0;
+    if (hour == 0) hour = 12;
+    else hour -= (hour > 12) ? 12 : 0;
     //strHour = (hour < 10) ? "0" + hour.toString() : hour.toString();
     strMinutes = (minutes < 10) ? "0" + minutes.toString() : minutes.toString();
     console.log("hour is: ", hour);
     console.log("minutes is: ", minutes);
     console.log(hour.toString() + ":" + strMinutes +  ifPM);
-    this.setState({ timeDisplayEnd: hour.toString() + ":" + strMinutes + ifPM });
+    this.setState({ timeDisplayEnd: hour.toString() + ":" + strMinutes + ifPM, dateTimestampEnd: date });
     this._hideDateTimePickerTwo();
   };
 
@@ -381,10 +383,10 @@ class CreateClubEvent extends Component {
 
   createEvent = async () => {
     const { _id } = this.props.screenProps;
-    const { name, date, time, description, location, imageURL, chosenDate, selectedStartDate, selectedEndDate, timeDisplay, timeDisplayEnd } = this.state;
+    const { name, date, time, description, location, imageURL, chosenDate, selectedStartDate, selectedEndDate, dateTimestampStart, dateTimestampEnd } = this.state;
     var newEvent;
     await axios.post('http://localhost:3000/api/events/'+_id+'/new', {
-      name, date, time, description, location, imageURL, chosenDate, selectedStartDate, selectedEndDate, timeDisplay, timeDisplayEnd
+      name, date, time, description, location, imageURL, chosenDate, selectedStartDate, selectedEndDate, dateTimestampStart, dateTimestampEnd
     }).then(response => {
       newEvent = response.data.event;
     }).catch(error => console.log(error + 'ruh roh'));

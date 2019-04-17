@@ -25,6 +25,8 @@
     "express": "^4.16.4",
     "fonts": "0.0.2",
     "jwt-decode": "^2.2.0",
+    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.23",
     "mongoose": "^5.3.4",
     "native-base": "^2.8.0",
     "npm": "^6.9.0",
