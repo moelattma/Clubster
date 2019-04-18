@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
-import { AppRegistry, StyleSheet } from 'react-native';
-import {SafeAreaView} from 'react-navigation';
+import { StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-navigation';
 import App from './components/router';
+
+import { Provider } from 'react-redux';
+import store from './reducers/index';
+
 console.ignoredYellowBox = ['Remote debugger'];
 import { YellowBox } from 'react-native';
 YellowBox.ignoreWarnings([
@@ -11,9 +15,11 @@ YellowBox.ignoreWarnings([
 export default class Clubster extends Component {
   render() {
     return (
-      <SafeAreaView forceInset={{ bottom: 'never' }} style={styles.SafeAreaView}>
-        <App />
-      </SafeAreaView>
+        <SafeAreaView forceInset={{ bottom: 'never' }} style={styles.SafeAreaView}>
+            <Provider store={store}>
+              <App />
+            </Provider> 
+        </SafeAreaView>
     );
   }
 }
@@ -24,5 +30,3 @@ const styles = StyleSheet.create({
       backgroundColor: '#E0E0E0'
   }
 })
-
-AppRegistry.registerComponent('Clubster', () => Clubster);

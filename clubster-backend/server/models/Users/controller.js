@@ -51,19 +51,21 @@ exports.createUser = (req, res) => {
 
 exports.findUser = (req, res) => {
   const { username, password } = req.body;
-  User.findOne({ username: username }).then((user) => {
+  User.findOne({ username: username }).populate('arrayClubsAdmin arrayClubsMember gallery').then((user) => {
     // checks if both username and password are valid
     if (!user) {
       return res.status(400).json({ 'Error': 'User does not exist' });
     } else {
       bcrypt.compare(password, user.password).then(same => {
+        delete user.password;
         // both password and username are correct and sends success token to server
         if (same) {
-          const payload = { _id: user._id, name: user.name, image: user.image };
+          const payload = { _id: user._id, name: user.name };
           jwt.sign(payload, 'secret', { expiresIn: 3600 }, (err, token) => {
             res.json({
               success: true,
-              token: 'Bearer ' + token
+              token: 'Bearer ' + token,
+              user: user
             });
           });
         } else {

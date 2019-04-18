@@ -5,7 +5,7 @@ import { ImagePicker, Permissions, Constants } from 'expo';
 import GalleryImage from './GalleryImage';
 import { View } from "native-base";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { accessKeyId, secretAccessKey } from '../../../keys/keys';
+import { accessKeyId, secretAccessKey } from '../../keys/keys';
 import v1 from 'uuid/v1';
 import axios from 'axios';
 import { RNS3 } from 'react-native-aws3';

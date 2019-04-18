@@ -1,17 +1,14 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {
   Image, StyleSheet, Text, TouchableOpacity, View,
   Dimensions, TouchableWithoutFeedback, FlatList, ScrollView,
   RefreshControl
 } from 'react-native';
+import { connect } from 'react-redux'
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import axios from 'axios';
-import { ImagePicker, Permissions } from 'expo';
-import v1 from 'uuid/v1';
-import { accessKeyId, secretAccessKey } from '../../keys/keys';
-import { Content, Container, Thumbnail, Form, Item, Input, Button } from 'native-base';
-import { RNS3 } from 'react-native-aws3';
-import { DefaultImg } from '../router';
+import { AppLoading } from 'expo';
+import { Button } from 'native-base';
+import { DefaultImg } from '../Utils/Defaults';
 
 const window = Dimensions.get('window');
 const imageWidth = (window.width / 3) + 30;
@@ -21,7 +18,7 @@ const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const CLUB_WIDTH = WIDTH * 4 / 10;
 const CLUB_HEIGHT = HEIGHT / 4;
 
-export class ShowClubs extends Component {
+class ShowClubs extends React.Component {
   constructor(props) { // Initializing state
     super(props);
     
@@ -29,18 +26,15 @@ export class ShowClubs extends Component {
     props.navigation.setParams({ showAdmin: true })
 
     this.state = {
-      clubsAdmin: [],
-      clubsMember: [],
       tappedAdmin: false,
       show: false,
-      loading: false,
       name: '',
       description: '',
       imageURL: DefaultImg
     }
   }
 
-  static navigationOptions = ({ navigation, screenProps }) => {
+  static navigationOptions = ({ navigation }) => {
     return {
       headerLeft: (
         <View style={{ marginLeft: 13 }}>
@@ -72,47 +66,9 @@ export class ShowClubs extends Component {
     };
   };
 
-  async componentWillMount() {
-    await this.getUserClubs();
-  };
-
-  getUserClubs = async () => {
-    this.setState({ loading: true });
-    var getClubsAdmin = [];
-    var getClubsMember = [];
-    axios.get("http://localhost:3000/api/organizations").then((response) => {
-      const { arrayClubsAdmin, arrayClubsMember } = response.data;
-      getClubsAdmin = arrayClubsAdmin;
-      for (var i = 0; i < arrayClubsAdmin.length; i++) {
-        if (getClubsAdmin[i].image)
-          url = 'https://s3.amazonaws.com/clubster-123/' + getClubsAdmin[i].image;
-        else
-          url = DefaultImg;  
-        getClubsAdmin[i].image = url;
-        getClubsAdmin[i].isAdmin = true;
-      };
-
-      for (var i = 0; i < arrayClubsMember.length; i++) {
-        var club = arrayClubsMember[i];
-        if (arrayClubsMember[i].image)
-          url = 'https://s3.amazonaws.com/clubster-123/' + arrayClubsMember[i].image;
-        else
-          url = DefaultImg;
-        club.image = url;
-        club.isAdmin = false;
-        getClubsMember.push(club);
-      };
-      if (getClubsAdmin.length % 2 != 0)
-        getClubsAdmin.push({ empty: true });
-      if (getClubsMember.length % 2 != 0)
-        getClubsMember.push({ empty: true });
-      this.setState({ clubsAdmin: getClubsAdmin, clubsMember: getClubsMember }); // Setting up state variable
-      this.setState({ loading: false });
-    }).catch(() => { this.setState({ loading: false }); });
-  };
-
   navigateUser = (item) => {
-    this.props.screenProps.home.navigate('AdminMemNavigation', { item, isAdmin: item.isAdmin });
+    const { params } = this.props.navigation.state;
+    this.props.navigation.navigate((!params || params.showAdmin ? 'AdminNavigation' : 'MemberNavigation'), { item, isAdmin: item.isAdmin });
   };
 
   _renderItem = ({ item }) => {
@@ -123,7 +79,7 @@ export class ShowClubs extends Component {
       <TouchableWithoutFeedback onPress={() => this.navigateUser(item)}
         style={{ flexDirection: 'row' }}>
         <View style={styles.eventContainer} >
-          <Image style={styles.containerImage} source={{ uri: item.image }} />
+          <Image style={styles.containerImage} source={{ uri:  'https://s3.amazonaws.com/clubster-123/' + item.image }} />
           <View style={{ margin: 10 }}>
             <Text allowFontScaling numberOfLines={1}
               style={styles.eventTitle}> {item.name}
@@ -135,54 +91,51 @@ export class ShowClubs extends Component {
   }
 
   render() {
+    if (this.props.loading)
+      return <AppLoading/>
     if (!this.props.navigation.state.params || this.props.navigation.state.params.showAdmin) {
-      if (!this.state.loading && (!this.state.clubsAdmin || this.state.clubsAdmin.length == 0))
+      if (!this.props.clubsAdmin || this.props.clubsAdmin.length == 0)
         return (
             <ScrollView refreshControl={<RefreshControl
-              refreshing={this.state.loading}
-              onRefresh={this.getUserClubs}
+              refreshing={this.props.loading}
             />}>
             <Text style={[{ flex: 1 }, styles.noneText ]}>You are not an admin of any clubs</Text>
             </ScrollView>
         )
       return (
         <ScrollView refreshControl={<RefreshControl
-          refreshing={this.state.loading}
-          onRefresh={this.getUserClubs}
+          refreshing={this.props.loading}
         />}>
           <FlatList
-            data={this.state.clubsAdmin.slice(0, 40)}
+            data={this.props.clubsAdmin}
             renderItem={this._renderItem}
             horizontal={false}
             numColumns={2}
             keyExtractor={club => club._id}
-            extraData={this.state}
           />
         </ScrollView>
       )
     }
     else {
-      if (!this.state.loading && (!this.state.clubsMember || this.state.clubsMember.length == 0))
+      if (!this.props.clubsMember || this.props.clubsMember.length == 0)
         return (
           <ScrollView refreshControl={<RefreshControl
-            refreshing={this.state.loading}
-            onRefresh={this.getUserClubs}
+            refreshing={this.props.loading}
           />}>
             <Text style={[{ flex: 1 }, styles.noneText ]}>You are not a member of any clubs</Text>
           </ScrollView>
         )
       return (
         <ScrollView refreshControl={<RefreshControl
-          refreshing={this.state.loading}
-          onRefresh={this.getUserClubs}
+          refreshing={this.props.loading}
         />}>
           <FlatList
-            data={this.state.clubsMember.slice(0, 40)}
+            data={this.props.clubsMember.slice(0, 40)}
             renderItem={this._renderItem}
             horizontal={false}
             numColumns={2}
             keyExtractor={club => club._id}
-            extraData={this.state}
+            extraData={this.props}
           />
         </ScrollView>
       )
@@ -190,114 +143,21 @@ export class ShowClubs extends Component {
   }
 }
 
-export class CreateClub extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      img: 'https://facebook.github.io/react/logo-og.png',
-      uri: 'https://image.flaticon.com/icons/png/512/128/128423.png',
-      isImageUploaded: false
-    }
-  }
-  askPermissionsAsync = async () => {
-    await Permissions.askAsync(Permissions.CAMERA);
-    await Permissions.askAsync(Permissions.CAMERA_ROLL);
-  };
-
-  useLibraryHandler = async () => {
-    await this.askPermissionsAsync();
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: true,
-        aspect: [4, 3],
-        base64: false,
-      });
-      if (result.cancelled)
-        return;
-      const key = `${v1()}.jpeg`;
-      const file = {
-        uri: result.uri,
-        type: 'image/jpeg',
-        name: key
-      };
-      const options = {
-        keyPrefix: 's3/',
-        bucket: 'clubster-123',
-        region: 'us-east-1',
-        accessKey: accessKeyId,
-        secretKey: secretAccessKey,
-        successActionStatus: 201
-      }
-      await RNS3.put(file, options).then((response) => {
-        this.setState({ 
-          imageURL: response.body.postResponse.key,
-          uri: 'https://s3.amazonaws.com/clubster-123/' + response.body.postResponse.key,
-          isImageUploaded: true
-         })
-      }).catch((err) => { console.log(err) });
-    } catch (error) { console.log(error); };
-  };
-
-  submit = async () => {
-    const { name, description, imageURL } = this.state;
-    await axios.post('http://localhost:3000/api/organizations/new', {
-      name, description, imageURL
-    });
-    var func = this.props.navigation.getParam('refreshClubs');
-    if (func) {
-      await func();
-      this.props.navigation.navigate('ShowClubs');
-    } else this.props.navigation.navigate('ShowClubs');
-  }
-
-  render() {
-    const { name, description } = this.state;
-    return (
-      <Container>
-        <Form>
-          <Item>
-            <Input placeholder="Name"
-              label='name'
-              onChangeText={(name) => this.setState({ name })}
-              value={name}
-            />
-          </Item>
-          <Item>
-            <Input placeholder="Description"
-              label='description'
-              onChangeText={(description) => this.setState({ description })}
-              value={description}
-            />
-          </Item>
-        </Form>
-        <Content>
-        {this.state.isImageUploaded == false
-        ?
-        <TouchableOpacity onPress={this.useLibraryHandler}>
-               <Thumbnail square small style={styles.uploadIcon}
-                source={{uri: this.state.uri}} />
-          </TouchableOpacity>
-        :
-        <TouchableOpacity onPress={this.useLibraryHandler}>
-               <Thumbnail square large style={styles.imageThumbnail}
-                source={{uri: this.state.uri}} />
-          </TouchableOpacity>
-        }
-        </Content>
-
-        <Button bordered
-          onPress={this.submit}
-          style={{
-            margin: 20, width: 100,
-            justifyContent: 'center', alignSelf: 'center'
-          }}>
-          <Text>Create Club!</Text>
-        </Button>
-
-      </Container>
-    );
+const mapStateToProps = (state) => {
+  if (!state.user.user)
+    return { loading: true };
+  var clubsAdmin = state.clubs.clubsAdmin;
+  var clubsMember = state.clubs.clubsMember;
+  if (clubsAdmin.length % 2 != 0) clubsAdmin.push({ empty: true });
+  if (clubsMember.length % 2 != 0) clubsMember.push({ empty: true });
+  return {
+    clubsAdmin: state.clubs.clubsAdmin,  
+    clubsMember: state.clubs.clubsMember,
+    loading: false
   }
 }
+
+export default connect(mapStateToProps, null)(ShowClubs);
 
 const styles = StyleSheet.create({
   eventContainer: {

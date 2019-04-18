@@ -1,20 +1,16 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text, Dimensions, Keyboard, AsyncStorage, View } from 'react-native';
+import { TouchableOpacity, StyleSheet, Text, AsyncStorage } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { TextField } from 'react-native-material-textfield';
 import { connect } from 'react-redux'
-import { USER_LOGIN, USER_LOGOUT } from '../../actions/ActionTypes'
-import { bindActionCreators } from 'redux';
-import { userLogin } from '../../actions/UserAction'
+import { USER_LOGIN, CLUBS_SET } from '../../reducers/ActionTypes'
 
 import axios from 'axios';
-const { width: WIDTH } = Dimensions.get('window');
 
-export default class Login extends React.Component {
+class Login extends React.Component {
   state = {
     username: 'mohamedzak',
-    password: 'mohamed123',
-    userID: null
+    password: 'mohamed123'
   };
 
   handleLogin = () => {
@@ -26,15 +22,17 @@ export default class Login extends React.Component {
       })
         .then(response => {
           if (response.status == 200) {
+            const { token } = response.data;
+            var user = response.data.user;
             // Set token to ls\
-            AsyncStorage.setItem('jwtToken', response.data.token);
-            axios.defaults.headers.common['Authorization'] = response.data.token;
+            AsyncStorage.setItem('jwtToken', token);
+            axios.defaults.headers.common['Authorization'] = token;
             this.props.navigation.navigate('ClubsterNavigation');               //Navigate to Clubs page if successful
-
-            //set store userID with response.data.userID
-            this.props.userLogin(response.data.userID);
-            console.log(response.data.userID);
-            console.log(this.state.userID);
+            
+            this.props.setClubs(user.arrayClubsAdmin, user.arrayClubsMember);
+            delete user.arrayClubsAdmin;
+            delete user.arrayClubsMember;
+            this.props.userLogin(user);
           }
         })
         .catch((err) => {
@@ -87,16 +85,18 @@ export default class Login extends React.Component {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    updateUser: (user) => dispatch({
+    userLogin: (user) => dispatch({
       type: USER_LOGIN,
-      payload: {
-        user
-      }
+      payload: { user }
     }),
+    setClubs: (clubsAdmin, clubsMember) => dispatch({
+      type: CLUBS_SET,
+      payload: { clubsAdmin, clubsMember }
+    })
   }
 }
 
-// export default connect(null, mapDispatchToProps)(Login);
+export default connect(null, mapDispatchToProps)(Login);
 
 const styles = StyleSheet.create({
   container: {

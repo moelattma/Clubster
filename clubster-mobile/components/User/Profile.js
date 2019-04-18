@@ -1,18 +1,19 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { AsyncStorage, View, ScrollView, StyleSheet,
-     Image, TouchableOpacity, TextInput, Dimensions } from 'react-native';
-import Expo, { ImagePicker, Permissions } from 'expo';
+     TouchableOpacity, Dimensions } from 'react-native';
+import { ImagePicker, Permissions } from 'expo';
 import axios from 'axios';
 import Modal from 'react-native-modal';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Gallery from './Cards/Gallery';
-import InformationCard from './Cards/InformationCard';
+import Gallery from '../Utils/Gallery';
 import { accessKeyId, secretAccessKey } from '../../keys/keys';
 import v1 from 'uuid/v1';
 import { RNS3 } from 'react-native-aws3';
-import ClubList from './Cards/ClubList';
-import { Thumbnail, Button, Text, Form, Item, Input } from 'native-base';
-import { DefaultImg } from '../router';
+import ClubList from './ClubList';
+import { Thumbnail, Button, Text, Form, Item, Input, Content, Card, CardItem } from 'native-base';
+import { DefaultImg } from '../Utils/Defaults';
+import { connect } from 'react-redux';
+import { USER_LOGOUT, USER_CHANGEPROFILE, USER_CHANGEPHOTO } from '../../reducers/ActionTypes';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 
@@ -20,7 +21,7 @@ const SELECT_ABOUT = 0;
 const SELECT_PHOTOS = 1;
 const SELECT_CLUBS = 2;
 
-export default class Profile extends Component {
+class Profile extends React.Component {
     constructor() {
         super();
 
@@ -38,24 +39,13 @@ export default class Profile extends Component {
             selected: SELECT_ABOUT,
             _loading: true,
             userClubs: [],
+            adminClubs: [],
+            memberClubs: [],
             refreshClubs: true
         }
     }
 
     onUpdatePhotos(photos) { this.setState({ photos }) };
-
-    async componentWillMount() {
-        axios.get('http://localhost:3000/api/profile').then((response) => {
-            const { name, image, major, biography, hobbies, gallery } = response.data.profile;
-            if (response.data.profile) {
-                this.setState({ name: name, major: major ? major: '', biography: biography ? biography : '', galleryID: gallery._id,
-                    hobbies: hobbies ? hobbies.join(" ") : '', img: (image ? 'https://s3.amazonaws.com/clubster-123/' + image : DefaultImg), 
-                    photos: gallery.photos.length > 5 ? gallery.photos.slice(0, 6) : gallery.photos.concat({ addPhotoIcon: true })});
-            }
-        });
-
-        this.setState({ _loading: false });
-    }
 
     async getClubs() {
         var allClubs = [];
@@ -110,6 +100,7 @@ export default class Profile extends Component {
         try {
             await AsyncStorage.removeItem('jwtToken');
             delete axios.defaults.headers.common['Authorization'];
+
             this.props.navigation.navigate('Login');
         }
         catch (exception) {
@@ -131,6 +122,8 @@ export default class Profile extends Component {
         var splicedCount = 0;
         removeIndices.map(index => hobbiesList.splice(index - splicedCount++));
 
+        const { major, biography } = this.state;
+
         axios.post('http://localhost:3000/api/profile', {
             major: this.state.major, hobbies: hobbiesList,
             facebook: this.state.facebook, instagram: this.state.instagram,
@@ -138,6 +131,7 @@ export default class Profile extends Component {
         }).then((response) => {
             if (response.status == 201 || response.status == 200) {
                 this.setState({ show: false, hobbies: hobbiesList.join(', ') });
+                this.props.changeProfile(major, hobbiesList, biography);
             }
         })
     }
@@ -172,7 +166,7 @@ export default class Profile extends Component {
                 imageURL = response.body.postResponse.key;
             }).catch((err) => { console.log(err) });
             await axios.post('http://localhost:3000/api/changePhoto', { imageURL: imageURL }).then((response) => {
-                this.setState({ img: 'https://s3.amazonaws.com/clubster-123/' + response.data.image });
+                this.props.changePhoto(response.data.image);
             });
         } catch (error) { console.log(error); }
     };
@@ -232,9 +226,6 @@ export default class Profile extends Component {
 
 
     render() {
-        if (this.state._loading)
-            return <Expo.AppLoading/>;
-
         return (
             <ScrollView>
                 <View style={{ height: HEIGHT / 4, backgroundColor: '#59cbbd' }}>
@@ -254,7 +245,7 @@ export default class Profile extends Component {
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity style={styles.avatar} onPress={this.changePicture}>
-                    <Thumbnail style={styles.imageAvatar} source={{ uri: this.state.img }} />
+                    <Thumbnail style={styles.imageAvatar} source={{ uri: this.props.img }} />
                 </TouchableOpacity>
                 <View style={{height: 100}}></View>
 
@@ -278,14 +269,29 @@ export default class Profile extends Component {
 
                 {(this.state.selected == SELECT_ABOUT)
                     //about tab
-                    ? <InformationCard userInfo = {this.state} />
+                    ? (<Content padder>
+                        <Card>
+                          <CardItem>
+                            <Text>Name: {this.props.name}</Text>
+                          </CardItem>
+                          <CardItem>
+                            <Text>Major: {this.props.major}</Text>
+                          </CardItem>
+                          <CardItem>
+                            <Text>Hobbies: {this.props.hobbies}</Text>
+                          </CardItem>
+                          <CardItem>
+                            <Text>Bio: {this.props.biography}</Text>
+                          </CardItem>
+                        </Card>
+                      </Content>)
                     //photos tab
                     : ((this.state.selected == SELECT_PHOTOS)
-                        ? <Gallery photos={this.state.photos} galleryID={this.state.galleryID} 
+                        ? <Gallery photos={this.props.photos} galleryID={this.props.galleryID} 
                                    onUpdatePhotos={this.onUpdatePhotos.bind(this)} />
                         //clubs tab
                         :
-                        <ClubList userClubs = {this.state.userClubs} />
+                        <ClubList adminClubs={this.props.adminClubs} memberClubs={this.props.memberClubs} name={this.props.name} />
                     )}
                 {/* MODAL  */}
                 <View style={{ flex: 1 }}>
@@ -310,27 +316,6 @@ export default class Profile extends Component {
                                 />
                             </Item>
                             <Item>
-                                <Input placeholder="Facebook"
-                                label='Facebook'
-                                onChangeText={(facebook) => this.setState({ facebook })}
-                                value={this.state.facebook}
-                                />
-                            </Item>
-                            <Item>
-                                <Input placeholder="Instagram"
-                                label='Facebook'
-                                onChangeText={(instagram) => this.setState({ instagram })}
-                                value={this.state.instagram}
-                                />
-                            </Item>
-                            <Item>
-                                <Input placeholder="LinkedIn"
-                                label='LinkedIn'
-                                onChangeText={(linkedIn) => this.setState({ linkedIn })}
-                                value={this.state.linkedIn}
-                                />
-                            </Item>
-                            <Item>
                                 <Input placeholder="Describe yourself"
                                 label=''
                                 onChangeText={(biography) => this.setState({ biography })}
@@ -350,10 +335,35 @@ export default class Profile extends Component {
                     </Modal>
                 </View>
             </ScrollView>
-
         );
     }
 }
+
+const mapStateToProps = (state) => {
+    const { name, major, biography, gallery, hobbies, image } = state.user.user;
+    return {
+        name: name, major: (major ? major: ''), biography: (biography ? biography : ''), galleryID: gallery._id,
+        hobbies: (hobbies ? hobbies.join(" ") : ''), img: (image ? 'https://s3.amazonaws.com/clubster-123/' + image : DefaultImg), 
+        photos: (gallery.photos.length > 5 ? gallery.photos.slice(0, 6) : gallery.photos.concat({ addPhotoIcon: true })), _loading: false,
+        adminClubs: state.clubs.clubsAdmin, memberClubs: state.clubs.clubsMember 
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        userLogout: () => dispatch({ type: USER_LOGOUT }),
+        changeProfile: (major, hobbies, biography) => dispatch({ 
+            type: USER_CHANGEPROFILE,
+            payload: { major, hobbies, biography }
+        }),
+        changePhoto: (image) => dispatch({
+            type: USER_CHANGEPHOTO,
+            payload: { image }
+        })
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Profile);
 
 const styles = StyleSheet.create({
     button: {
