@@ -383,10 +383,10 @@ class CreateClubEvent extends Component {
 
   createEvent = async () => {
     const { _id } = this.props.screenProps;
-    const { name, date, time, description, location, imageURL, chosenDate, selectedStartDate, selectedEndDate, dateTimestampStart, dateTimestampEnd } = this.state;
+    const { name, date, time, description, location, imageURL, chosenDate, selectedStartDate, selectedEndDate, timeDisplay, timeDisplayEnd } = this.state;
     var newEvent;
     await axios.post('http://localhost:3000/api/events/'+_id+'/new', {
-      name, date, time, description, location, imageURL, chosenDate, selectedStartDate, selectedEndDate, dateTimestampStart, dateTimestampEnd
+      name, date, time, description, location, imageURL, chosenDate, selectedStartDate, selectedEndDate, timeDisplay, timeDisplayEnd
     }).then(response => {
       newEvent = response.data.event;
     }).catch(error => console.log(error + 'ruh roh'));
