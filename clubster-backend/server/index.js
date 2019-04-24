@@ -34,6 +34,8 @@ app.use(passport.initialize());
 // Passport Config
 require('./utils/passport')(passport);
 
+app.get('/', (req, res) => res.send('Hello, World!'));
+
 app.use('/api', [loginRoutes, organizationRoutes,
   notificationRoutes, eventRoutes, ridesRoutes,
   conversationRoutes, messageRoutes, graphRoutes,
