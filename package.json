@@ -1,0 +1,19 @@
+{
+  "name": "clubster",
+  "version": "1.0.0",
+  "description": "One-stop shop for clubs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moelattma/Clubster.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/moelattma/Clubster/issues"
+  },
+  "homepage": "https://github.com/moelattma/Clubster#readme"
+}
