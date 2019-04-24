@@ -252,18 +252,4 @@ exports.addCommentToEvent = (req, res) => {
 	})
 };
 
-
-// get events of orgs that person is a part of 
-exports.getUserOrgs = (req, res) => {
-	const { orgID } = req.body;
-	let userID = req.user._id;
-	User.findById(userID).populate('arrayClubsMember arrayClubsAdmin').then(() => {
-		if (!organization) {
-			return res.status(400).json({ 'Error': 'No events found' });	//organization is null, DNE
-		} else {
-			return res.status(201).json({ 'events': organization.events, idOfUser: req.user._id }); //returns organization's events along with idOfUser
-		}
-	}).catch((err) => console.log(err));
-};
 	
-}

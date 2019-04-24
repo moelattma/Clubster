@@ -67,7 +67,8 @@ class ShowEvents extends Component {
       date: '',
       location: '',
       time: '',
-      imageURL: DefaultImg
+      imageURL: DefaultImg,
+      editModal: false
     }
   }
 
@@ -118,6 +119,15 @@ class ShowEvents extends Component {
     this.setState({ clubEvents: events, loading: false });
   }
 
+  // modal for when user enters invalid fields 
+  openEditModal() {
+    this.setState({
+      editModal: true
+    })
+  }
+
+  closeEditModal() { this.setState({ editModal: false }) }
+
   _handleGoing = (item) => {
     for (var i = 0; i < this.state.clubEvents.length; i++) {
       if (this.state.clubEvents[i]._id === item._id)
@@ -149,6 +159,7 @@ class ShowEvents extends Component {
   _renderItem = ({ item }) => {
     var hostURL;
     var eventURL;
+    const { name, date, time, description, location } = this.state;
     if (item.image && item.image != null)
       eventURL = 'https://s3.amazonaws.com/clubster-123/' + item.image;
     else
@@ -159,68 +170,192 @@ class ShowEvents extends Component {
     else
       hostURL = DefaultImg;
 
-    return (
-      <Card>
-        <CardItem>
-          <Left>
-            <Thumbnail source={{ uri: hostURL }} />
+    if (this.props.screenProps.isAdmin) {
+      return (
+        <Card>
+          <Modal isVisible={this.state.editModal}>
+            <View style={styles.formStyle}>
+              <TouchableOpacity onPress={() => this.closeEditModal()}>
+                <Icon name="ios-arrow-dropleft"
+                  style={styles.modalButton} />
+              </TouchableOpacity>
+              <Form>
+                <Input placeholder={item.name}
+                  style={styles.modalContent}
+                  label='name'
+                  onChangeText={(name) => this.setState({ name })}
+                  //onChangeText={item.name = name}
+                  value={name}
+                />
+                <Input placeholder={item.location}
+                  style={styles.modalContent}
+                  label='location'
+                  onChangeText={(location) => this.setState({ location })}
+                  //onChangeText={item.location = location}
+                  value={location}
+                />
+                <Input placeholder={item.date}
+                  style={styles.modalContent}
+                  label='date'
+                  onChangeText={(date) => this.setState({ date })}
+                  //onChangeText={item.date = date}
+                  value={date}
+                />
+                <Input placeholder={item.time}
+                  style={styles.modalContent}
+                  label='time'
+                  onChangeText={(time) => this.setState({ time })}
+                  //onChangeText={item.time = time}
+                  value={time}
+                />
+                <Input placeholder={item.description}
+                  style={styles.modalContent}
+                  label='description'
+                  onChangeText={(description) => this.setState({ name })}
+                  //onChangeText={item.description = description}
+                  value={description}
+                />
+              </Form>
+              <Button bordered
+                onPress={this.validateInput}
+                style={{
+                  margin: 20, width: 160,
+                  justifyContent: 'center', alignSelf: 'center'
+                }}>
+                <Text>Create Event!</Text>
+              </Button>
+            </View>
+          </Modal>
+          <CardItem>
+            <Left>
+              <Thumbnail source={{ uri: hostURL }} />
+              <Body>
+                <Text>{item.host.name} is hosting {item.name}</Text>
+              </Body>
+            </Left>
+            <Right>
+              <Button transparent onPress={() => this.openEditModal()}>
+                <Text> edit </Text>
+              </Button>
+            </Right>
+          </CardItem>
+          <CardItem cardBody>
+            <Image source={{ uri: eventURL }} style={{ height: 200, width: null, flex: 1 }} />
+          </CardItem>
+          <CardItem>
+            <Left>
+              <Body>
+                <Text note>{item.time} on {item.date}</Text>
+                <Text note>{item.location}</Text>
+              </Body>
+            </Left>
+            <Right>
+              <Button bordered onPress={() => this.props.navigation.navigate('EventProfile', { event: item })}>
+                <Text>Know More</Text>
+              </Button>
+            </Right>
+          </CardItem>
+          <CardItem>
+            <Left>
+              {
+                item.likers && item.likers.indexOf(this.state.idOfUser) > -1 ?
+                  <Button transparent onPress={() => this._handleLikers(item)}>
+                    <Icon name="thumbs-up" />
+                    <Text>{item.likers.length} likes</Text>
+                  </Button> :
+                  <Button transparent onPress={() => this._handleLikers(item)}>
+                    <Icon name="thumbs-up" style={{ color: 'gray' }} />
+                    <Text style={{ color: 'gray' }}>{item.likers.length} likes</Text>
+                  </Button>
+              }
+            </Left>
             <Body>
-              <Text>{item.host.name} is hosting {item.name}</Text>
+              <Button transparent onPress={() => this.props.navigation.navigate('Comments', { eventID: item._id })}>
+                < Icon active name="chatbubbles" />
+                <Text>{item.comments.length} comments</Text>
+              </Button>
             </Body>
-          </Left>
-        </CardItem>
-        <CardItem cardBody>
-          <Image source={{ uri: eventURL }} style={{ height: 200, width: null, flex: 1 }} />
-        </CardItem>
-        <CardItem>
-          <Left>
+            <Right>
+              {
+                item.going && item.going.indexOf(this.state.idOfUser) > -1 ?
+                  <Button transparent onPress={() => this._handleGoing(item)}>
+                    <Icon active name="star" />
+                    <Text>{item.going.length} going</Text>
+                  </Button> :
+                  <Button transparent onPress={() => this._handleGoing(item)}>
+                    <Icon name="star" style={{ color: 'gray' }} />
+                    <Text style={{ color: 'gray' }}>{item.going.length} going</Text>
+                  </Button>
+              }
+            </Right>
+          </CardItem>
+        </Card>
+      )
+    }
+    else {
+      return (
+        <Card>
+          <CardItem>
+            <Left>
+              <Thumbnail source={{ uri: hostURL }} />
+              <Body>
+                <Text>{item.host.name} is hosting {item.name}</Text>
+              </Body>
+            </Left>
+          </CardItem>
+          <CardItem cardBody>
+            <Image source={{ uri: eventURL }} style={{ height: 200, width: null, flex: 1 }} />
+          </CardItem>
+          <CardItem>
+            <Left>
+              <Body>
+                <Text note>{item.time} on {item.date}</Text>
+                <Text note>{item.location}</Text>
+              </Body>
+            </Left>
+            <Right>
+              <Button bordered onPress={() => this.props.navigation.navigate('EventProfile', { event: item })}>
+                <Text>Know More</Text>
+              </Button>
+            </Right>
+          </CardItem>
+          <CardItem>
+            <Left>
+              {
+                item.likers && item.likers.indexOf(this.state.idOfUser) > -1 ?
+                  <Button transparent onPress={() => this._handleLikers(item)}>
+                    <Icon name="thumbs-up" />
+                    <Text>{item.likers.length} likes</Text>
+                  </Button> :
+                  <Button transparent onPress={() => this._handleLikers(item)}>
+                    <Icon name="thumbs-up" style={{ color: 'gray' }} />
+                    <Text style={{ color: 'gray' }}>{item.likers.length} likes</Text>
+                  </Button>
+              }
+            </Left>
             <Body>
-              <Text note>{item.time} on {item.date}</Text>
-              <Text note>{item.location}</Text>
+              <Button transparent onPress={() => this.props.navigation.navigate('Comments', { eventID: item._id })}>
+                <Icon active name="chatbubbles" />
+                <Text>{item.comments.length} comments</Text>
+              </Button>
             </Body>
-          </Left>
-          <Right>
-            <Button bordered onPress={() => this.props.navigation.navigate('EventProfile', { event: item })}>
-              <Text>Know More</Text>
-            </Button>
-          </Right>
-        </CardItem>
-        <CardItem>
-          <Left>
-            {
-              item.likers && item.likers.indexOf(this.state.idOfUser) > -1 ?
-                <Button transparent onPress={() => this._handleLikers(item)}>
-                  <Icon name="thumbs-up" />
-                  <Text>{item.likers.length} likes</Text>
-                </Button> :
-                <Button transparent onPress={() => this._handleLikers(item)}>
-                  <Icon name="thumbs-up" style={{ color: 'gray' }} />
-                  <Text style={{ color: 'gray' }}>{item.likers.length} likes</Text>
-                </Button>
-            }
-          </Left>
-          <Body>
-            <Button transparent onPress={() => this.props.navigation.navigate('Comments', { eventID: item._id })}>
-              <Icon active name="chatbubbles" />
-              <Text>{item.comments.length} comments</Text>
-            </Button>
-          </Body>
-          <Right>
-            {
-              item.going && item.going.indexOf(this.state.idOfUser) > -1 ?
-                <Button transparent onPress={() => this._handleGoing(item)}>
-                  <Icon active name="star" />
-                  <Text>{item.going.length} going</Text>
-                </Button> :
-                <Button transparent onPress={() => this._handleGoing(item)}>
-                  <Icon name="star" style={{ color: 'gray' }} />
-                  <Text style={{ color: 'gray' }}>{item.going.length} going</Text>
-                </Button>
-            }
-          </Right>
-        </CardItem>
-      </Card>
-    );
+            <Right>
+              {
+                item.going && item.going.indexOf(this.state.idOfUser) > -1 ?
+                  <Button transparent onPress={() => this._handleGoing(item)}>
+                    <Icon active name="star" />
+                    <Text>{item.going.length} going</Text>
+                  </Button> :
+                  <Button transparent onPress={() => this._handleGoing(item)}>
+                    <Icon name="star" style={{ color: 'gray' }} />
+                    <Text style={{ color: 'gray' }}>{item.going.length} going</Text>
+                  </Button>
+              }
+            </Right>
+          </CardItem>
+        </Card>
+      )
+    };
   }
 
   render() {
@@ -501,15 +636,16 @@ const styles = StyleSheet.create({
     height: HEIGHT / 3
   },
   modalStyle: {
-    flex: 1,
-    margin: 2,
-    backgroundColor: 'white',
-    padding: 4,
-    marginTop: 50,
-    marginRight: 20,
-    marginBottom: 30,
-    marginLeft: 20,
-    borderRadius: 6
+    margin: 1,
+    backgroundColor: "white",
+    padding: 22,
+    borderRadius: 4,
+    borderColor: "rgba(0, 0, 0, 0.1)"
+  },
+  modalContent: {
+    justifyContent: "center",
+    alignItems: "center",
+    fontSize: 20
   },
   modalButtons: {
     flexDirection: 'row',
@@ -519,5 +655,11 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 40,
     margin: 10
+  },
+  formStyle: {
+    color: 'black',
+    flex: 1,
+    backgroundColor: "white",
+    margin: 4
   },
 });

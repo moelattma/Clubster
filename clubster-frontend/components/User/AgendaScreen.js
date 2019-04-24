@@ -5,6 +5,8 @@ import {
   StyleSheet
 } from 'react-native';
 import {Agenda} from 'react-native-calendars';
+import axios from 'axios';
+
 
 export default class AgendaScreen extends Component {
   constructor(props) {
@@ -12,6 +14,12 @@ export default class AgendaScreen extends Component {
     this.state = {
       items: {}
     };
+  }
+
+  componentDidMount() {
+    axios.get("http://localhost:3000/api/user").then((response) => {
+      
+    });
   }
 
   render() {

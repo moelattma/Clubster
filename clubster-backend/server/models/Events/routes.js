@@ -52,6 +52,5 @@ router.post('/events/:eventID/comments', passport.authenticate('jwt', {session:f
 router.post('/events/:eventID/changeEventPicture', passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.changeEventPicture(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
-
 //Export
 module.exports = router;
