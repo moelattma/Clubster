@@ -5,24 +5,117 @@ import {
   StyleSheet
 } from 'react-native';
 import {Agenda} from 'react-native-calendars';
-import axios from 'axios';
-
+var moment = require('moment-timezone');
 
 export default class AgendaScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: {}
+      items: {},
+      events: [{
+        _id: {
+            "$oid": "5cb81a53601d33408834675f"
+        },
+        date: [
+            1555743600,
+            1555743600
+        ],
+        photos: [],
+        going: [
+            {
+                "$oid": "5c04a79bfd61322588b80309"
+            }
+        ],
+        likers: [
+            {
+                "$oid": "5c04a79bfd61322588b80309"
+            }
+        ],
+        rides: [],
+        comments: [],
+        organization: {
+            "$oid": "5cb6a9196203c14aa0a66aa1"
+        },
+        name: "Test 1",
+        description: "Test 1",
+        host: {
+            "$oid": "5c04a79bfd61322588b80309"
+        },
+        location: "Test 1",
+        image: "s3/ed98fa20-61a3-11e9-b39a-0bdefcda8e19.jpeg",
+        value: 4,
+        __v: 0
+      }, {
+        _id: {
+            "$oid": "5cb81fa5601d334088346761"
+        },
+        date: [
+            1555830000,
+            1555830000
+        ],
+        photos: [],
+        going: [
+            {
+                "$oid": "5c04a79bfd61322588b80309"
+            }
+        ],
+        likers: [
+            {
+                "$oid": "5c04a79bfd61322588b80309"
+            }
+        ],
+        rides: [],
+        comments: [],
+        organization: {
+            "$oid": "5cb6a9196203c14aa0a66aa1"
+        },
+        name: "Test 3",
+        description: "Test 3",
+        host: {
+            "$oid": "5c04a79bfd61322588b80309"
+        },
+        location: "Test 3",
+        image: "s3/19d34660-61a7-11e9-9620-af4117ad71ca.jpeg",
+        value: 5,
+        __v: 0
+      }]
     };
   }
 
-  componentDidMount() {
-    axios.get("http://localhost:3000/api/user").then((response) => {
-      
+  timeToString(time) {
+    return moment.tz(time, "America/Los_Angeles").format().split('T')[0];
+  }
+
+  processEvents() {
+    for(let i = 0;i < this.state.events.length; i++) {
+      let begDateTimestamp = this.state.events[i].date[0];
+      let endDateTimestamp = this.state.events[i].date[1];
+      let date = this.timeToString(begDateTimestamp*1000);
+      if (!this.state.items[date]) {
+        this.state.items[date] = [];
+        this.state.items[date].push({
+          name: 'Item for ' + date,
+          height: (endDateTimestamp - begDateTimestamp)/60*5
+        });
+      } else {
+        if(endDateTimestamp - begDateTimestamp != 0) {
+          this.state.items[date].push({
+            name: 'Item for ' + date,
+            height: (endDateTimestamp - begDateTimestamp)/60*5
+          });
+        }
+      }
+    }
+    const newItems = {};
+    Object.keys(this.state.items).forEach(key => {newItems[key] = this.state.items[key];});
+    this.setState({
+      items: newItems
     });
+
   }
 
   render() {
+    console.log(this.state.items);
     return (
       <Agenda
         items={this.state.items}
@@ -49,29 +142,7 @@ export default class AgendaScreen extends Component {
   }
 
   loadItems(day) {
-    setTimeout(() => {
-      for (let i = -15; i < 85; i++) {
-        const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-        const strTime = this.timeToString(time);
-        if (!this.state.items[strTime]) {
-          this.state.items[strTime] = [];
-          const numItems = Math.floor(Math.random() * 5);
-          for (let j = 0; j < numItems; j++) {
-            this.state.items[strTime].push({
-              name: 'Item for ' + strTime,
-              height: Math.max(50, Math.floor(Math.random() * 150))
-            });
-          }
-        }
-      }
-      //console.log(this.state.items);
-      const newItems = {};
-      Object.keys(this.state.items).forEach(key => {newItems[key] = this.state.items[key];});
-      this.setState({
-        items: newItems
-      });
-    }, 1000);
-    // console.log(`Load Items for ${day.year}-${day.month}`);
+    this.processEvents();
   }
 
   renderItem(item) {
@@ -90,10 +161,7 @@ export default class AgendaScreen extends Component {
     return r1.name !== r2.name;
   }
 
-  timeToString(time) {
-    const date = new Date(time);
-    return date.toISOString().split('T')[0];
-  }
+
 }
 
 const styles = StyleSheet.create({
