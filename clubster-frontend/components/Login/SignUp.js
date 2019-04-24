@@ -41,6 +41,7 @@ export default class SignUp extends Component {
     }).catch(err => console.log('Could not sign up', err));
   };
 
+  // checks if inputs are invalid
   validateInput = () => {
     let errors = {};
     if (this.state != null) {

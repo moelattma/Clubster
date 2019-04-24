@@ -78,7 +78,7 @@ export const HomeNavigator = createMaterialTopTabNavigator(
             screen: AgendaScreen,
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }) => (
-                    <MaterialIcons name={focused ? 'calendar-today' : 'calendar-today'} size={30} color={tintColor} />
+                    <MaterialIcons name={focused ? 'person' : 'person-outline'} size={30} color={tintColor} />
                 )
             }
         }

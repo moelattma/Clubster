@@ -29,4 +29,8 @@ router.get('/profile', passport.authenticate('jwt', { session: false }), (req, r
 	controller.retrieveProfile(req, res);
 });
 
+router.get('/user', passport.authenticate('jwt', {session:false}), (req, res) => {
+	controller.getAllEvents(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
+});
+
 module.exports = router;
