@@ -25,10 +25,9 @@ export default class GalleryImage extends Component {
           duration={500}
           source= {{uri: uri}}
           style={{
-            height: 160,
-            position: 'absolute',
+            height: 160, borderRadius: 5, margin: 2,
             resizeMode: 'cover',
-            width: WIDTH / 3,
+            width: WIDTH / 4,
           }}
         />
       </Button>

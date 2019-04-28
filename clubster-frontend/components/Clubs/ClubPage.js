@@ -7,12 +7,13 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
+import Modal from 'react-native-modal';
 import { ImagePicker, Permissions, Font } from 'expo';
 import converter from 'base64-arraybuffer';
 import v1 from 'uuid/v1';
 import { accessKeyId, secretAccessKey } from '../../keys/keys';
 import { createStackNavigator } from 'react-navigation';
-import { Content, Container, Thumbnail, Form, Item, Input, Button } from 'native-base';
+import { Content, Container, Thumbnail, Form, Icon, Item, Input, Button } from 'native-base';
 import { RNS3 } from 'react-native-aws3';
 import { DefaultImg } from '../router';
 
@@ -49,6 +50,7 @@ class ShowClubs extends Component {
       clubsAdmin: [],
       clubsMember: [],
       tappedAdmin: false,
+      validModal: false,
       show: false,
       loading: false,
       name: '',
@@ -155,12 +157,12 @@ class ShowClubs extends Component {
     if (!this.props.navigation.state.params || this.props.navigation.state.params.showAdmin) {
       if (!this.state.loading && (!this.state.clubsAdmin || this.state.clubsAdmin.length == 0))
         return (
-            <ScrollView refreshControl={<RefreshControl
-              refreshing={this.state.loading}
-              onRefresh={this.getUserClubs}
-            />}>
-            <Text style={[{ flex: 1 }, styles.noneText ]}>You are not an admin of any clubs</Text>
-            </ScrollView>
+          <ScrollView refreshControl={<RefreshControl
+            refreshing={this.state.loading}
+            onRefresh={this.getUserClubs}
+          />}>
+            <Text style={[{ flex: 1 }, styles.noneText]}>You are not an admin of any clubs</Text>
+          </ScrollView>
         )
       return (
         <ScrollView refreshControl={<RefreshControl
@@ -185,7 +187,7 @@ class ShowClubs extends Component {
             refreshing={this.state.loading}
             onRefresh={this.getUserClubs}
           />}>
-            <Text style={[{ flex: 1 }, styles.noneText ]}>You are not a member of any clubs</Text>
+            <Text style={[{ flex: 1 }, styles.noneText]}>You are not a member of any clubs</Text>
           </ScrollView>
         )
       return (
@@ -250,10 +252,39 @@ class CreateClub extends Component {
           imageURL: response.body.postResponse.key,
           uri: 'https://s3.amazonaws.com/clubster-123/' + response.body.postResponse.key,
           isImageUploaded: true
-         })
+        })
       }).catch((err) => { console.log(err) });
     } catch (error) { console.log(error); };
   };
+
+  // modal for when user enters invalid fields 
+  openValidModal() {
+    this.setState({
+      validModal: true
+    })
+  }
+
+  closeValidModal() { this.setState({ validModal: false }) }
+
+  // checks if any of the fields are empty. If any are, the
+  // page will not change and it will ask for inputs again
+  validateInput = () => {
+    let errors = {};
+    if (this.state != null) {
+      const { name, description, imageURL } = this.state;
+      if (name == '' || name == null)
+        errors['name'] = 'Please enter a name for the club'
+      if (description == '' || description == null)
+        errors['description'] = 'Please enter a description'
+      this.setState({ errors });
+      if (Object.keys(errors).length == 0) {
+        this.submit();
+      }
+      else {
+        this.openValidModal();
+      }
+    }
+  }
 
   submit = async () => {
     const { name, description, imageURL } = this.state;
@@ -268,6 +299,7 @@ class CreateClub extends Component {
   }
 
   render() {
+    let { errors = {} } = this.state;
     const { name, description } = this.state;
     return (
       <Container>
@@ -288,22 +320,37 @@ class CreateClub extends Component {
           </Item>
         </Form>
         <Content>
-        {this.state.isImageUploaded == false
-        ?
-        <TouchableOpacity onPress={this.useLibraryHandler}>
-               <Thumbnail square small style={styles.uploadIcon}
-                source={{uri: this.state.uri}} />
-          </TouchableOpacity>
-        :
-        <TouchableOpacity onPress={this.useLibraryHandler}>
-               <Thumbnail square large style={styles.imageThumbnail}
-                source={{uri: this.state.uri}} />
-          </TouchableOpacity>
-        }
+          {this.state.isImageUploaded == false
+            ?
+            <TouchableOpacity onPress={this.useLibraryHandler}>
+              <Thumbnail square small style={styles.uploadIcon}
+                source={{ uri: this.state.uri }} />
+            </TouchableOpacity>
+            :
+            <TouchableOpacity onPress={this.useLibraryHandler}>
+              <Thumbnail square large style={styles.imageThumbnail}
+                source={{ uri: this.state.uri }} />
+            </TouchableOpacity>
+          }
         </Content>
 
+        <Modal isVisible={this.state.validModal}>
+          <View style={styles.modalStyle}>
+            <TouchableOpacity onPress={() => this.closeValidModal()}>
+              <Icon name="ios-arrow-dropleft"
+                style={styles.modalButton} />
+            </TouchableOpacity>
+            <Text style={styles.modalContent}>
+              {errors.name}
+            </Text>
+            <Text style={styles.modalContent}>
+              {errors.description}
+            </Text>
+          </View>
+        </Modal>
+
         <Button bordered
-          onPress={this.submit}
+          onPress={this.validateInput}
           style={{
             margin: 20, width: 100,
             justifyContent: 'center', alignSelf: 'center'
@@ -362,23 +409,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'center'
   },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 82,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 4,
-    borderColor: 'rgba(0, 0, 0, 0.1)',
-  },
-  bottomModal: {
-    justifyContent: 'flex-end',
-    margin: 0,
-  },
   container: {
     flex: 1,
     marginVertical: 20,
   },
-  uploadIcon:{
+  uploadIcon: {
     alignSelf: 'center',
     margin: 10,
   },
@@ -386,8 +421,13 @@ const styles = StyleSheet.create({
     margin: 20,
     alignSelf: 'center',
     borderRadius: 2,
+<<<<<<< HEAD
     width: WIDTH/1.5,
     height: HEIGHT/3
+=======
+    width: WIDTH / 1.5,
+    height: HEIGHT / 3
+>>>>>>> 881d369ac9d8971214ab2ebe7c2ebf8608161d97
   },
   btn: {
     position: 'absolute',
@@ -466,11 +506,32 @@ const styles = StyleSheet.create({
   meetupCardMetaDate: {
     fontSize: 13
   },
+  modalStyle: {
+    margin: 1,
+    backgroundColor: "white",
+    padding: 22,
+    borderRadius: 4,
+    borderColor: "rgba(0, 0, 0, 0.1)"
+  },
+  modalContent: {
+    justifyContent: "center",
+    alignItems: "center",
+    fontSize: 20
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  modalButton: {
+    color: 'black',
+    fontSize: 40,
+    margin: 10
+  },
   noneText: {
-      textAlign: 'center',
-      textAlignVertical: 'center',
-      color: 'black',
-      fontSize: 16,
-      marginTop: 10
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    color: 'black',
+    fontSize: 16,
+    marginTop: 10
   }
 });

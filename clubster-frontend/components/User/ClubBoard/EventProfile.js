@@ -74,7 +74,7 @@ export default class EventProfile extends Component {
                 imageURL = response.body.postResponse.key;
             }).catch((err) => { console.log(err) });
             await axios.post(`http://localhost:3000/api/events/${this.event._id}/changeEventPicture`, { imageURL }).then((image) => {
-                this.setState({ eventImage: 'https://s3.amazonaws.com/clubster-123/' + image });
+                this.setState({ eventImage: 'https://s3.amazonaws.com/clubster-123/' + imageURL });
             });
         } catch (error) { console.log(error); }
     }
@@ -293,7 +293,6 @@ export default class EventProfile extends Component {
                         </Card>
                     </Content>
                     <CommentCard eventInfo={eventInfo} />
-                    <Gallery eventInfo={eventInfo} />
                 </ScrollView>
 
                 <Modal isVisible={this.state.likersModal}

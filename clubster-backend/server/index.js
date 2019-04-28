@@ -13,13 +13,12 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const passport = require('passport');
-const {databasePassword, databaseUsername} = require('../keys/keys');
 const multer = require('multer');
 const graphRoutes = require('./models/Graphs/routes');
 
 mongoose.Promise = global.Promise; // let's us use then catch
 mongoose.set('useCreateIndex', true);
-mongoose.connect(`mongodb://${databaseUsername}:${databasePassword}@ds131963.mlab.com:31963/clubster`, { useNewUrlParser: true });
+mongoose.connect(`mongodb://${process.env.databaseUsername}:${process.env.databasePassword}@ds131963.mlab.com:31963/clubster`, { useNewUrlParser: true });
 mongoose.connection
     .once('open', () => console.log('Mongodb running'))
     .on('error', err => console.log(err)); // to use routes
@@ -35,6 +34,8 @@ app.use(passport.initialize());
 // Passport Config
 require('./utils/passport')(passport);
 
+app.get('/', (req, res) => res.send('Hello, World!'));
+
 app.use('/api', [loginRoutes, organizationRoutes,
   notificationRoutes, eventRoutes, ridesRoutes,
   conversationRoutes, messageRoutes, graphRoutes,
@@ -45,7 +46,6 @@ const PORT = process.env.PORT || 3000;
 const server = require("http").createServer(app);
 var io = require('socket.io').listen(server);
 var url = require('url');
-const port = 3000;
 
 io.sockets.on('connection', socket => {
   clientId=socket.handshake.query.id;
@@ -56,4 +56,4 @@ io.sockets.on('connection', socket => {
   });
 });
 
-server.listen(port, () => console.log('server'));
+server.listen(PORT, () => console.log('server'));

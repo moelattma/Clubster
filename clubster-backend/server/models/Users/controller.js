@@ -6,6 +6,7 @@
 
 //Import Node.js libraries.
 const User = require('./model');              //import User Schema
+const Events = require('../Events/model')
 const Galleries = require('../Galleries/model')
 const bcrypt = require('bcrypt');             //bcrypt library is useful for salting, hashing passwords
 const jwt = require('jsonwebtoken');          //jwt is used for making a token for logged in users
@@ -112,8 +113,36 @@ exports.retrieveProfile = (req, res) => {
       });
     });
   }
-  
+
   User.findById(req.user._id).select('-username -email -password').populate('gallery').then((user) => {
     return res.status(201).json({ 'profile': user });
   });
 };
+
+exports.getAllEvents = (req, res) => {
+  Events.find({}, function(err, events) {
+    if (err) {
+      return res.status(404).json({ 'Error': 'error' });
+    }
+    else {
+      return res.status(201).json({ 'events': events })
+    }
+  })
+};  
+
+// // get events of orgs that person is a part of 
+// exports.getAllUserEvents = (req, res) => {
+//   console.log("HELLO!");
+//   let userID = req.user._id;
+//   User.findById(userID)
+//     .select('arrayClubsMember arrayClubsAdmin')
+//     .populate({ path: 'arrayClubsMember', populate: { select: 'events', path: 'events' } })
+//     .populate({ path: 'arrayClubsAdmin', populate: { select: 'events', path: 'events' } })
+//     .then(user => User.aggregate([{
+//       $group: {
+//         "_id": user.arrayClubsAdmin,
+//         "events": { $push: user.arrayClubsAdmin.name }
+//       }
+//     }
+//     ])).then(pipeline => { return res.status(201).json({ 'events': pipeline }) })
+// };  

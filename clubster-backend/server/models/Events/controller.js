@@ -4,6 +4,7 @@
 */
 
 // Import
+const User = require('./model');              //import User Scheme
 const Events = require('./model');	//events schema
 const Organization = require('../Organizations/model');	//organizations schema
 const mongoose = require('mongoose');	//mongoose, library to communicate with backend
@@ -88,9 +89,26 @@ exports.handleGoing = (req, res) => {
 */
 exports.addEvent = (req, res) => {
 	const { organizationID } = req.params;	//grab the idOfOrganization whose id = idOfOrganization
-	var { name, date, description, location, time, imageURL } = req.body;	//grab data from req.body
+	var { name, date, description, location, time, imageURL, chosenDate, selectedStartDate, selectedEndDate, timeDisplay, timeDisplayEnd } = req.body;	//grab data from req.body
 	//Next 4 lines are how to write image info to db. We are going to change this soon. Code is more to memorize
 		//Find Organization whose id = organizationID
+		console.log(timeDisplay, timeDisplayEnd);
+		console.log(parseInt(timeDisplay.substring(0,timeDisplay.indexOf(":"))) + 12);
+		const startDate = selectedStartDate.split("T")[0].split("-");
+		if(selectedStartDate) {
+			year = selectedStartDate.split("T")[0].split("-")[0];
+			startMonth = selectedStartDate.split("T")[0].split("-")[1];
+			startDay = selectedStartDate.split("T")[0].split("-")[2];
+		}
+		if(selectedEndDate) {
+			yearEnd = selectedEndDate.split("T")[0].split("-")[0];
+			endMonth = selectedEndDate.split("T")[0].split("-")[1];
+			endDay = selectedEndDate.split("T")[0].split("-")[2];
+		}
+		var dateStart = new Date(parseInt(year), parseInt(startMonth) - 1, parseInt(startDay), parseInt(timeDisplay.substring(0,timeDisplay.indexOf(":"))) + (timeDisplay.indexOf("PM") == -1) ? 0 : 12, parseInt(timeDisplay.substring(timeDisplay.indexOf(":") + 1, timeDisplay.indexOf(":") + 3))).getTime() / 1000;
+		var dateEnd = new Date(parseInt(yearEnd), parseInt(endMonth) - 1, parseInt(endDay), parseInt(timeDisplayEnd.substring(0,timeDisplayEnd.indexOf(":"))) + (timeDisplayEnd.indexOf("PM") == -1) ? 0 : 12, parseInt(timeDisplayEnd.substring(timeDisplayEnd.indexOf(":") + 1, timeDisplayEnd.indexOf(":") + 3))).getTime() / 1000;
+
+
 		Organization.findByIdAndUpdate(organizationID).then((organization) => {
 			if (!organization) {
 				return res.status(400).json({ 'Error': 'No such organization exists' }); //DNE, doesnt exist
@@ -99,11 +117,10 @@ exports.addEvent = (req, res) => {
 				let clubEvent = new Events({
 					organization: organizationID,
 					name: name,
-					date: date,
+					date: [dateStart, dateEnd],
 					description: description,
 					host: req.user._id,
 					location: location,
-					time: time,
 					going: [req.user._id],
 					likers: [req.user._id],
 					comments: [],
@@ -112,6 +129,7 @@ exports.addEvent = (req, res) => {
 					totalComments: 0,
 					totalLikes: 0
 				});
+				console.log('Hi this is date ', clubEvent.date[0].toString());
 				//write clubEvent to db
 				clubEvent.save().then((event) => {
 					// Add event's id to organization's events array
@@ -249,4 +267,18 @@ exports.addCommentToEvent = (req, res) => {
 				return res.status(400).json({ 'Error': 'No comments found' });
 			}
 	})
-}
+};
+
+
+// get events of orgs that person is a part of
+exports.getUserOrgs = (req, res) => {
+	const { orgID } = req.body;
+	let userID = req.user._id;
+	User.findById(userID).populate('arrayClubsMember arrayClubsAdmin').then(() => {
+		if (!organization) {
+			return res.status(400).json({ 'Error': 'No events found' });	//organization is null, DNE
+		} else {
+			return res.status(201).json({ 'events': organization.events, idOfUser: req.user._id }); //returns organization's events along with idOfUser
+		}
+	}).catch((err) => console.log(err));
+};
