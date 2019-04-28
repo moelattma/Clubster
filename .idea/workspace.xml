@@ -2,9 +2,42 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="23bb1ad5-2436-460b-9d06-c5893fd4a870" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clubster-frontend/components/Clubs/ClubPage.js" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-frontend/components/Clubs/ClubPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clubster-frontend/components/User/ClubsterNavigation.js" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-frontend/components/User/ClubsterNavigation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/.travis.yml" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/.travis.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/appveyor.yml" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/appveyor.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/lib/binding/bcrypt_lib.node" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/lib/binding/bcrypt_lib.node" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/.bin/detect-libc" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/.bin/detect-libc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/.bin/mkdirp" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/.bin/mkdirp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/.bin/needle" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/.bin/needle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/.bin/node-pre-gyp" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/.bin/node-pre-gyp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/.bin/nopt" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/.bin/nopt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/.bin/rc" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/.bin/rc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/.bin/rimraf" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/.bin/rimraf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/.bin/semver" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/.bin/semver" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/minizlib/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/minizlib/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/minizlib/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/minizlib/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/needle/lib/needle.js" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/needle/lib/needle.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/needle/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/needle/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/needle/test/long_string_spec.js" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/needle/test/long_string_spec.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/node-pre-gyp/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/node-pre-gyp/CHANGELOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/node-pre-gyp/lib/install.js" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/node-pre-gyp/lib/install.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/node-pre-gyp/lib/util/abi_crosswalk.json" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/node-pre-gyp/lib/util/abi_crosswalk.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/node-pre-gyp/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/node-pre-gyp/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/npm-packlist/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/npm-packlist/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/npm-packlist/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/npm-packlist/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/semver/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/semver/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/semver/bin/semver" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/semver/bin/semver" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/semver/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/semver/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/semver/semver.js" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/semver/semver.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/tar/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/tar/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/tar/lib/parse.js" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/tar/lib/parse.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/tar/lib/unpack.js" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/tar/lib/unpack.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/tar/lib/write-entry.js" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/tar/lib/write-entry.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/tar/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/node_modules/tar/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/node_modules/bcrypt/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-backend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clubster-frontend/components/Login/Login.js" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-frontend/components/Login/Login.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/clubster-frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/clubster-frontend/package-lock.json" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -17,12 +50,11 @@
     <session id="-1202895917">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="4" />
+          <entry key="project.closed" value="3" />
           <entry key="project.open.time.0" value="1" />
           <entry key="project.open.time.1" value="1" />
-          <entry key="project.open.time.2" value="1" />
           <entry key="project.open.time.3" value="1" />
-          <entry key="project.opened" value="4" />
+          <entry key="project.opened" value="3" />
         </counts>
       </usages-collector>
     </session>
@@ -41,7 +73,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
@@ -59,6 +90,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">

@@ -6,7 +6,7 @@ import { ImagePicker, Permissions, Constants } from 'expo';
 import converter from 'base64-arraybuffer';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { Container, Card, Button, Text, Form, Content, Item, Icon, Left, Body, Right, Input, Thumbnail, Drawer, Header, Title } from 'native-base';
+import { Container, Card, Button, Text, Form, Content, Item, Icon, Left, Body, Right, Input, Thumbnail } from 'native-base';
 import MembersList from './MembersList';
 import v1 from 'uuid/v1';
 import Gallery from '../Cards/Gallery';
@@ -17,7 +17,6 @@ import { DefaultImg } from '../../router';
 const { WIDTH, HEIGHT } = Dimensions.get('window');
 
 export default class Settings extends Component {
-
     constructor() {
         super();
         this.state = {
@@ -134,12 +133,11 @@ export default class Settings extends Component {
 
     render() {
         return (
-
             <ScrollView>
-                {this.props.screenProps.isAdmin ?
+                {this.props.screenProps.isAdmin ? 
                     <TouchableOpacity style={styles.editButton} onPress={this._showModal}>
                         <FontAwesome name="edit" size={35} color={'black'} />
-                    </TouchableOpacity>
+                    </TouchableOpacity> 
                     :
                     null
                 }
@@ -149,9 +147,21 @@ export default class Settings extends Component {
                         source={{ uri: this.state.img }} />
                 </TouchableOpacity>
 
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', margin:7 }}>
+                    <Button bordered style={styles.buttonText} onPress={() => this.aboutClicked()}>
+                        <Text> About </Text>
+                    </Button>
+                    <Button bordered style={styles.buttonText} onPress={() => this.photosClicked()}>
+                        <Text > Photos </Text>
+                    </Button>
+                    <Button bordered style={styles.buttonText} transparent onPress={() => this.membersClicked()}>
+                        <Text > Members </Text>
+                    </Button>
+                </View>
+
                 {(this.state.photosDisplay)
                     //Photos tab
-                    ? <Gallery galleryID={this.state.galleryID} photos={this.state.photos} isAdmin={this.props.screenProps.isAdmin}
+                    ? <Gallery galleryID={this.state.galleryID} photos={this.state.photos} isAdmin={this.props.screenProps.isAdmin} 
                                onUpdatePhotos={this.onUpdatePhotos.bind(this)} />
                     //members tab
                     : ((this.state.members) ? <View>
@@ -181,7 +191,6 @@ export default class Settings extends Component {
                             </View>
                         </View>
                     )}
-
 
                 {/*---------- MODAL  ---------------*/}
                 <View>
@@ -229,11 +238,9 @@ export default class Settings extends Component {
                     </Modal>
                 </View>
             </ScrollView>
-
         );
     }
 }
-
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -247,9 +254,6 @@ const styles = StyleSheet.create({
     editButton:{
         alignSelf: 'flex-end',
         margin: 10
-    },
-    menuButton:{
-        alignSelf: 'flex-start',
     },
     pageTitle: {
         justifyContent: 'center',

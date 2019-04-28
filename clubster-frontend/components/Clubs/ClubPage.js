@@ -26,7 +26,7 @@ const CLUB_WIDTH = WIDTH * 4 / 10;
 const CLUB_HEIGHT = HEIGHT / 4;
 
 export default class ClubsPage extends Component {
-  static navigationOptions = () => {
+  static navigationOptions = ({ }) => {
     return {
       header: null
     };
@@ -421,13 +421,8 @@ const styles = StyleSheet.create({
     margin: 20,
     alignSelf: 'center',
     borderRadius: 2,
-<<<<<<< HEAD
-    width: WIDTH/1.5,
-    height: HEIGHT/3
-=======
     width: WIDTH / 1.5,
     height: HEIGHT / 3
->>>>>>> 881d369ac9d8971214ab2ebe7c2ebf8608161d97
   },
   btn: {
     position: 'absolute',
