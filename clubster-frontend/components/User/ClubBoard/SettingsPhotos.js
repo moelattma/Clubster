@@ -16,7 +16,7 @@ import { DefaultImg } from '../../router';
 
 const { WIDTH, HEIGHT } = Dimensions.get('window');
 
-export default class Settings extends Component {
+export default class SettingsPhotos extends Component {
 
     constructor() {
         super();
@@ -149,38 +149,8 @@ export default class Settings extends Component {
                         source={{ uri: this.state.img }} />
                 </TouchableOpacity>
 
-                {(this.state.photosDisplay)
-                    //Photos tab
-                    ? <Gallery galleryID={this.state.galleryID} photos={this.state.photos} isAdmin={this.props.screenProps.isAdmin}
-                               onUpdatePhotos={this.onUpdatePhotos.bind(this)} />
-                    //members tab
-                    : ((this.state.members) ? <View>
-                        <View style={{ margin: 10 }}>
-                            <MembersList _id={this.props.screenProps._id}
-                                style={{ margin: 10 }}></MembersList>
-                        </View>
-                    </View>
-                        //about tab
-                        : <View>
-                            <View style={styles.mainContainer}>
-                                <Text style={styles.nameText}>
-                                    {this.state.name}
-                                </Text>
-                                <Text style={styles.subText}>
-                                    President:
-                                </Text>
-                                <Text style={{ marginLeft: 10, marginBottom: 7 }}>
-                                    {this.state.president}
-                                </Text>
-                                <Text style={styles.subText}>
-                                    Description/ purpose:
-                                </Text>
-                                <Text style={{ marginLeft: 10, marginBottom: 7 }}>
-                                    {this.state.description}
-                                </Text>
-                            </View>
-                        </View>
-                    )}
+                <Gallery galleryID={this.state.galleryID} photos={this.state.photos} isAdmin={this.props.screenProps.isAdmin}
+                    onUpdatePhotos={this.onUpdatePhotos.bind(this)} />
 
 
                 {/*---------- MODAL  ---------------*/}
@@ -229,7 +199,6 @@ export default class Settings extends Component {
                     </Modal>
                 </View>
             </ScrollView>
-
         );
     }
 }

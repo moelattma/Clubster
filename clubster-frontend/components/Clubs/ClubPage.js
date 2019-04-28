@@ -25,7 +25,7 @@ const CLUB_WIDTH = WIDTH * 4 / 10;
 const CLUB_HEIGHT = HEIGHT / 4;
 
 export default class ClubsPage extends Component {
-  static navigationOptions = ({ }) => {
+  static navigationOptions = () => {
     return {
       header: null
     };
@@ -41,7 +41,7 @@ export default class ClubsPage extends Component {
 class ShowClubs extends Component {
   constructor(props) { // Initializing state
     super(props);
-    
+
     props.navigation.setParams({ refreshClubs: this.getUserClubs });
     props.navigation.setParams({ showAdmin: true })
 
@@ -83,7 +83,7 @@ class ShowClubs extends Component {
           <Button transparent onPress={() => navigation.setParams({ showAdmin: false })}>
             <Text style={[{ fontSize: 20, fontWeight: 'bold' }, navigation.state.params &&
               !navigation.state.params.showAdmin ? { color: '#59cbbd' } : {}]} >Member</Text>
-          </Button>          
+          </Button>
         </View>
       )
     };
@@ -104,7 +104,7 @@ class ShowClubs extends Component {
         if (getClubsAdmin[i].image)
           url = 'https://s3.amazonaws.com/clubster-123/' + getClubsAdmin[i].image;
         else
-          url = DefaultImg;  
+          url = DefaultImg;
         getClubsAdmin[i].image = url;
         getClubsAdmin[i].isAdmin = true;
       };
@@ -246,7 +246,7 @@ class CreateClub extends Component {
         successActionStatus: 201
       }
       await RNS3.put(file, options).then((response) => {
-        this.setState({ 
+        this.setState({
           imageURL: response.body.postResponse.key,
           uri: 'https://s3.amazonaws.com/clubster-123/' + response.body.postResponse.key,
           isImageUploaded: true
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     borderRadius: 2,
     width: WIDTH/1.5,
-    height: HEIGHT/3 
+    height: HEIGHT/3
   },
   btn: {
     position: 'absolute',
