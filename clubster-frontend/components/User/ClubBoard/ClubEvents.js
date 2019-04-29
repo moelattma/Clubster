@@ -72,7 +72,8 @@ class ShowEvents extends Component {
       location: '',
       time: null,
       imageURL: DefaultImg,
-      show:true
+      show:true,
+      editModal: false
     }
   }
 
@@ -133,6 +134,21 @@ class ShowEvents extends Component {
   }
 
   closeEditModal() { this.setState({ editModal: false }) }
+
+  _updateEvent = (item) => {
+    const { name, description, time, date, location } = this.state;
+    
+    if (name != "") 
+      item.name = name
+    if (description != "")
+      item.description = description
+    if (time != "")
+      item.time = time
+    if (date != "")
+      item.date = date
+    if (location != "")
+      item.location = location
+  } 
 
   _handleGoing = (item) => {
     for (var i = 0; i < this.state.clubEvents.length; i++) {
@@ -223,12 +239,12 @@ class ShowEvents extends Component {
                 />
               </Form>
               <Button bordered
-                onPress={this.validateInput}
+                onPress={this._updateEvent(item)}
                 style={{
                   margin: 20, width: 160,
                   justifyContent: 'center', alignSelf: 'center'
                 }}>
-                <Text>Create Event!</Text>
+                <Text>Update Event!</Text>
               </Button>
             </View>
           </Modal>

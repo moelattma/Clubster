@@ -18,7 +18,8 @@ const graphRoutes = require('./models/Graphs/routes');
 
 mongoose.Promise = global.Promise; // let's us use then catch
 mongoose.set('useCreateIndex', true);
-mongoose.connect(`mongodb://${process.env.databaseUsername}:${process.env.databasePassword}@ds131963.mlab.com:31963/clubster`, { useNewUrlParser: true });
+// mongoose.connect(`mongodb://${process.env.databaseUsername}:${process.env.databasePassword}@ds131963.mlab.com:31963/clubster`, { useNewUrlParser: true });
+mongoose.connect(`mongodb://clubster123:Clubster123!@ds131963.mlab.com:31963/clubster`, { useNewUrlParser: true });
 mongoose.connection
     .once('open', () => console.log('Mongodb running'))
     .on('error', err => console.log(err)); // to use routes

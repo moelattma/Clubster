@@ -6,6 +6,7 @@
 
 //Import Node.js libraries.
 const User = require('./model');              //import User Schema
+const Organization = require('../Organizations/model')
 const Events = require('../Events/model')
 const Galleries = require('../Galleries/model')
 const bcrypt = require('bcrypt');             //bcrypt library is useful for salting, hashing passwords
@@ -130,19 +131,16 @@ exports.getAllEvents = (req, res) => {
   })
 };  
 
-// // get events of orgs that person is a part of 
-// exports.getAllUserEvents = (req, res) => {
-//   console.log("HELLO!");
-//   let userID = req.user._id;
-//   User.findById(userID)
-//     .select('arrayClubsMember arrayClubsAdmin')
-//     .populate({ path: 'arrayClubsMember', populate: { select: 'events', path: 'events' } })
-//     .populate({ path: 'arrayClubsAdmin', populate: { select: 'events', path: 'events' } })
-//     .then(user => User.aggregate([{
-//       $group: {
-//         "_id": user.arrayClubsAdmin,
-//         "events": { $push: user.arrayClubsAdmin.name }
-//       }
-//     }
-//     ])).then(pipeline => { return res.status(201).json({ 'events': pipeline }) })
-// };  
+// get events of orgs that person is a part of 
+exports.getAllUserEvents = (req, res) => {
+  console.log("HELLO!");
+  let userID = req.user._id;
+  let eventsArray = [];
+  User.findById(userID).then(user => {
+    console.log(user.arrayClubsAdmin);
+      Organization.findById(user.arrayClubsAdmin, user.arrayClubsMember).populate('events').then(
+        //orgEvent => console.log(orgEvent) 
+        orgEvent => { return res.status(201).json({ orgEvent }) }
+      )
+ })
+};  
