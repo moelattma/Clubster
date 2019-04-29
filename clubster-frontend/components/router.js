@@ -21,7 +21,7 @@ import ClubPage from './Clubs/ClubPage';
 import ClubSearch from './Clubs/ClubSearch';
 import ClubProfile from './Clubs/ClubProfile';
 
-import Dashboard from './User/ClubBoard/Settings';
+import Dashboard from './User/ClubBoard/Drawer';
 import ClubEvents from './User/ClubBoard/ClubEvents';
 import Chat from './User/ClubBoard/Chat';
 import MemberList from './User/ClubBoard/MembersList';
@@ -142,7 +142,7 @@ export const AdminNavigator = createMaterialTopTabNavigator(
             screen: Graphs,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
-                    <Octicons name='graph' size={27} color={tintColor} /> 
+                    <Octicons name='graph' size={27} color={tintColor} />
                 ),
             }
         }

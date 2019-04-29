@@ -16,9 +16,10 @@ const passport = require('passport');
 const multer = require('multer');
 const graphRoutes = require('./models/Graphs/routes');
 
+console.log('usrname is ', process.env.databaseUsername);
+
 mongoose.Promise = global.Promise; // let's us use then catch
 mongoose.set('useCreateIndex', true);
-// mongoose.connect(`mongodb://${process.env.databaseUsername}:${process.env.databasePassword}@ds131963.mlab.com:31963/clubster`, { useNewUrlParser: true });
 mongoose.connect(`mongodb://clubster123:Clubster123!@ds131963.mlab.com:31963/clubster`, { useNewUrlParser: true });
 mongoose.connection
     .once('open', () => console.log('Mongodb running'))
