@@ -8,6 +8,7 @@ export const USER_CHANGEPHOTO = 'USER_CHANGEPHOTO';
 
 // club actions
 export const CLUBS_SET = 'CLUBS_SET';
+export const CLUBS_SETALL = 'CLUBS_SET_ALL';
 export const CLUBS_GET = 'CLUBS_GET';
 export const CLUBS_CREATE = 'CLUBS_CREATE';
 export const CLUBS_EDIT = 'CLUBS_EDIT';

@@ -7,7 +7,7 @@ import axios from 'axios';
 import { ListItem, Left, Body, Thumbnail, Text } from 'native-base';
 
 import { connect } from 'react-redux';
-import { CLUB_GET_ALL } from '../../reducers/ActionTypes';
+import { CLUBS_SETALL } from '../../reducers/ActionTypes';
 import { DefaultImg } from '../Utils/Defaults';
 
 class SearchClubs extends PureComponent {
@@ -19,9 +19,9 @@ class SearchClubs extends PureComponent {
         this.state = {
             loading: false,
             error: null,
-            allOrganizations: [],
             organizations: [],
-            query: ""
+            query: "",
+            noneSearched: true
         }
     }
 
@@ -46,7 +46,7 @@ class SearchClubs extends PureComponent {
         };
       };
 
-    async componentWillMount() {
+    async componentDidMount() {
         this.getOrganizations();
     }
 
@@ -54,18 +54,19 @@ class SearchClubs extends PureComponent {
         this.setState({ loading: true });
         axios.get('http://localhost:3000/api/organizations/all')
             .then((response) => {
-                this.setState({ organizations: response.data.organizations, allOrganizations: response.data.organizations });
-                this.setState({ loading: false });
+                this.setState({ organizations: response.data.organizations, loading: false });
+                this.handleSearch(this.state.query);
+                this.props.setAllClubs(response.data.organizations);
             });
     }
 
     handleSearch = text => {
         const formatQuery = text.toLowerCase();
-        const data = _.filter(this.state.allOrganizations, org => {
+        const data = _.filter(this.props.allOrganizations, org => {
             return org.name.toLowerCase().includes(formatQuery);
         });
 
-        this.setState({ query: text, organizations: data });
+        this.setState({ query: text, organizations: data, noneSearched: false });
     }
 
     renderSeparator = () => {
@@ -108,10 +109,9 @@ class SearchClubs extends PureComponent {
     render() {
         return (
             <FlatList
-                data={this.state.organizations.slice(0, 40)}
+                data={(this.state.noneSearched ? this.props.allOrganizations.slice(0, 40) : this.state.organizations.slice(0, 40))}
                 renderItem={this._renderItem}
                 keyExtractor={organization => organization.name}
-                // ListHeaderComponent={this.renderHeader}
                 ItemSeparatorComponent={this.renderSeparator}
                 ListFooterComponent={this.renderFooter}
                 refreshing={this.state.loading}
@@ -123,14 +123,20 @@ class SearchClubs extends PureComponent {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        getAllClubs: () => dispatch({
+        setAllClubs: (allClubs) => dispatch({
             type: CLUB_GET_ALL,
-            payload: {  }
+            payload: { allClubs }
         })
     }
 }
 
-export default connect(null, mapDispatchToProps)(SearchClubs);
+const mapStateToProps = (state) => {
+    return {
+        allOrganizations: state.clubs.allClubs
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SearchClubs);
 
 const styles = StyleSheet.create({
     header: {

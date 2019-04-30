@@ -6,6 +6,5 @@ npm-debug.*
 *.key
 *.mobileprovision
 package-lock.json
-package.json
 keys
 config.js
