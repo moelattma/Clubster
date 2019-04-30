@@ -46,9 +46,9 @@ export default class Notifications extends Component {
                     }
                 </TouchableOpacity>
                 <View style={{ width: WIDTH/2, alignItems: 'center', marginLeft:4, marginRight:4 }}>
-                    <Text 
+                    <Text
                     style={{ fontSize: 16, textAlign: 'left' }}>
-                        {item.message} 
+                        {item.message}
                      </Text>
                 </View>
                 </View>
@@ -117,19 +117,27 @@ export default class Notifications extends Component {
         )
     }
 
+    renderNotifications = () => {
+      return (
+        <ScrollView style={styles.notificationPage} refreshControl={<RefreshControl
+            refreshing={this.state.refreshing}
+            onRefresh={() => this._getNotifications()}
+          />}>
+            <FlatList
+                data={this.state.notifications.reverse().slice(0, 20)}
+                renderItem={this._renderItem}
+                keyExtractor={(item) => item._id}
+                ItemSeparatorComponent={this.renderSeparator}
+            />
+        </ScrollView>
+      )
+    }
+
     render() {
         return (
-            <ScrollView style={styles.notificationPage} refreshControl={<RefreshControl
-                refreshing={this.state.refreshing}
-                onRefresh={() => this._getNotifications()}
-              />}>
-                <FlatList
-                    data={this.state.notifications.reverse().slice(0, 20)}
-                    renderItem={this._renderItem}
-                    keyExtractor={(item) => item._id}
-                    ItemSeparatorComponent={this.renderSeparator}
-                />
-            </ScrollView>
+            <View style = {{flex:1}}>
+              {this.renderNotifications()}
+            </View>
         );
     }
 }

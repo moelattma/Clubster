@@ -26,7 +26,7 @@ const CLUB_WIDTH = WIDTH * 4 / 10;
 const CLUB_HEIGHT = HEIGHT / 4;
 
 export default class ClubsPage extends Component {
-  static navigationOptions = ({ }) => {
+  static navigationOptions = () => {
     return {
       header: null
     };
@@ -257,7 +257,7 @@ class CreateClub extends Component {
     } catch (error) { console.log(error); };
   };
 
-  // modal for when user enters invalid fields 
+  // modal for when user enters invalid fields
   openValidModal() {
     this.setState({
       validModal: true
