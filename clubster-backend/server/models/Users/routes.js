@@ -6,13 +6,14 @@
 const router = require('express').Router();
 const controller = require('./controller');
 const passport = require('passport');
-const cors = require('cors')
 
 router.post('/register', (req, res) => {
 	controller.createUser(req, res);
 });
 
-router.post('/login', cors(), (req, res) => {
+router.post('/login', (req, res) => {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "X-Requested-With");
 	controller.findUser(req, res);
 });
 
