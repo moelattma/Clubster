@@ -13,7 +13,7 @@ router.post('/register', (req, res) => {
 
 router.post('/login', (req, res) => {
 	res.header("Access-Control-Allow-Origin", "*");
-	res.header("Access-Control-Allow-Headers", "X-Requested-With");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	controller.findUser(req, res);
 });
 
