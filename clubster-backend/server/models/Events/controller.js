@@ -37,6 +37,31 @@ exports.changeEventPicture = (req, res) => {
 	  });
 };
 
+exports.addWentUser = (req, res) => {
+	const { eventID, userID } = req.params;
+	let userObj;
+	if(userID == 'null') {
+		userObj = {
+			guest_name: req.body.name
+		}
+	} else {
+		userObj = {
+			_idUser: userID
+		}
+	}
+	Events.findOneAndUpdate(
+		{ _id: eventID },
+		{ $push: { went: userObj } },
+		{ new: true, upsert: true },
+		function (error, event) {
+			if (error) {
+				console.log(error);
+			} else {
+				return res.status(201).json({ event });
+			}
+		});
+};
+
 /*
 * Method to add a member to an event. This function is called when you tap the star on the event.
 */
@@ -127,6 +152,7 @@ exports.addEvent = (req, res) => {
 					image: imageURL,
 					value: 5,
 					totalComments: 0,
+					went: [],
 					totalLikes: 0
 				});
 				console.log('Hi this is date ', clubEvent.date[0].toString());
