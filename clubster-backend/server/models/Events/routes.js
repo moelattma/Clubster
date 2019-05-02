@@ -49,6 +49,10 @@ router.post('/events/:eventID/comments', passport.authenticate('jwt', {session:f
 	controller.addCommentToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
+router.post('/events/:eventID/:userID', (req, res) => {
+	controller.addWentUser(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
+});
+
 router.post('/events/:eventID/changeEventPicture', passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.changeEventPicture(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });

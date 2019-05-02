@@ -58,6 +58,10 @@ const Events = new Schema({
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'Rides'
   }],
+  went: [{
+    _idUser: Schema.Types.ObjectId,
+    guest_name: String
+  }],
   comments: [{
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'comments'

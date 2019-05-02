@@ -19,6 +19,7 @@
     "babel-register": "^6.26.0",
     "bcrypt": "^3.0.4",
     "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
     "express": "^4.16.4",
     "fs": "0.0.1-security",
     "gravatar": "^1.6.0",
