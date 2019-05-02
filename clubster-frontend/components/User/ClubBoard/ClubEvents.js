@@ -66,6 +66,7 @@ class ShowEvents extends Component {
       clubEvents: [],
       loading: false,
       idOfUser: '',
+      editedItem: null,
       name: '',
       description: '',
       date: '',
@@ -129,6 +130,7 @@ class ShowEvents extends Component {
   // modal for when user enters invalid fields 
   openEditModal( item ) {
     this.setState({
+      editedItem: item,
       name: item.name,
       description: item.description,
       time: item.time,
@@ -140,20 +142,19 @@ class ShowEvents extends Component {
 
   closeEditModal() { this.setState({ editModal: false }) }
 
-  submitEventChanges = (item) => {
-    const { _id } = this.props.screenProps;
+  submitEventChanges = () => {
     let { name, description, time, date, location } = this.state;
     if (name == "")
-      name = item.name;
+      name = this.state.editedItem.name;
     if (description == "")
-      description = item.description;
+      description = this.state.editedItem.description;
     if (time == "")
-      time = item.time
+      time = this.state.editedItem.time
     if (date == "")
-      date = item.date
+      date = this.state.editedItem.date
     if (location == "")
-      location = item.location
-    axios.post(`http://localhost:3000/api/events/${item._id}`, {
+      location = this.state.editedItem.location
+    axios.post(`http://localhost:3000/api/events/${this.state.editedItem._id}`, {
       name: this.state.name,
       description: this.state.description,
       time: this.state.time,
@@ -301,7 +302,7 @@ class ShowEvents extends Component {
               </View>
               <View>
                 <Button bordered
-                  onPress={() => {this.submitEventChanges(item) }}
+                  onPress={() => {this.submitEventChanges() }}
                   style={{
                     margin: 20, width: 160,
                     justifyContent: 'center', alignSelf: 'center'

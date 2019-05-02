@@ -176,13 +176,14 @@ exports.addEvent = (req, res) => {
 
 }
 
+// backend for updating events
 exports.updateEvent = (req, res) => {
 	const { eventID } = req.params;
 	const { name, description, date, time, location } = req.body;
 
 	Events.findById(eventID).then((event) => {
 		if (event) {
-			let updatedEvent = {
+			let updatedEvent = { 
 				name: name,
 				description: description,
 				date: date,
@@ -195,12 +196,10 @@ exports.updateEvent = (req, res) => {
 				{ $set: updatedEvent },	
 				{ new: true }
 			).then((event) => {
-				Events.findById(event._id).populate('event').then((event) => {
 					if (event)
 						return res.status(201).json({ 'event': event });
 					else	
 						return res.status(400).json({ 'err': 'err' })
-				}).catch(err => console.log(err));
 			})
 		}
 		else {
