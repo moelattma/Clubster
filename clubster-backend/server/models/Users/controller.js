@@ -51,7 +51,10 @@ exports.createUser = (req, res) => {
 
 exports.findUser = (req, res) => {
   const { username, password } = req.body;
-  User.findOne({ username: username }).populate('arrayClubsAdmin arrayClubsMember gallery').then((user) => {
+  User.findOne({ username: username }).populate('gallery')
+  .populate({ path: 'arrayClubsAdmin', select: 'name image _id' })
+  .populate({ path: 'arrayClubsMember', select: 'name image _id' })
+  .then((user) => {
     // checks if both username and password are valid
     if (!user) {
       return res.status(400).json({ 'Error': 'User does not exist' });

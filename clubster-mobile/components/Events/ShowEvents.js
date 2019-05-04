@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Dimensions, FlatList, StyleSheet, Image } from 'react-native';
+import { connect } from 'react-redux'
 import axios from 'axios';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -10,11 +11,11 @@ const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const EVENT_WIDTH = WIDTH * 9 / 10;
 const EVENT_HEIGHT = HEIGHT * 3 / 7;
 
-export default class ShowEvents extends React.Component {
+export class ShowEvents extends React.Component {
   constructor(props) {
     super(props);
 
-    props.navigation.setParams({ addEvent: this.addEvent });
+    props.navigation.setParams({ addEvent: this.addEvent, isAdmin: props.isAdmin });
 
     this._mounted = false;
 
@@ -31,26 +32,6 @@ export default class ShowEvents extends React.Component {
     }
   }
 
-  static navigationOptions = ({ navigation, screenProps }) => {
-    rightHeader = (
-      <View style={{ marginRight: 6 }}>
-        <FontAwesome
-          name="plus" size={32} color={'black'}
-          onPress={() => navigation.navigate('CreateClubEvent', { addEvent: navigation.state.params.addEvent })} />
-      </View>);
-
-    return {
-      headerLeft: (
-        <View style={{ marginLeft: 13 }}>
-          <MaterialIcons
-            name="arrow-back" size={32} color={'black'}
-            onPress={() => screenProps.clubBoardNav.navigate('HomeNavigation')} />
-        </View>
-      ),
-      headerRight: (screenProps.isAdmin ? rightHeader : null)
-    }
-  }
-
   componentWillMount() {
     this._mounted = true;
     if (this._mounted) this.getClubEvents();
@@ -59,9 +40,8 @@ export default class ShowEvents extends React.Component {
   componentWillUnmount() { this._mounted = false; }
 
   getClubEvents = async () => {
-    const { _id } = this.props.screenProps;
     this.setState({ loading: true })
-    axios.get(`http://localhost:3000/api/events/${_id}`)
+    axios.get(`http://localhost:3000/api/events/${this.props.clubID}`)
       .then((response) => {
         if (this._mounted) {
           this.setState({ clubEvents: response.data.events, idOfUser: response.data.idOfUser });
@@ -69,13 +49,6 @@ export default class ShowEvents extends React.Component {
         }
       })
       .catch((err) => { console.log('getClubEvents failed'); console.log(err) });
-  }
-
-  addEvent = async (newEvent) => {
-    this.setState({ loading: true });
-    var events = this.state.clubEvents;
-    events.unshift(newEvent);
-    this.setState({ clubEvents: events, loading: false });
   }
 
   _handleGoing = (item) => {
@@ -188,17 +161,47 @@ export default class ShowEvents extends React.Component {
       return <Expo.AppLoading />;
     }
     return (
-      <FlatList
-        data={this.state.clubEvents}
-        renderItem={this._renderItem}
-        keyExtractor={clubEvent => clubEvent._id}
-        ItemSeparatorComponent={this.renderSeparator}
-        refreshing={this.state.loading}
-        onRefresh={() => this.getClubEvents()}
-      />
+      <View>
+        <View style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 2, alignSelf: 'center', justifyContent: 'flex-end', width: WIDTH }}>
+          <Button info onPress={() => this.props.navigation.navigate('CreateEvent')}>
+            <Text> New! </Text>
+          </Button>
+        </View>
+        <FlatList
+          data={this.state.clubEvents}
+          renderItem={this._renderItem}
+          keyExtractor={clubEvent => clubEvent._id}
+          ItemSeparatorComponent={this.renderSeparator}
+          refreshing={this.state.loading}
+          onRefresh={() => this.getClubEvents()}
+        />
+      </View>
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  // const {  } = state.events.clubEvents;
+  const clubID = state.clubs.club._id;
+  return {
+    clubID
+  }
+}
+
+// const mapDispatchToProps = (dispatch) => {
+//   return {
+//       setUserClubs: (clubsAdmin, clubsMember) => dispatch({
+//           type: CLUBS_SET,
+//           payload: { clubsAdmin, clubsMember }
+//       }),
+//       setCurrentClub: (club) => dispatch({
+//           type: CLUBS_SETUSER,
+//           payload: { club }
+//       })
+//   }
+// }
+
+export default connect(mapStateToProps, null)(ShowEvents);
 
 const styles = StyleSheet.create({
   eventCard: {

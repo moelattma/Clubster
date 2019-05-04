@@ -9,6 +9,8 @@ import { Button, Text, Thumbnail } from 'native-base';
 import v1 from 'uuid/v1';
 import { RNS3 } from 'react-native-aws3';
 
+import { connect } from 'react-redux';
+
 import Gallery from '../../Utils/Gallery';
 import MembersList from './MembersList';
 import { DefaultImg } from '../../Utils/Defaults';
@@ -16,7 +18,7 @@ import { accessKeyId, secretAccessKey } from '../../../keys/keys';
 
 const { WIDTH, HEIGHT } = Dimensions.get('window');
 
-export default class Settings extends React.Component {
+export class Settings extends React.Component {
     constructor() {
         super();
         this.state = {
@@ -69,7 +71,7 @@ export default class Settings extends React.Component {
         await RNS3.put(file,options).then((response)=> {
            imageURL = response.body.postResponse.key;
         }).catch((err) => {console.log(err)});
-        axios.post(`http://localhost:3000/api/organizations/modifyOrgPicture/${this.props.screenProps._id}`, { imageURL }).then((response) => {
+        axios.post(`http://localhost:3000/api/organizations/modifyOrgPicture/${this.props._id}`, { imageURL }).then((response) => {
             this.setState({ img: (response.data.image ? 'https://s3.amazonaws.com/clubster-123/' + response.data.image : DefaultImg) });
         }).catch((err) => { return; });
         this.props.navigation.navigate('ShowClubs');
@@ -78,20 +80,8 @@ export default class Settings extends React.Component {
       };
     };
 
-    async componentWillMount() {
-        const { _id } = this.props.screenProps;
-        await axios.get(`http://localhost:3000/api/organizations/getOrg/${_id}`).then((response) => {
-            const { president, name, description, gallery, image } = response.data.org;
-            this.setState({
-                president, name, description, img: 'https://s3.amazonaws.com/clubster-123/' + image,
-                isLoading: false, galleryID: gallery._id,
-                photos: gallery.photos.length > 5 ? gallery.photos.slice(0, 6) : gallery.photos.concat({ addPhotoIcon: true })
-            });
-        }).catch(() => { return; });
-    }
-
     submitClubChanges() {
-        const { _id } = this.props.screenProps;
+        const { _id } = this.props;
         axios.post(`http://localhost:3000/api/organizations/${_id}`, {
             name: this.state.name,
             description: this.state.description,
@@ -134,7 +124,7 @@ export default class Settings extends React.Component {
     render() {
         return (
             <ScrollView>
-                {this.props.screenProps.isAdmin ? 
+                {this.props.isAdmin ? 
                     <TouchableOpacity style={styles.editButton} onPress={this._showModal}>
                         <FontAwesome name="edit" size={35} color={'black'} />
                     </TouchableOpacity> 
@@ -144,7 +134,7 @@ export default class Settings extends React.Component {
 
                 <TouchableOpacity onPressIn={this.changePicture}>
                     <Thumbnail square style={{ height: 200, width: WIDTH }}
-                        source={{ uri: this.state.img }} />
+                        source={{ uri: this.props.img }} />
                 </TouchableOpacity>
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', margin:7 }}>
@@ -161,12 +151,12 @@ export default class Settings extends React.Component {
 
                 {(this.state.photosDisplay)
                     //Photos tab
-                    ? <Gallery galleryID={this.state.galleryID} photos={this.state.photos} isAdmin={this.props.screenProps.isAdmin} 
+                    ? <Gallery galleryID={this.props.galleryID} photos={this.props.photos} isAdmin={this.props.isAdmin} 
                                onUpdatePhotos={this.onUpdatePhotos.bind(this)} />
                     //members tab
-                    : ((this.state.members) ? <View>
+                    : ((this.props.members) ? <View>
                         <View style={{ margin: 10 }}>
-                            <MembersList _id={this.props.screenProps._id}
+                            <MembersList _id={this.props._id}
                                 style={{ margin: 10 }}></MembersList>
                         </View>
                     </View>
@@ -174,19 +164,19 @@ export default class Settings extends React.Component {
                         : <View>
                             <View style={styles.mainContainer}>
                                 <Text style={styles.nameText}>
-                                    {this.state.name}
+                                    {this.props.name}
                                 </Text>
                                 <Text style={styles.subText}>
                                     President:
                                 </Text>
                                 <Text style={{ marginLeft: 10, marginBottom: 7 }}>
-                                    {this.state.president}
+                                    {this.props.president}
                                 </Text>
                                 <Text style={styles.subText}>
                                     Description/ purpose:
                                 </Text>
                                 <Text style={{ marginLeft: 10, marginBottom: 7 }}>
-                                    {this.state.description}
+                                    {this.props.description}
                                 </Text>
                             </View>
                         </View>
@@ -241,6 +231,34 @@ export default class Settings extends React.Component {
         );
     }
 }
+
+const mapStateToProps = (state) => {
+    const { name, president, description, image, gallery, members, isAdmin, _id } = state.clubs.club;
+
+    return {
+        name: name,
+        president: president,
+        description: description,
+        img: (image ? 'https://s3.amazonaws.com/clubster-123/' + image : DefaultImg), 
+        photos: (gallery.photos.length > 5 ? gallery.photos.slice(0, 6) : gallery.photos.concat({ addPhotoIcon: true })),
+        members, isAdmin, _id
+    }
+}
+  
+//   const mapDispatchToProps = (dispatch) => {
+//     return {
+//         setUserClubs: (clubsAdmin, clubsMember) => dispatch({
+//             type: CLUBS_SET,
+//             payload: { clubsAdmin, clubsMember }
+//         }),
+//         setCurrentClub: (club) => dispatch({
+//             type: CLUBS_SETUSER,
+//             payload: { club }
+//         })
+//     }
+//   }
+
+export default connect(mapStateToProps, null)(Settings);
 
 const styles = StyleSheet.create({
     mainContainer: {

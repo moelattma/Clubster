@@ -13,15 +13,14 @@ import { DefaultImg } from '../Utils/Defaults';
 class SearchClubs extends PureComponent {
     constructor(props) {
         super(props);
-
-        props.navigation.setParams({ handleSearch: this.handleSearch });
+        
+        props.navigation.setParams({ handleSearch: this.handleSearch, query: "" });
 
         this.state = {
             loading: false,
             error: null,
             organizations: [],
-            query: "",
-            noneSearched: true
+            query: ""
         }
     }
 
@@ -38,7 +37,8 @@ class SearchClubs extends PureComponent {
                         placeholder="Search Clubs"
                         lightTheme
                         round
-                        onChangeText={text => navigation.state.params.handleSearch(text)}
+                        onChangeText={(text) => { navigation.state.params.handleSearch(text); navigation.setParams({ query: text }); }}
+                        value={navigation.state.params && navigation.state.params.query ? navigation.state.params.query : ''}
                         autoCorrect={false}
                     />
                 </View>
@@ -46,7 +46,7 @@ class SearchClubs extends PureComponent {
         };
       };
 
-    async componentDidMount() {
+    componentWillMount() {
         this.getOrganizations();
     }
 
@@ -55,7 +55,6 @@ class SearchClubs extends PureComponent {
         axios.get('http://localhost:3000/api/organizations/all')
             .then((response) => {
                 this.setState({ organizations: response.data.organizations, loading: false });
-                this.handleSearch(this.state.query);
                 this.props.setAllClubs(response.data.organizations);
             });
     }
@@ -66,7 +65,7 @@ class SearchClubs extends PureComponent {
             return org.name.toLowerCase().includes(formatQuery);
         });
 
-        this.setState({ query: text, organizations: data, noneSearched: false });
+        this.setState({ query: text, organizations: data });
     }
 
     renderSeparator = () => {
@@ -109,7 +108,7 @@ class SearchClubs extends PureComponent {
     render() {
         return (
             <FlatList
-                data={(this.state.noneSearched ? this.props.allOrganizations.slice(0, 40) : this.state.organizations.slice(0, 40))}
+                data={this.state.organizations.slice(0, 40)}
                 renderItem={this._renderItem}
                 keyExtractor={organization => organization.name}
                 ItemSeparatorComponent={this.renderSeparator}
@@ -124,7 +123,7 @@ class SearchClubs extends PureComponent {
 const mapDispatchToProps = (dispatch) => {
     return {
         setAllClubs: (allClubs) => dispatch({
-            type: CLUB_GET_ALL,
+            type: CLUBS_SETALL,
             payload: { allClubs }
         })
     }

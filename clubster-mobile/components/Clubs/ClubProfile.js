@@ -35,6 +35,7 @@ export default class ClubProfile extends React.Component {
     async componentWillMount() {
         await axios.post("http://localhost:3000/api/organizations/isMember", { orgID: this.state.organizationID }).then((response) => {
             this.setState({ joinable: (!response.data.isMember) });
+            console.log(response.data.isMember)
             const { image, name, president, description, _id, photos } = response.data.organization;
 
             this.setState({ img: (image ? 'https://s3.amazonaws.com/clubster-123/' + image : DefaultImg), 

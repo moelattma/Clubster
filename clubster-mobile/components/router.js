@@ -27,7 +27,7 @@ import Graphs from './Graphs/Graphs';
 
 export const ClubEventNavigator = createStackNavigator(
     {
-        ShowEvents: { screen: ShowEvents },
+        ShowEvents: { screen: ShowEvents, navigationOptions: { header: null } },
         CreateEvent: { screen: CreateEvent },
         EventProfile: { screen: EventProfile },
         Comments: { screen: Comments }
@@ -45,6 +45,7 @@ export const AdminNavigator = createMaterialTopTabNavigator(
                 tabBarIcon: ({ tintColor }) => (
                     <MaterialIcons name='event' size={25} color={tintColor} />
                 ),
+                header: null
             }
         },
         Chat: {
@@ -133,17 +134,6 @@ export const ClubPageNavigator = createStackNavigator(
     }
 )
 
-export const ClubsterNavigator = createSwitchNavigator(
-    {
-        HomeNavigation: { screen: ClubPageNavigator, navigationOptions: { header: null } },
-        AdminNavigation: { screen: AdminNavigator },
-        MemberNavigation: { screen: MemberNavigator }
-    },
-    {
-        initialRouteName: 'HomeNavigation'
-    }
-)
-
 export const HomeNavigator = createMaterialTopTabNavigator(
     {   
         AgendaScreen: {
@@ -163,7 +153,7 @@ export const HomeNavigator = createMaterialTopTabNavigator(
             }
         },
         ClubsNavigation: {
-            screen: ClubsterNavigator,
+            screen: ClubPageNavigator,
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }) => (
                     <MaterialCommunityIcons name={focused ? 'home' : 'home-outline'} size={focused ? 27 : 25} color={tintColor} />
@@ -194,11 +184,19 @@ export const HomeNavigator = createMaterialTopTabNavigator(
     }
 );
 
+export const ClubsterNavigator = createStackNavigator(
+    {
+        HomeNavigation: { screen: HomeNavigator, navigationOptions: { header: null } },
+        AdminNavigation: { screen: AdminNavigator },
+        MemberNavigation: { screen: MemberNavigator }
+    }
+)
+
 export const LoginNavigator = createSwitchNavigator(
     {
         Login: { screen: Login },
         SignUp: { screen: SignUp },
-        ClubsterNavigation: { screen: HomeNavigator }
+        ClubsterNavigation: { screen: ClubsterNavigator }
     }
 );
 

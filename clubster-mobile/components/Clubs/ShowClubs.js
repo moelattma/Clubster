@@ -5,10 +5,13 @@ import {
   RefreshControl
 } from 'react-native';
 import { connect } from 'react-redux'
+import axios from 'axios';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { AppLoading } from 'expo';
 import { Button } from 'native-base';
+
 import { DefaultImg } from '../Utils/Defaults';
+import { CLUBS_SET, CLUBS_SETUSER, EVENTS_SETCLUB } from '../../reducers/ActionTypes';
 
 const window = Dimensions.get('window');
 const imageWidth = (window.width / 3) + 30;
@@ -68,7 +71,12 @@ class ShowClubs extends React.Component {
 
   navigateUser = (item) => {
     const { params } = this.props.navigation.state;
-    this.props.navigation.navigate((!params || params.showAdmin ? 'AdminNavigation' : 'MemberNavigation'), { item, isAdmin: item.isAdmin });
+    axios.get(`http://localhost:3000/api/organizations/getOrg/${item._id}`).then((response) => {
+      var club = response.data.org;
+      club.isAdmin = !params || params.showAdmin;
+      this.props.setCurrentClub(club);
+      this.props.navigation.navigate(!params || params.showAdmin ? 'AdminNavigation' : 'MemberNavigation', { isAdmin: club.isAdmin });
+    }).catch(() => { return; });
   };
 
   _renderItem = ({ item }) => {
@@ -90,6 +98,13 @@ class ShowClubs extends React.Component {
     );
   }
 
+  refreshUserClubs = () => {
+    axios.get("http://localhost:3000/api/organizations").then((response) => { 
+      const { arrayClubsAdmin, arrayClubsMember } = response.data;
+      this.props.setUserClubs(arrayClubsAdmin, arrayClubsMember);
+    });
+  }
+
   render() {
     if (this.props.loading)
       return <AppLoading/>
@@ -98,6 +113,7 @@ class ShowClubs extends React.Component {
         return (
             <ScrollView refreshControl={<RefreshControl
               refreshing={this.props.loading}
+              onRefresh={() => this.refreshUserClubs()}
             />}>
             <Text style={[{ flex: 1 }, styles.noneText ]}>You are not an admin of any clubs</Text>
             </ScrollView>
@@ -105,6 +121,7 @@ class ShowClubs extends React.Component {
       return (
         <ScrollView refreshControl={<RefreshControl
           refreshing={this.props.loading}
+          onRefresh={() => this.refreshUserClubs()}
         />}>
           <FlatList
             data={this.props.clubsAdmin}
@@ -121,6 +138,7 @@ class ShowClubs extends React.Component {
         return (
           <ScrollView refreshControl={<RefreshControl
             refreshing={this.props.loading}
+            onRefresh={() => this.refreshUserClubs()}
           />}>
             <Text style={[{ flex: 1 }, styles.noneText ]}>You are not a member of any clubs</Text>
           </ScrollView>
@@ -128,6 +146,7 @@ class ShowClubs extends React.Component {
       return (
         <ScrollView refreshControl={<RefreshControl
           refreshing={this.props.loading}
+          onRefresh={() => this.refreshUserClubs()}
         />}>
           <FlatList
             data={this.props.clubsMember.slice(0, 40)}
@@ -157,7 +176,24 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, null)(ShowClubs);
+const mapDispatchToProps = (dispatch) => {
+  return {
+      setUserClubs: (clubsAdmin, clubsMember) => dispatch({
+          type: CLUBS_SET,
+          payload: { clubsAdmin, clubsMember }
+      }),
+      setCurrentClub: (club) => dispatch({
+          type: CLUBS_SETUSER,
+          payload: { club }
+      }),
+      setClubEvents: (events) => dispatch({
+          type: EVENTS_SETCLUB,
+          payload: { events }
+      })
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ShowClubs);
 
 const styles = StyleSheet.create({
   eventContainer: {
