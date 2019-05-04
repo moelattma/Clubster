@@ -65,7 +65,8 @@ exports.findUser = (req, res) => {
           jwt.sign(payload, 'secret', { expiresIn: 3600 }, (err, token) => {
             res.json({
               success: true,
-              token: 'Bearer ' + token
+              token: 'Bearer ' + token,
+              _id: user._id
             });
           });
         } else {
