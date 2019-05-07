@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import { Container, Card, CardItem, Thumbnail, Form, Content, Item, Icon, Left, Body, Right, Input } from 'native-base';
+import {  Card, CardItem, Thumbnail } from 'native-base';
+import { connect } from 'react-redux'
 
 import {
   TouchableOpacity,
@@ -17,23 +18,11 @@ import axios from 'axios';
 import { DefaultImg } from '../../Utils/Defaults';
 
 
-export default class MembersList extends Component {
-  constructor() {
-    //calling react's constructor, configures this key word
-    super();
-    this.state = {
-      memberArr: [],
-      admins: [],
-      idOfUser: '',
-      isLoading: true,
-      president: ''
-    };
-  }
-
+export class MembersList extends Component {
   renderTrash = (item) => {
-    if (this.state.admins.indexOf(`${item.member._id}`) == -1 && this.state.idOfUser == this.state.president) {
+    if (!item.isAdmin && !item.isPresident && this.props.userIsPresident) {
       return (
-        <TouchableOpacity style={styles.btn} onPress={() => { this.deleteUser(item.member._id) }}>
+        <TouchableOpacity style={styles.btn} onPress={() => { this.deleteUser(item._id) }}>
           <MaterialIcons
             name="delete-forever"
             size={35}
@@ -47,7 +36,7 @@ export default class MembersList extends Component {
   }
 
   renderItem = ({ item }) => {
-    var url = (item.member.image ? 'https://s3.amazonaws.com/clubster-123/' + item.member.image : DefaultImg);
+    var url = (item.image ? 'https://s3.amazonaws.com/clubster-123/' + item.image : DefaultImg);
     return (
       <Card>
         <CardItem style={styles.cardStyle}>
@@ -55,11 +44,11 @@ export default class MembersList extends Component {
             <Thumbnail large style={styles.img} source={{ uri: url }} />
           </TouchableOpacity>
           <Text style={styles.nm}>
-                {item.member.name}
+                {item.name}
           </Text>
-          {this.state.president == item.member._id ? 
+          {item.isPresident ? 
             <Text style={styles.memberText} >President</Text> :
-            (this.state.admins.indexOf(item.member._id) > -1) ? 
+            (item.isAdmin) ? 
               <Text style={styles.memberText}>Admin</Text> : 
               <Text style={styles.memberText}>Member</Text>
           }
@@ -78,22 +67,6 @@ export default class MembersList extends Component {
     )
   }
 
-  componentWillMount() {
-    const orgID = this.props._id;
-    // get request-setup memberArr[]
-    axios.get(`http://localhost:3000/api/organizations/${orgID}/members`)
-    .then((response) => {
-      const { members, idOfUser, admins, president } = response.data;
-      this.setState({ 
-        memberArr: members,
-         idOfUser, 
-         admins, 
-         isLoading: false,
-         president 
-        });
-    });
-  }
-
   deleteUser = (idDeleted) => {
     const orgID = this.props._id;
 
@@ -105,16 +78,14 @@ export default class MembersList extends Component {
 
     // post request - we delete user by sending the id of user thats going to be deleted to the backend
     axios.post(`http://localhost:3000/api/organizations/${orgID}/${idDeleted}`).then((response) => {
-      membersArr.splice(i, 1);
-      this.setState({ memberArr: membersArr });
+      // do a delete user thing in redux
     });
   }
 
   render() {
-    if (this.state.isLoading) return null;
     return (
       <FlatList
-        data={this.state.memberArr}
+        data={this.props.members.slice(0, 10)}
         renderItem={this.renderItem}
         keyExtractor={member => member._id}
         ItemSeparatorComponent={this.renderSeparator}
@@ -122,6 +93,30 @@ export default class MembersList extends Component {
     );
   }
 }
+
+const mapStateToProps = (state) => {
+  const { admins, members } = state.clubs.club;
+  var mems = [];
+  var adminIDs = [];
+  if (admins && admins.length > 0) {
+    mems.push(Object.assign(admins[0].admin, { isPresident: true }));
+    adminIDs.push(admins[0].admin._id);
+    admins.shift();
+    if (admins.length > 0) {
+      admins.map(admin => { 
+        mems.push(Object.assign(admin.admin, { isAdmin: true }))
+        adminIDs.push(admin.admin._id);
+      });
+    }
+  }
+  members.map(member => { 
+    if (!adminIDs.includes(member.member._id))
+      mems.push(member.member);
+  });
+  return { members: mems, userIsPresident: (adminIDs.length > 0 ? adminIDs[0] == state.user.user._id : false ) }
+}
+
+export default connect(mapStateToProps, null)(MembersList);
 
 const styles = StyleSheet.create({
   btn: {

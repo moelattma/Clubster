@@ -3,6 +3,7 @@ import { TouchableOpacity, Dimensions, StyleSheet, View, TextInput, ScrollView }
 import Modal from "react-native-modal";
 import axios from 'axios';
 import { ImagePicker, Permissions } from 'expo';
+import { Header } from 'react-native-elements'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Button, Text, Thumbnail } from 'native-base';
@@ -124,14 +125,12 @@ export class Settings extends React.Component {
     render() {
         return (
             <ScrollView>
-                {this.props.isAdmin ? 
-                    <TouchableOpacity style={styles.editButton} onPress={this._showModal}>
-                        <FontAwesome name="edit" size={35} color={'black'} />
-                    </TouchableOpacity> 
-                    :
-                    null
-                }
-
+                <Header
+                    backgroundColor={'transparent'}
+                    leftComponent={{ icon: 'arrow-back', onPress: () => this.props.navigation.navigate('HomeNavigation') }}
+                    centerComponent={{ text: this.props.name + ' Settings', style: { fontSize: 24, fontWeight: '500' } }}
+                    rightComponent={this.props.isAdmin ? { icon: 'edit', onPress: (() => this._showModal())} : null}
+                />
                 <TouchableOpacity onPressIn={this.changePicture}>
                     <Thumbnail square style={{ height: 200, width: WIDTH }}
                         source={{ uri: this.props.img }} />
@@ -154,32 +153,22 @@ export class Settings extends React.Component {
                     ? <Gallery galleryID={this.props.galleryID} photos={this.props.photos} isAdmin={this.props.isAdmin} 
                                onUpdatePhotos={this.onUpdatePhotos.bind(this)} />
                     //members tab
-                    : ((this.props.members) ? <View>
+                    : ((this.state.members) ? <View>
                         <View style={{ margin: 10 }}>
-                            <MembersList _id={this.props._id}
-                                style={{ margin: 10 }}></MembersList>
+                            <MembersList members={this.props.members} president={this.props.president} 
+                                style={{ margin: 10 }}/>
                         </View>
                     </View>
                         //about tab
-                        : <View>
+                        :
                             <View style={styles.mainContainer}>
-                                <Text style={styles.nameText}>
-                                    {this.props.name}
+                                <Text style={styles.subText}>
+                                    President: {this.props.president}
                                 </Text>
                                 <Text style={styles.subText}>
-                                    President:
-                                </Text>
-                                <Text style={{ marginLeft: 10, marginBottom: 7 }}>
-                                    {this.props.president}
-                                </Text>
-                                <Text style={styles.subText}>
-                                    Description/ purpose:
-                                </Text>
-                                <Text style={{ marginLeft: 10, marginBottom: 7 }}>
-                                    {this.props.description}
+                                    Description: {this.props.description}
                                 </Text>
                             </View>
-                        </View>
                     )}
 
                 {/*---------- MODAL  ---------------*/}
@@ -233,15 +222,12 @@ export class Settings extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    const { name, president, description, image, gallery, members, isAdmin, _id } = state.clubs.club;
+    const { name, description, image, gallery, isAdmin, _id, president } = state.clubs.club;
 
     return {
-        name: name,
-        president: president,
-        description: description,
+        name, description, isAdmin, _id, president,
         img: (image ? 'https://s3.amazonaws.com/clubster-123/' + image : DefaultImg), 
         photos: (gallery.photos.length > 5 ? gallery.photos.slice(0, 6) : gallery.photos.concat({ addPhotoIcon: true })),
-        members, isAdmin, _id
     }
 }
   

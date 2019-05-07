@@ -5,13 +5,16 @@ let eventState = { allEvents: [], userEvents: [], clubEvents: [], thisEvent: nul
 const eventReducer = (state = eventState, action) => {
     switch (action.type) {
         case Actions.EVENTS_SETALL: 
-            state = Object.assign({}, state, { allEvents: action.payload.allEvents } );
+            if (action.payload.allEvents.length != state.allEvents.length)
+                state = Object.assign({}, state, { allEvents: action.payload.allEvents } );
             return state;
         case Actions.EVENTS_SETUSER:
-            state = Object.assign({}, state, { userEvents: action.payload.userEvents } );
+            if (action.payload.userEvents.length != state.userEvents.length)
+                state = Object.assign({}, state, { userEvents: action.payload.userEvents } );
             return state;
         case Actions.EVENTS_SETCLUB:
-            state = Object.assign({}, state, { clubEvents: action.payload.clubEvents } );
+            if (action.payload.events.length != state.clubEvents.length)
+                state = Object.assign({}, state, { clubEvents: action.payload.events } );
             return state;
         case Actions.EVENTS_SETCURRENT:
             state = Object.assign({}, state, { thisEvent: action.payload.thisEvent } );

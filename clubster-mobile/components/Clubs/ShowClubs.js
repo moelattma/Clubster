@@ -69,14 +69,16 @@ class ShowClubs extends React.Component {
     };
   };
 
-  navigateUser = (item) => {
+  navigateUser = async (item) => {
     const { params } = this.props.navigation.state;
-    axios.get(`http://localhost:3000/api/organizations/getOrg/${item._id}`).then((response) => {
+    await axios.get(`http://localhost:3000/api/organizations/getOrg/${item._id}`).then((response) => {
       var club = response.data.org;
       club.isAdmin = !params || params.showAdmin;
       this.props.setCurrentClub(club);
-      this.props.navigation.navigate(!params || params.showAdmin ? 'AdminNavigation' : 'MemberNavigation', { isAdmin: club.isAdmin });
+      this.props.setClubEvents(club.events);
     }).catch(() => { return; });
+    var isAdmin = !params || params.showAdmin
+    this.props.navigation.navigate(isAdmin ? 'AdminNavigation' : 'MemberNavigation', { isAdmin });
   };
 
   _renderItem = ({ item }) => {

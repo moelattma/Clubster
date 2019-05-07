@@ -2,10 +2,10 @@ import React from 'react';
 import { View, Dimensions, FlatList, StyleSheet, Image } from 'react-native';
 import { connect } from 'react-redux'
 import axios from 'axios';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { Header } from 'react-native-elements'
 import { Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 import { DefaultImg } from '../Utils/Defaults';
+import { EVENTS_SETCLUB } from '../../reducers/ActionTypes'
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const EVENT_WIDTH = WIDTH * 9 / 10;
@@ -15,14 +15,8 @@ export class ShowEvents extends React.Component {
   constructor(props) {
     super(props);
 
-    props.navigation.setParams({ addEvent: this.addEvent, isAdmin: props.isAdmin });
-
-    this._mounted = false;
-
     this.state = {
-      clubEvents: [],
       loading: false,
-      idOfUser: '',
       name: '',
       description: '',
       date: '',
@@ -32,32 +26,22 @@ export class ShowEvents extends React.Component {
     }
   }
 
-  componentWillMount() {
-    this._mounted = true;
-    if (this._mounted) this.getClubEvents();
-  }
-
-  componentWillUnmount() { this._mounted = false; }
-
-  getClubEvents = async () => {
+  getClubEvents = () => {
     this.setState({ loading: true })
     axios.get(`http://localhost:3000/api/events/${this.props.clubID}`)
       .then((response) => {
-        if (this._mounted) {
-          this.setState({ clubEvents: response.data.events, idOfUser: response.data.idOfUser });
-          this.setState({ loading: false })
-        }
+        this.props.setClubEvents(response.data.events);
+        this.setState({ loading: false })
       })
       .catch((err) => { console.log('getClubEvents failed'); console.log(err) });
   }
 
   _handleGoing = (item) => {
-    for (var i = 0; i < this.state.clubEvents.length; i++) {
-      if (this.state.clubEvents[i]._id === item._id)
+    for (var i = 0; i < this.props.clubEvents.length; i++) {
+      if (this.props.clubEvents[i]._id === item._id)
         break;
     }
-    var clubEvents = this.state.clubEvents;
-    var id = this.state.idOfUser;
+    var clubEvents = this.props.clubEvents;
     axios.post(`http://localhost:3000/api/events/${item._id}/going`).then((response) => {
       clubEvents[i].going = response.data.event.going;
       this.setState({ clubEvents: clubEvents });
@@ -66,12 +50,11 @@ export class ShowEvents extends React.Component {
   }
 
   _handleLikers = (item) => {
-    for (var i = 0; i < this.state.clubEvents.length; i++) {
-      if (this.state.clubEvents[i]._id === item._id)
+    for (var i = 0; i < this.props.clubEvents.length; i++) {
+      if (this.props.clubEvents[i]._id === item._id)
         break;
     }
-    var clubEvents = this.state.clubEvents;
-    var id = this.state.idOfUser;
+    var clubEvents = this.props.clubEvents;
     axios.post(`http://localhost:3000/api/events/${item._id}/likers`).then((response) => {
       clubEvents[i].likers = response.data.event.likers;
       this.setState({ clubEvents: clubEvents });
@@ -157,18 +140,16 @@ export class ShowEvents extends React.Component {
   }
 
   render() {
-    if (this.state.loading || !this.state.clubEvents) {
-      return <Expo.AppLoading />;
-    }
     return (
       <View>
-        <View style={{ flex: 1, flexDirection: 'row', position: 'absolute', bottom: 2, alignSelf: 'center', justifyContent: 'flex-end', width: WIDTH }}>
-          <Button info onPress={() => this.props.navigation.navigate('CreateEvent')}>
-            <Text> New! </Text>
-          </Button>
-        </View>
+        <Header
+          backgroundColor={'transparent'}
+          leftComponent={{ icon: 'arrow-back', onPress: () => this.props.navigation.navigate('HomeNavigation') }}
+          centerComponent={{ text: this.props.clubName + ' Events', style: { fontSize: 24, fontWeight: '500' } }}
+          rightComponent={this.props.isAdmin ? { icon: 'add', onPress: (() => this.props.navigation.navigate('CreateEvent')) } : null}
+        />
         <FlatList
-          data={this.state.clubEvents}
+          data={this.props.clubEvents.slice(0, 4)}
           renderItem={this._renderItem}
           keyExtractor={clubEvent => clubEvent._id}
           ItemSeparatorComponent={this.renderSeparator}
@@ -181,27 +162,22 @@ export class ShowEvents extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  // const {  } = state.events.clubEvents;
-  const clubID = state.clubs.club._id;
+  const { _id, name } = state.clubs.club;
   return {
-    clubID
+    clubID: _id, clubName: name, clubEvents: state.events.clubEvents
   }
 }
 
-// const mapDispatchToProps = (dispatch) => {
-//   return {
-//       setUserClubs: (clubsAdmin, clubsMember) => dispatch({
-//           type: CLUBS_SET,
-//           payload: { clubsAdmin, clubsMember }
-//       }),
-//       setCurrentClub: (club) => dispatch({
-//           type: CLUBS_SETUSER,
-//           payload: { club }
-//       })
-//   }
-// }
+const mapDispatchToProps = (dispatch) => {
+  return {
+      setClubEvents: (events) => dispatch({
+          type: EVENTS_SETCLUB,
+          payload: { events }
+      })
+  }
+}
 
-export default connect(mapStateToProps, null)(ShowEvents);
+export default connect(mapStateToProps, mapDispatchToProps)(ShowEvents);
 
 const styles = StyleSheet.create({
   eventCard: {

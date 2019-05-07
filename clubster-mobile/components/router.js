@@ -184,9 +184,9 @@ export const HomeNavigator = createMaterialTopTabNavigator(
     }
 );
 
-export const ClubsterNavigator = createStackNavigator(
+export const ClubsterNavigator = createSwitchNavigator(
     {
-        HomeNavigation: { screen: HomeNavigator, navigationOptions: { header: null } },
+        HomeNavigation: { screen: HomeNavigator },
         AdminNavigation: { screen: AdminNavigator },
         MemberNavigation: { screen: MemberNavigator }
     }

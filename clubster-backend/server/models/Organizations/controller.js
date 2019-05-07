@@ -155,10 +155,13 @@ exports.retrieveOrg = (req, res) => {
 		}
 	});
 
-	Organization.findOne({ _id: orgID }).populate('gallery').populate('events', 'going name').then((organization) => {
-		if (organization) {
-			return res.status(201).json({ 'org': organization, 'idOfUser': req.user._id });
-		}
+	Organization.findOne({ _id: orgID }).populate('gallery')
+	.populate({ path: 'events', populate: { path: 'host', select: 'name image _id' } })
+	.populate('members.member', 'name image _id' )
+	.populate('admins.admin', 'name image _id' )
+	.then((organization) => {
+		if (organization) 
+			return res.status(201).json({ 'org': organization });
 		else
 			return res.status(400).json({ 'err': 'err' });
 	});
