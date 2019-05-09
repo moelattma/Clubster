@@ -124,7 +124,7 @@ export const MemberNavigator = createMaterialTopTabNavigator(
 
 export const ClubPageNavigator = createStackNavigator(
     {
-        ShowClubs: { screen: ShowClubs },
+        ShowClubs: { screen: ShowClubs, navigationOptions: { header: null } },
         CreateClub: { screen: CreateClub },
         ClubSearch: { screen: ClubSearch },
         ClubProfile: { screen: ClubProfile }

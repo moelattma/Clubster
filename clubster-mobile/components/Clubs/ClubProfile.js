@@ -54,9 +54,9 @@ export default class ClubProfile extends React.Component {
     handleJoin = (orgID, joinType) => {
         axios.post("http://localhost:3000/api/notifications/new", { type: joinType, orgID })
             .then((response) => {
-              if(response.status == 201) {
-                this.setState({ joinable: false})
-              }
+                if (response.status == 201) {
+                    this.setState({ joinable: false })
+                }
             })
             .catch((err) => console.log('couldnt find it', err));
     };

@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Dimensions, FlatList, StyleSheet, Image } from 'react-native';
+import { View, Dimensions, FlatList, StyleSheet, Image, ScrollView, RefreshControl } from 'react-native';
 import { connect } from 'react-redux'
 import axios from 'axios';
-import { Header } from 'react-native-elements'
+import { Header } from 'react-native-elements';
 import { Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 import { DefaultImg } from '../Utils/Defaults';
-import { EVENTS_SETCLUB } from '../../reducers/ActionTypes'
+import { EVENTS_SETCLUB, EVENTS_SETCURRENT, EVENTS_HANDLEGOING, EVENTS_HANDLELIKE } from '../../reducers/ActionTypes'
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const EVENT_WIDTH = WIDTH * 9 / 10;
@@ -37,29 +37,15 @@ export class ShowEvents extends React.Component {
   }
 
   _handleGoing = (item) => {
-    for (var i = 0; i < this.props.clubEvents.length; i++) {
-      if (this.props.clubEvents[i]._id === item._id)
-        break;
-    }
-    var clubEvents = this.props.clubEvents;
     axios.post(`http://localhost:3000/api/events/${item._id}/going`).then((response) => {
-      clubEvents[i].going = response.data.event.going;
-      this.setState({ clubEvents: clubEvents });
-    })
-      .catch((err) => { console.log('error getting Going'); console.log(err) });
+      this.props._handleGoing(item._id, response.data.event.going);
+    }).catch((err) => { console.log('error getting Going'); console.log(err) });
   }
 
   _handleLikers = (item) => {
-    for (var i = 0; i < this.props.clubEvents.length; i++) {
-      if (this.props.clubEvents[i]._id === item._id)
-        break;
-    }
-    var clubEvents = this.props.clubEvents;
     axios.post(`http://localhost:3000/api/events/${item._id}/likers`).then((response) => {
-      clubEvents[i].likers = response.data.event.likers;
-      this.setState({ clubEvents: clubEvents });
-    })
-      .catch((err) => { console.log('error posting to Likers'); console.log(err) });
+      this.props._handleLikers(item._id, response.data.event.likers);
+    }).catch((err) => { console.log('error posting to Likers'); console.log(err) });
   }
 
   _renderItem = ({ item }) => {
@@ -96,7 +82,12 @@ export class ShowEvents extends React.Component {
             </Body>
           </Left>
           <Right>
-            <Button bordered onPress={() => this.props.navigation.navigate('EventProfile', { event: item })}>
+            <Button bordered onPress={() => {
+                axios.get(`http://localhost:3000/api/events/getClubEvent/${item._id}`).then((response) => {
+                  this.props._setCurrentEvent(response.data.clubEvent);
+                  this.props.navigation.navigate('EventProfile');
+                });
+              }}>
               <Text>Know More</Text>
             </Button>
           </Right>
@@ -104,7 +95,7 @@ export class ShowEvents extends React.Component {
         <CardItem>
           <Left>
             {
-              item.likers && item.likers.indexOf(this.state.idOfUser) > -1 ?
+              item.likers && item.likers.indexOf(this.props.userID) > -1 ?
                 <Button transparent onPress={() => this._handleLikers(item)}>
                   <Icon name="thumbs-up" />
                   <Text>{item.likers.length} likes</Text>
@@ -123,7 +114,7 @@ export class ShowEvents extends React.Component {
           </Body>
           <Right>
             {
-              item.going && item.going.indexOf(this.state.idOfUser) > -1 ?
+              item.going && item.going.indexOf(this.props.userID) > -1 ?
                 <Button transparent onPress={() => this._handleGoing(item)}>
                   <Icon active name="star" />
                   <Text>{item.going.length} going</Text>
@@ -141,39 +132,58 @@ export class ShowEvents extends React.Component {
 
   render() {
     return (
-      <View>
+      <ScrollView refreshControl={<RefreshControl
+        refreshing={this.state.loading}
+        onRefresh={() => this.getClubEvents()}
+      />}>
         <Header
           backgroundColor={'transparent'}
           leftComponent={{ icon: 'arrow-back', onPress: () => this.props.navigation.navigate('HomeNavigation') }}
-          centerComponent={{ text: this.props.clubName + ' Events', style: { fontSize: 24, fontWeight: '500' } }}
+          centerComponent={{ text: this.props.clubName + ' Events', style: { fontSize: 21, fontWeight: '500' } }}
           rightComponent={this.props.isAdmin ? { icon: 'add', onPress: (() => this.props.navigation.navigate('CreateEvent')) } : null}
         />
-        <FlatList
-          data={this.props.clubEvents.slice(0, 4)}
-          renderItem={this._renderItem}
-          keyExtractor={clubEvent => clubEvent._id}
-          ItemSeparatorComponent={this.renderSeparator}
-          refreshing={this.state.loading}
-          onRefresh={() => this.getClubEvents()}
-        />
-      </View>
+        {!this.props.clubEvents || this.props.clubEvents.length == 0 ?
+          <Text style={[{ flex: 1 }, styles.noneText]}>{this.props.clubName} does not have any events yet!</Text>
+          :
+          <FlatList
+            data={this.props.clubEvents.slice(0, 4)}
+            renderItem={this._renderItem}
+            keyExtractor={clubEvent => clubEvent._id}
+            ItemSeparatorComponent={this.renderSeparator}
+            extraData={this.props.updateStuff}
+          />
+        }
+      </ScrollView>
     );
   }
 }
 
 const mapStateToProps = (state) => {
-  const { _id, name } = state.clubs.club;
+  const { _id, name, isAdmin } = state.clubs.club;
+
   return {
-    clubID: _id, clubName: name, clubEvents: state.events.clubEvents
+    clubID: _id, clubName: name, clubEvents: state.events.clubEvents, isAdmin, userID: state.user.user._id, updateStuff: Math.random()
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-      setClubEvents: (events) => dispatch({
-          type: EVENTS_SETCLUB,
-          payload: { events }
-      })
+    setClubEvents: (events) => dispatch({
+      type: EVENTS_SETCLUB,
+      payload: { events }
+    }),
+    _setCurrentEvent: (thisEvent) => dispatch({
+      type: EVENTS_SETCURRENT,
+      payload: { thisEvent }
+    }),
+    _handleGoing: (corrID, going) => dispatch({
+      type: EVENTS_HANDLEGOING,
+      payload: { corrID, going }
+    }),
+    _handleLikers: (corrID, likers) => dispatch({
+      type: EVENTS_HANDLELIKE,
+      payload: { corrID, likers }
+    })
   }
 }
 
@@ -232,4 +242,11 @@ const styles = StyleSheet.create({
     width: WIDTH / 1.5,
     height: HEIGHT / 3
   },
+  noneText: {
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    color: 'black',
+    fontSize: 16,
+    marginTop: 10
+}
 });

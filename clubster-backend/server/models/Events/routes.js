@@ -53,5 +53,9 @@ router.post('/events/:eventID/changeEventPicture', passport.authenticate('jwt', 
 	controller.changeEventPicture(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
+router.get('/events/getClubEvent/:eventID', (req, res) => {
+	controller.getClubEvent(req, res);
+});
+
 //Export
 module.exports = router;

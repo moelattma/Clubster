@@ -6,12 +6,11 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux'
 import axios from 'axios';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { AppLoading } from 'expo';
 import { Button } from 'native-base';
-
+import { Header } from 'react-native-elements';
 import { DefaultImg } from '../Utils/Defaults';
-import { CLUBS_SET, CLUBS_SETUSER, EVENTS_SETCLUB } from '../../reducers/ActionTypes';
+import { CLUBS_SET, CLUBS_SETUSER, EVENTS_SETCLUB, USER_TOGGLECLUBS } from '../../reducers/ActionTypes';
 
 const window = Dimensions.get('window');
 const imageWidth = (window.width / 3) + 30;
@@ -22,62 +21,14 @@ const CLUB_WIDTH = WIDTH * 4 / 10;
 const CLUB_HEIGHT = HEIGHT / 4;
 
 class ShowClubs extends React.Component {
-  constructor(props) { // Initializing state
-    super(props);
-    
-    props.navigation.setParams({ refreshClubs: this.getUserClubs });
-    props.navigation.setParams({ showAdmin: true })
-
-    this.state = {
-      tappedAdmin: false,
-      show: false,
-      name: '',
-      description: '',
-      imageURL: DefaultImg
-    }
-  }
-
-  static navigationOptions = ({ navigation }) => {
-    return {
-      headerLeft: (
-        <View style={{ marginLeft: 13 }}>
-          <FontAwesome
-            name="plus" size={24} color={'black'}
-            onPress={() => navigation.navigate('CreateClub', { refreshClubs: navigation.state.params.refreshClubs })} />
-        </View>
-      ),
-      headerRight: (
-        <View style={{ marginRight: 6 }}>
-          <FontAwesome
-            name="search" size={24} color={'black'}
-            onPress={() => navigation.navigate('ClubSearch')} />
-        </View>
-      ),
-      headerTitle: (
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }} >
-          <Button transparent onPress={() => navigation.setParams({ showAdmin: true })} >
-            <Text style={[{ fontSize: 20, fontWeight: 'bold' }, !navigation.state.params ||
-              navigation.state.params.showAdmin ? { color: '#59cbbd' } : {}]} >Admin</Text>
-          </Button>
-          <Text style={{ fontSize: 32, fontWeight: 'bold' }} >|</Text>
-          <Button transparent onPress={() => navigation.setParams({ showAdmin: false })}>
-            <Text style={[{ fontSize: 20, fontWeight: 'bold' }, navigation.state.params &&
-              !navigation.state.params.showAdmin ? { color: '#59cbbd' } : {}]} >Member</Text>
-          </Button>          
-        </View>
-      )
-    };
-  };
-
   navigateUser = async (item) => {
-    const { params } = this.props.navigation.state;
     await axios.get(`http://localhost:3000/api/organizations/getOrg/${item._id}`).then((response) => {
       var club = response.data.org;
-      club.isAdmin = !params || params.showAdmin;
+      club.isAdmin = this.props.showAdminClubs;
       this.props.setCurrentClub(club);
       this.props.setClubEvents(club.events);
     }).catch(() => { return; });
-    var isAdmin = !params || params.showAdmin
+    var isAdmin = this.props.showAdminClubs;
     this.props.navigation.navigate(isAdmin ? 'AdminNavigation' : 'MemberNavigation', { isAdmin });
   };
 
@@ -89,7 +40,7 @@ class ShowClubs extends React.Component {
       <TouchableWithoutFeedback onPress={() => this.navigateUser(item)}
         style={{ flexDirection: 'row' }}>
         <View style={styles.eventContainer} >
-          <Image style={styles.containerImage} source={{ uri:  'https://s3.amazonaws.com/clubster-123/' + item.image }} />
+          <Image style={styles.containerImage} source={{ uri: (!item.image || item.image == null ? DefaultImg : 'https://s3.amazonaws.com/clubster-123/' + item.image) }} />
           <View style={{ margin: 10 }}>
             <Text allowFontScaling numberOfLines={1}
               style={styles.eventTitle}> {item.name}
@@ -110,88 +61,91 @@ class ShowClubs extends React.Component {
   render() {
     if (this.props.loading)
       return <AppLoading/>
-    if (!this.props.navigation.state.params || this.props.navigation.state.params.showAdmin) {
-      if (!this.props.clubsAdmin || this.props.clubsAdmin.length == 0)
-        return (
-            <ScrollView refreshControl={<RefreshControl
-              refreshing={this.props.loading}
-              onRefresh={() => this.refreshUserClubs()}
-            />}>
+    return (
+      <ScrollView refreshControl={<RefreshControl
+        refreshing={this.props.loading}
+        onRefresh={() => this.refreshUserClubs()}
+      />}>
+        <Header
+          backgroundColor={'transparent'}
+          leftComponent={{ icon: 'add', onPress: () => this.props.navigation.navigate('CreateClub') }}
+          centerComponent={
+            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'stretch' }} >
+              <Text>     </Text>
+              <Button transparent onPress={() => this.props.toggleClubs(true)} >
+                <Text style={[{ fontSize: 18, fontWeight: '400' }, this.props.showAdminClubs ? { color: '#59cbbd' } : {}]} >Admin</Text>
+              </Button>
+              <Text style={{ fontSize: 30, fontWeight: '400' }} >|</Text>
+              <Button transparent onPress={() => this.props.toggleClubs(false)}>
+                <Text style={[{ fontSize: 18, fontWeight: '400' }, !this.props.showAdminClubs ? { color: '#59cbbd' } : {}]} >Member</Text>
+              </Button>
+            </View>
+          }
+          rightComponent={{ icon: 'search', onPress: () => this.props.navigation.navigate('ClubSearch') }}
+        />
+        {this.props.showAdminClubs ? 
+          (!this.props.clubsAdmin || this.props.clubsAdmin.length == 0 ?             
             <Text style={[{ flex: 1 }, styles.noneText ]}>You are not an admin of any clubs</Text>
-            </ScrollView>
-        )
-      return (
-        <ScrollView refreshControl={<RefreshControl
-          refreshing={this.props.loading}
-          onRefresh={() => this.refreshUserClubs()}
-        />}>
-          <FlatList
-            data={this.props.clubsAdmin}
-            renderItem={this._renderItem}
-            horizontal={false}
-            numColumns={2}
-            keyExtractor={club => club._id}
-          />
-        </ScrollView>
-      )
-    }
-    else {
-      if (!this.props.clubsMember || this.props.clubsMember.length == 0)
-        return (
-          <ScrollView refreshControl={<RefreshControl
-            refreshing={this.props.loading}
-            onRefresh={() => this.refreshUserClubs()}
-          />}>
+            : 
+            <FlatList
+              data={this.props.clubsAdmin}
+              renderItem={this._renderItem}
+              horizontal={false}
+              numColumns={2}
+              keyExtractor={club => club._id}
+            />
+          )
+          :
+          (!this.props.clubsMember || this.props.clubsMember.length == 0 ?
             <Text style={[{ flex: 1 }, styles.noneText ]}>You are not a member of any clubs</Text>
-          </ScrollView>
-        )
-      return (
-        <ScrollView refreshControl={<RefreshControl
-          refreshing={this.props.loading}
-          onRefresh={() => this.refreshUserClubs()}
-        />}>
-          <FlatList
-            data={this.props.clubsMember.slice(0, 40)}
-            renderItem={this._renderItem}
-            horizontal={false}
-            numColumns={2}
-            keyExtractor={club => club._id}
-            extraData={this.props}
-          />
-        </ScrollView>
-      )
-    }
+            : 
+            <FlatList
+              data={this.props.clubsMember}
+              renderItem={this._renderItem}
+              horizontal={false}
+              numColumns={2}
+              keyExtractor={club => club._id}
+            />
+          )
+        }
+      </ScrollView>  
+    )
   }
 }
 
 const mapStateToProps = (state) => {
   if (!state.user.user)
     return { loading: true };
-  var clubsAdmin = state.clubs.clubsAdmin;
-  var clubsMember = state.clubs.clubsMember;
-  if (clubsAdmin.length % 2 != 0) clubsAdmin.push({ empty: true });
-  if (clubsMember.length % 2 != 0) clubsMember.push({ empty: true });
+  var clubsAdmin = state.clubs.clubsAdmin.slice(0);
+  var clubsMember = state.clubs.clubsMember.slice(0);
+  if (clubsAdmin && clubsAdmin != null && clubsAdmin.length % 2 != 0) 
+    clubsAdmin.push({ empty: true });
+  if (clubsMember && clubsMember != null && clubsMember.length % 2 != 0) 
+    clubsMember.push({ empty: true });
   return {
-    clubsAdmin: state.clubs.clubsAdmin,  
-    clubsMember: state.clubs.clubsMember,
-    loading: false
+    clubsAdmin, clubsMember,
+    loading: false, showAdminClubs: state.user.showAdminClubs
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-      setUserClubs: (clubsAdmin, clubsMember) => dispatch({
-          type: CLUBS_SET,
-          payload: { clubsAdmin, clubsMember }
-      }),
-      setCurrentClub: (club) => dispatch({
-          type: CLUBS_SETUSER,
-          payload: { club }
-      }),
-      setClubEvents: (events) => dispatch({
-          type: EVENTS_SETCLUB,
-          payload: { events }
-      })
+    setUserClubs: (clubsAdmin, clubsMember) => dispatch({
+      type: CLUBS_SET,
+      payload: { clubsAdmin, clubsMember }
+    }),
+    setCurrentClub: (club) => dispatch({
+      type: CLUBS_SETUSER,
+      payload: { club }
+    }),
+    setClubEvents: (events) => dispatch({
+      type: EVENTS_SETCLUB,
+      payload: { events }
+    }),
+    toggleClubs: (showAdminClubs) => dispatch({
+      type: USER_TOGGLECLUBS,
+      payload: { showAdminClubs }
+    })
   }
 }
 
@@ -203,7 +157,7 @@ const styles = StyleSheet.create({
     height: CLUB_HEIGHT,
     position: 'relative',
     backgroundColor: '#59cbbd',
-    marginTop: 20,
+    marginBottom: 20,
     marginRight: 5,
     marginLeft: 5,
     borderRadius: 5,

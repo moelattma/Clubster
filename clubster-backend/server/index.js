@@ -45,7 +45,7 @@ const PORT = process.env.PORT || 3000;
 const server = require("http").createServer(app);
 var io = require('socket.io').listen(server);
 var url = require('url');
-const port = 3000;
+// const port = 3000;
 
 io.sockets.on('connection', socket => {
   clientId=socket.handshake.query.id;
@@ -56,4 +56,4 @@ io.sockets.on('connection', socket => {
   });
 });
 
-server.listen(port, () => console.log('server'));
+server.listen(PORT, () => console.log('server'));

@@ -67,6 +67,3 @@ export default class Comments extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
-
-});

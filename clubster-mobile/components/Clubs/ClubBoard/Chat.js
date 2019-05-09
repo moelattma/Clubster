@@ -4,7 +4,9 @@ import { connect } from 'react-redux'
 import axios from 'axios';
 import io from "socket.io-client";
 import { GiftedChat } from 'react-native-gifted-chat';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Header } from 'react-native-elements';
+import { DefaultImg } from '../../Utils/Defaults';
 
 export class Chat extends React.Component {
     constructor(props) {
@@ -17,31 +19,21 @@ export class Chat extends React.Component {
     }
 
     componentDidMount() {
-      this.socket = io('http://localhost:3000/', { query:  `groupId=${this.props._id}` });
+      this.socket = io('https://clubster-backend.herokuapp.com/', { query:  `groupId=${this.props._id}` });
       this.socket.on('output', data => {
         this.setState(previousState => ({
           messages: GiftedChat.append(previousState.messages, data)
         }));
       });
-      axios.get(`http://localhost:3000/api/conversations/${this.props._id}`).then((response) => {
+      axios.get(`https://clubster-backend.herokuapp.com/api/conversations/${this.props._id}`).then((response) => {
         this.setState({ messages: response.data.conversation.messages.reverse() });
         this.setState({ userId: response.data.userId });
       }).catch((err) => console.log(err));
     }
-
-    onSend(messages = []) {
-      var text = messages[messages.length - 1].text;
-
-      axios.post(`http://localhost:3000/api/messages/${this.props._id}`, {
-        text: text
-      }).then((message) => {
-        this.socket.emit('input', text);
-      }).catch((err) => console.log(err));
-    }
-
+    
     submitChatMessage(messages = []) {
       var text = messages[messages.length - 1].text;
-      axios.post(`http://localhost:3000/api/messages/${this.props._id}`, {
+      axios.post(`https://clubster-backend.herokuapp.com/api/messages/${this.props._id}`, {
         text: text
       }).then((message) => {
         this.socket.emit("input", messages[0]);
@@ -52,6 +44,10 @@ export class Chat extends React.Component {
     render() {
       return (
         <KeyboardAwareScrollView contentContainerStyle={styles.container} scrollEnabled={true} enableOnAndroid={true}>
+          <Header
+            backgroundColor={'transparent'}
+            leftComponent={{ icon: 'arrow-back', onPress: () => this.props.navigation.navigate('HomeNavigation') }}
+          />
           <GiftedChat
             messages={this.state.messages}
             onSend={messages => this.submitChatMessage(messages)}

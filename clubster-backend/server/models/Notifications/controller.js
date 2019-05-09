@@ -28,7 +28,7 @@ exports.grabNotifications = (req, res) => {
 		if (!notifications) {
 			return res.status(400).json({ 'Error': 'No notifications found' });
 		} else {
-			return res.status(201).json({ 'notifications': notifications });
+			return res.status(201).json({ 'notifications': notifications.reverse() });
 		}
 	});
 };
@@ -66,7 +66,7 @@ exports.joinOrganization = (req, res) => {
 };
 
 exports.newNotification = (req, res) => {
-	const { type, _id, orgID, receiverID } = req.body;
+	const { type, orgID, receiverID } = req.body;
 	const senderID = (req.user ? req.user._id : req.body.senderID);
 
 	let notification = ({

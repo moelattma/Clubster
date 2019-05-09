@@ -8,7 +8,8 @@ const clubReducer = (state = clubState, action) => {
             state = Object.assign({}, state, { clubsAdmin: action.payload.clubsAdmin, clubsMember: action.payload.clubsMember } );
             return state;
         case Actions.CLUBS_CREATE:
-            state = Object.assign({}, state, { clubsAdmin: state.clubsAdmin.concat(action.payload.club) } );
+            const { club } = action.payload;
+            state = Object.assign({}, state, { clubsAdmin: state.clubsAdmin.concat(club), allClubs: state.allClubs.concat(club) } );
             return state;
         case Actions.CLUBS_SETALL:
             if (state.allClubs.length != action.payload.allClubs.length)

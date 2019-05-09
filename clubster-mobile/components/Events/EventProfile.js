@@ -4,6 +4,7 @@ import { View, Dimensions, FlatList, TouchableOpacity, TouchableWithoutFeedback,
 import axios from 'axios';
 import { ImagePicker, Permissions } from 'expo';
 import v1 from 'uuid/v1';
+import { connect } from 'react-redux'
 import { RNS3 } from 'react-native-aws3';
 import { Container, Card, Form, Content, ListItem, Thumbnail, Item,
          Text, Button, Icon, Left, Body, Right, Input } from 'native-base';
@@ -18,13 +19,11 @@ import { DefaultImg } from '../Utils/Defaults';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 
-export default class EventProfile extends React.Component {
+export class EventProfile extends React.Component {
     constructor(props) {
         super(props);
 
-        this.event = this.props.navigation.getParam('event', null);
         this.state = {
-            eventImage: this.event.image ? 'https://s3.amazonaws.com/clubster-123/' + this.event.image : DefaultImg,
             likersModal: false,
             goingModal: false,
             ridersModal: false,
@@ -36,7 +35,6 @@ export default class EventProfile extends React.Component {
             rideTime: '',
             rideLocation: '',
             description: '',
-            userID: null,
         }
     }
 
@@ -73,7 +71,7 @@ export default class EventProfile extends React.Component {
             await RNS3.put(file, options).then((response) => {
                 imageURL = response.body.postResponse.key;
             }).catch((err) => { console.log(err) });
-            await axios.post(`http://localhost:3000/api/events/${this.event._id}/changeEventPicture`, { imageURL }).then((image) => {
+            await axios.post(`http://localhost:3000/api/events/${this.props._id}/changeEventPicture`, { imageURL }).then((image) => {
                 this.setState({ eventImage: 'https://s3.amazonaws.com/clubster-123/' + imageURL });
             });
         } catch (error) { console.log(error); }
@@ -81,7 +79,7 @@ export default class EventProfile extends React.Component {
 
     // Likers
     openLikersModal() {
-        axios.get(`http://localhost:3000/api/events/${this.event._id}/likers`)
+        axios.get(`http://localhost:3000/api/events/${this.props._id}/likers`)
             .then(response => {
                 this.setState({ 
                     likersModal: true,
@@ -107,7 +105,7 @@ export default class EventProfile extends React.Component {
 
     // Going
     openGoingModal() {
-        axios.get(`http://localhost:3000/api/events/${this.event._id}/going`)
+        axios.get(`http://localhost:3000/api/events/${this.props._id}/going`)
             .then(response => {
                 this.setState({ 
                     goingModal: true,
@@ -133,7 +131,7 @@ export default class EventProfile extends React.Component {
 
     // Rides
     openRidesModal() {
-        axios.get(`http://localhost:3000/api/${this.event._id}/rides`)
+        axios.get(`http://localhost:3000/api/${this.props._id}/rides`)
             .then(response => {
                 this.setState({
                     ridersModal: true,
@@ -152,7 +150,7 @@ export default class EventProfile extends React.Component {
     addRideDropDown() { this.setState({ form: true }) }
 
     submitRide() {
-        const { userID } = this.state;
+        const { userID } = this.props;
         var skip = false;
         var removeFromRide;
 
@@ -174,7 +172,7 @@ export default class EventProfile extends React.Component {
             return;
         } else {
             const { seats, rideTime, rideLocation, description } = this.state;
-            axios.post(`http://localhost:3000/api/${this.event._id}/createRide`, {
+            axios.post(`http://localhost:3000/api/${this.props._id}/createRide`, {
                 passengerSeats: seats,
                 time: rideTime,
                 location: rideLocation,
@@ -265,13 +263,13 @@ export default class EventProfile extends React.Component {
 
     render() {
         const eventInfo = {
-            _id: this.event._id,
-            name: this.event.name,
-            description: this.event.description,
-            location: this.event.location,
-            date: this.event.date,
-            comments: this.event.comments,
-            photos: this.event.photos
+            _id: this.props._id,
+            name: this.props.name,
+            description: this.props.description,
+            location: this.props.location,
+            date: this.props.date,
+            comments: this.props.comments,
+            photos: this.props.photos
         }
 
         var { seats, rideTime, rideLocation, description } = this.state;
@@ -280,7 +278,7 @@ export default class EventProfile extends React.Component {
             <Container>
                 <ScrollView>
                     <TouchableWithoutFeedback onPress={() => this.changeEventPicture()}>
-                        <Image source={{ uri: this.state.eventImage }} style={{ height: 200 }} />
+                        <Image source={{ uri: !this.props.image || this.props.image == null ? DefaultImg : 'https://s3.amazonaws.com/clubster-123/' + this.props.image }} style={{ height: 200 }} />
                     </TouchableWithoutFeedback>
                     <InformationCard eventInfo={eventInfo} />
                     <Content padder>
@@ -302,11 +300,11 @@ export default class EventProfile extends React.Component {
                             <Icon name="ios-arrow-dropleft"
                                 style={styles.modalButton} />
                         </TouchableOpacity>
-                        {!this.state.likers || this.state.likers.length == 0 ?
+                        {!this.props.likers || this.props.likers.length == 0 ?
                             <Text style={styles.noneText}> No one likes this event </Text> 
                             :
                             <FlatList
-                                data={this.state.likers}
+                                data={this.props.likers}
                                 renderItem={this._renderLike}
                                 horizontal={false}
                                 keyExtractor={liker => liker._id}
@@ -324,11 +322,11 @@ export default class EventProfile extends React.Component {
                                     style={styles.modalButton} />
                             </TouchableOpacity>
                         </View>
-                        {!this.state.going || this.state.going.length == 0 ?
+                        {!this.props.going || this.props.going.length == 0 ?
                             <Text style={styles.noneText}> No one is going to this event </Text> 
                             :
                             <FlatList
-                                data={this.state.going}
+                                data={this.props.going}
                                 renderItem={this._renderGoing}
                                 horizontal={false}
                                 keyExtractor={going => going._id}
@@ -390,11 +388,11 @@ export default class EventProfile extends React.Component {
                             </View>
                             :
                             (
-                                this.state.rides == undefined || this.state.rides.length == 0 ?
+                                this.props.rides == undefined || this.props.rides.length == 0 ?
                                 <Text style={styles.noneText}> There are no rides for this event </Text>
                                 :
                                 <FlatList
-                                data={this.state.rides}
+                                data={this.props.rides}
                                 renderItem={this._renderRide}
                                 horizontal={false}
                                 keyExtractor={ride => ride._id}
@@ -407,6 +405,21 @@ export default class EventProfile extends React.Component {
     }
 }
 
+const mapStateToProps = (state) => {
+    const { isAdmin } = state.clubs.club;
+    console.log(state.events.thisEvent);
+    return {
+        ...(state.events.thisEvent), isAdmin, userID: state.user.user._id
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        
+    }
+}
+
+export default connect(mapStateToProps, null)(EventProfile);
 
 const styles = StyleSheet.create({
     aboutText: {

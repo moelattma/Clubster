@@ -253,3 +253,18 @@ exports.addCommentToEvent = (req, res) => {
 			}
 	})
 }
+
+exports.getClubEvent = (req, res) => {
+	const { eventID } = req.params;
+	Events.findById(eventID).populate({ path: 'host', select: 'name image _id' })
+	.populate('going', 'name image _id').populate('likers', 'name image _id')
+	.populate({ path: 'rides', populate: { path: 'driverID', select: 'name image' } })
+  	.populate({ path: 'rides', populate: { path: 'ridersID', select: 'name image' } })
+	.then((clubEvent) => {
+		if (!clubEvent) {
+			return res.status(400).json({ 'Error': 'No events found' });	//organization is null, DNE
+		} else {
+			return res.status(201).json({ 'clubEvent': clubEvent }); //returns organization's events along with idOfUser
+		}
+	}).catch((err) => console.log(err));
+}

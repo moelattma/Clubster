@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { TouchableOpacity, StyleSheet, View, FlatList, Dimensions, ScrollView, RefreshControl } from 'react-native';
 import { Button, Text, Thumbnail } from 'native-base';
+import { connect } from 'react-redux'
 import axios from 'axios';
 import { awsLink } from '../../keys/keys';
 import { DefaultImg } from '../Utils/Defaults';
+import { USER_NOTIFICATIONSSET } from '../../reducers/ActionTypes';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const itemWidth = WIDTH * 13 / 20;
@@ -12,14 +14,12 @@ const ACCEPT_ADMIN = "ACCEPT_ADMIN";
 const ACCEPT_MEM = "ACCEPT_MEMBER";
 const REJECT_JOIN = "REJECT_JOIN";
 
-export default class Notifications extends Component {
+export class Notifications extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            notifications: [],
-            refreshing: false,
-            img: DefaultImg
+            refreshing: true,
         };
     }
 
@@ -30,20 +30,18 @@ export default class Notifications extends Component {
     _getNotifications() {
         this.setState({ refreshing: true });
         axios.get("http://localhost:3000/api/notifications").then((response) => {
-            this.setState({ notifications: response.data.notifications, refreshing: false }); // Setting up state variable
+            this.props.setNotifications(response.data.notifications);
+            this.setState({ refreshing: false }); // Setting up state variable
         }).catch((err) => console.log(err));
     }
 
     _renderItem = ({ item }) => {
+        const { image } = item.idOfSender;
         return (
             <View style={{ flexDirection: 'row', height: HEIGHT/10, margin: 5, padding: 5 }}>
                 <View style={{ flexDirection: 'row' }}>
                 <TouchableOpacity>
-                    {item.idOfSender.image
-                    ?<Thumbnail source={{ uri: awsLink + item.idOfSender.image }}>
-                    </Thumbnail>
-                    :<Thumbnail source={{ uri: this.state.img }}></Thumbnail>
-                    }
+                    <Thumbnail source={{ uri: (!image || image == null ? DefaultImg : awsLink + image) }}/>
                 </TouchableOpacity>
                 <View style={{ width: WIDTH/2, alignItems: 'center', marginLeft:4, marginRight:4 }}>
                     <Text 
@@ -124,7 +122,7 @@ export default class Notifications extends Component {
                 onRefresh={() => this._getNotifications()}
               />}>
                 <FlatList
-                    data={this.state.notifications.reverse().slice(0, 20)}
+                    data={this.props.notifications.slice(0, 20)}
                     renderItem={this._renderItem}
                     keyExtractor={(item) => item._id}
                     ItemSeparatorComponent={this.renderSeparator}
@@ -134,6 +132,20 @@ export default class Notifications extends Component {
     }
 }
 
+const mapStateToProps = (state) => {
+    return { notifications: state.user.notifications };
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        setNotifications: (notifications) => dispatch({
+            type: USER_NOTIFICATIONSSET,
+            payload: { notifications }
+        })
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Notifications);
 
 const styles = StyleSheet.create({
     notification: {

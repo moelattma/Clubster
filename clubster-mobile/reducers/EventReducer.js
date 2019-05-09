@@ -19,6 +19,37 @@ const eventReducer = (state = eventState, action) => {
         case Actions.EVENTS_SETCURRENT:
             state = Object.assign({}, state, { thisEvent: action.payload.thisEvent } );
             return state;
+        case Actions.EVENTS_CREATE: 
+            const { event } = action.payload;
+            if (event && event != null) {
+                var { allEvents, clubEvents, userEvents } = state;
+                allEvents.unshift(event);
+                clubEvents.unshift(event);
+                userEvents.unshift(event);  
+                state = Object.assign({}, state, { allEvents, userEvents, clubEvents } );
+                return state;
+            }
+            return state;
+        case Actions.EVENTS_HANDLEGOING:
+            var { corrID, going } = action.payload;
+            var { clubEvents } = state;
+            for (var i = 0; i < clubEvents.length; i++) {
+                if (clubEvents[i]._id === corrID)
+                    break;
+            }
+            clubEvents[i].going = going;
+            state = Object.assign({}, state, { clubEvents: clubEvents });
+            return state;
+        case Actions.EVENTS_HANDLELIKE:
+            var { corrID, likers } = action.payload;
+            var { clubEvents } = state;
+            for (var i = 0; i < clubEvents.length; i++) {
+                if (clubEvents[i]._id === corrID)
+                    break;
+            }
+            clubEvents[i].likers = likers;
+            state = Object.assign({}, state, { clubEvents: clubEvents });
+            return state;
         default:
             return state;
     }

@@ -16,7 +16,7 @@ export default class ClubList extends Component {
     var toAdd = [];
     toAdd = props.adminClubs;
     toAdd.map(club => {
-      if (!club.empty && club.president == name) {
+      if (!club.empty && club.president === name) {
         club.type = TYPE_PRESIDENT;
         clubs.push(club);
       }

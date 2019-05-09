@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
+import { Header } from 'react-native-elements';
+import { connect } from 'react-redux'
 import { Container } from 'native-base';
 import axios from 'axios';
 import { BarChart, XAxis } from 'react-native-svg-charts';
@@ -8,13 +10,11 @@ import * as scale from '../../node_modules/react-native-svg-charts/node_modules/
 import SideGraph from './SideGraph';
 import ActiveChart from './ActiveChart';
 
-export default class Graphs extends React.Component {
+export class Graphs extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       club: [],
-      loading: false,
-      idOfUser: '',
       name: '',
       description: '',
       date: '',
@@ -26,71 +26,62 @@ export default class Graphs extends React.Component {
   }
 
   componentWillMount() {
-    this._mounted = true;
-    this.willFocus = this.props.navigation.addListener('willFocus', () => {
-      if (this._mounted)
-        this.getOrganization();
-    });
+    this.getOrgData();
   }
 
-  componentWillUnmount() {
-    this._mounted = false;
-  }
-
-  async getOrganization() {
-    const { _id } = this.props.screenProps;
-    this.setState({ loading: true });
+  getOrgData() {
     let eventLengths = [];
     let eventNames = [];
-    await axios.get(`http://localhost:3000/api/organizations/getOrg/${_id}`)
-      .then((response) => {
-        if (this._mounted) {
-          this.setState({ club: response.data.org, idOfUser: response.data.idOfUser });
-          this.setState({ loading: false })
-        }
-      })
-      .catch((err) => { console.log('getClubEvents failed'); console.log(err) });
-      for(let i = 0;i<this.state.club.events.length;i++) {
-        eventLengths.push(this.state.club.events[i].going.length);
-        eventNames.push(this.state.club.events[i].name.substring(0,2))
-      }
-      this.setState({data:eventLengths});
-      this.setState({names: eventNames});
+    const { club } = this.props;
+    for (let i = 0; i < club.events.length; i++) {
+      eventLengths.push(club.events[i].going.length);
+      eventNames.push(club.events[i].name ? club.events[i].name.substring(0, 2) : 'DNE');
+    }
+    this.setState({ data: eventLengths, names: eventNames });
   }
+
   render() {
-     var club = this.state.club;
     if (this.state.loading) {
       return <Expo.AppLoading />;
     }
 
     return (
       <Container>
-          <SideGraph club = {this.state.club} />
-          <ActiveChart club = {this.state.club} />
-          {(this.state.data != null && this.state.data.length != 0) ?
+        <Header
+          backgroundColor={'transparent'}
+          leftComponent={{ icon: 'arrow-back', onPress: () => this.props.navigation.navigate('HomeNavigation') }}
+        />
+        <SideGraph club={this.props.club} />
+        <ActiveChart club={this.props.club} />
+        {(this.state.data != null && this.state.data.length != 0) ?
           <View style={{ height: 200, padding: 20 }}>
-               <BarChart
-                   style={{ flex: 1 }}
-                   data={this.state.data}
-                   gridMin={0}
-                   svg={{ fill: 'rgb(134, 65, 244)' }}
-               />
-               <XAxis
-                   style={{ marginTop: 10 }}
-                   data={ this.state.names }
-                   xAccessor={({ index }) => index}
-                   scale={scale.scaleBand}
-                   formatLabel={(_, index) => this.state.names[ index ]}
-                   labelStyle={ { color: 'black' } }
-               />
-           </View> :
-           null
-         }
+            <BarChart
+              style={{ flex: 1 }}
+              data={this.state.data}
+              gridMin={0}
+              svg={{ fill: 'rgb(134, 65, 244)' }}
+            />
+            <XAxis
+              style={{ marginTop: 10 }}
+              data={this.state.names}
+              xAccessor={({ index }) => index}
+              scale={scale.scaleBand}
+              formatLabel={(_, index) => this.state.names[index]}
+              labelStyle={{ color: 'black' }}
+            />
+          </View> :
+          null
+        }
       </Container>
     );
   }
-
 }
+
+const mapStateToProps = (state) => {
+  return { club: state.clubs.club }
+}
+
+export default connect(mapStateToProps, null)(Graphs);
 
 const styles = StyleSheet.create({
   container: {

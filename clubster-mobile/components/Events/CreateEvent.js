@@ -8,14 +8,16 @@ import {
     Left, Body, Right, Form, Item, Input
 } from 'native-base';
 import v1 from 'uuid/v1';
+import { connect } from 'react-redux'
 import { accessKeyId, secretAccessKey } from '../../keys/keys';
 import { RNS3 } from 'react-native-aws3';
+import { EVENTS_CREATE } from '../../reducers/ActionTypes';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const EVENT_WIDTH = WIDTH * 9 / 10;
 const EVENT_HEIGHT = HEIGHT * 3 / 7;
 
-export default class CreateClubEvent extends React.Component {
+export class CreateClubEvent extends React.Component {
     constructor(props) {
         super(props);
 
@@ -70,20 +72,14 @@ export default class CreateClubEvent extends React.Component {
         } catch (error) { console.log('library handle failed'); console.log(error); }
     }
 
-    createEvent = async () => {
-        const { _id } = this.props.screenProps;
+    createEvent = () => {
         const { name, date, time, description, location, imageURL } = this.state;
-        var newEvent;
-        await axios.post('http://localhost:3000/api/events/' + _id + '/new', {
+        axios.post(`http://localhost:3000/api/events/${this.props.clubID}/new`, {
             name, date, time, description, location, imageURL
         }).then(response => {
-            newEvent = response.data.event;
-        }).catch(error => console.log(error + 'ruh roh'));
-        var func = this.props.navigation.getParam('addEvent');
-        if (func) {
-            await func(newEvent);
+            this.props.newClubEvent(response.data.event);
             this.props.navigation.navigate('ShowEvents');
-        } else this.props.navigation.navigate('ShowEvents');
+        }).catch(error => console.log(error + 'ruh roh'));
     }
 
     render() {
@@ -156,6 +152,23 @@ export default class CreateClubEvent extends React.Component {
         );
     }
 }
+
+const mapStateToProps = (state) => {
+    return {
+        clubID: state.clubs.club._id
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        newClubEvent: (event) => dispatch({
+            type: EVENTS_CREATE,
+            payload: { event }
+        })
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateClubEvent);
 
 const styles = StyleSheet.create({
     eventCard: {

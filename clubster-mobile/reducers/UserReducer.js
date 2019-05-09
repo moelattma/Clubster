@@ -1,6 +1,6 @@
 import * as Actions from '../reducers/ActionTypes';
 
-let userState = { user: null };
+let userState = { user: null, showAdminClubs: true, notifications: [] };
 
 const userReducer = (state = userState, action) => {
     switch (action.type) {
@@ -16,6 +16,14 @@ const userReducer = (state = userState, action) => {
             return state;
         case Actions.USER_CHANGEPHOTO:
             state = Object.assign({}, state, { user: { ...state.user, image: action.payload.image } })
+            return state;
+        case Actions.USER_TOGGLECLUBS:
+            if (action.payload.showAdminClubs != state.showAdminClubs)
+                state = Object.assign({}, state, { showAdminClubs: action.payload.showAdminClubs })
+            return state;
+        case Actions.USER_NOTIFICATIONSSET:
+            if (action.payload.notifications.length != state.notifications.length)
+                state = Object.assign({}, state, { notifications: action.payload.notifications })
             return state;
         default:
             return state;
