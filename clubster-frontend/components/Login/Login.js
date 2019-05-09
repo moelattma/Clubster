@@ -14,7 +14,7 @@ export default class Login extends React.Component {
   handleLogin = () => {
     const { username, password } = this.state;                        //Destructuring
     if (username && password) {
-      axios.post('http://localhost:3000/api/login', {               //POST with payload
+      axios.post('https://clubster-backend.herokuapp.com/api/login', {               //POST with payload
         username,
         password
       })

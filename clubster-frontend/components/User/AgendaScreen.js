@@ -12,6 +12,7 @@ import {
 import SwitchButton from 'switch-button-react-native';
 import {Agenda} from 'react-native-calendars';
 var moment = require('moment-timezone');
+var axios = require('axios');
 const {height, width} = Dimensions.get('window');
 
 export default class AgendaScreen extends Component {
@@ -19,73 +20,10 @@ export default class AgendaScreen extends Component {
     super(props);
     this.state = {
       items: {},
-      events: [{
-        _id: {
-            "$oid": "5cb81a53601d33408834675f"
-        },
-        date: [
-            1555743600,
-            1555743600
-        ],
-        photos: [],
-        going: [
-            {
-                "$oid": "5c04a79bfd61322588b80309"
-            }
-        ],
-        likers: [
-            {
-                "$oid": "5c04a79bfd61322588b80309"
-            }
-        ],
-        rides: [],
-        comments: [],
-        organization: {
-            "$oid": "5cb6a9196203c14aa0a66aa1"
-        },
-        name: "Test 1",
-        description: "Test 1",
-        host: {
-            "$oid": "5c04a79bfd61322588b80309"
-        },
-        location: "Test 1",
-        image: "s3/ed98fa20-61a3-11e9-b39a-0bdefcda8e19.jpeg",
-        value: 4,
-        __v: 0
-      }, {
-        _id: {
-            "$oid": "5cb81fa5601d334088346761"
-        },
-        date: [
-            1555830000,
-            1555830000
-        ],
-        photos: [],
-        going: [
-            {
-                "$oid": "5c04a79bfd61322588b80309"
-            }
-        ],
-        likers: [
-            {
-                "$oid": "5c04a79bfd61322588b80309"
-            }
-        ],
-        rides: [],
-        comments: [],
-        organization: {
-            "$oid": "5cb6a9196203c14aa0a66aa1"
-        },
-        name: "Test 3",
-        description: "Test 3",
-        host: {
-            "$oid": "5c04a79bfd61322588b80309"
-        },
-        location: "Test 3",
-        image: "s3/19d34660-61a7-11e9-9620-af4117ad71ca.jpeg",
-        value: 5,
-        __v: 0
-      }],
+      eventsAll: [],
+      eventsAllObjectArr: {},
+      eventsUser: [],
+      eventsUserObjectArr: {},
       switch1Value: false
     };
   }
@@ -94,21 +32,35 @@ export default class AgendaScreen extends Component {
     return moment.tz(time, "America/Los_Angeles").format().split('T')[0];
   }
 
+  timeToStringTime(time) {
+    return moment.tz(time, "America/Los_Angeles").format().split('T')[1];
+  }
+
+  async componentDidMount() {
+    await axios.get('http://localhost:3000/api/user').then((response) => {
+      this.setState({ eventsUser: response.data.eventsArray });
+    })
+    await axios.get('http://localhost:3000/api/events').then((response) => {
+      this.setState({ eventsAll: response.data.events });
+    })
+  }
+
 
   processEvents() {
-    for(let i = 0;i < this.state.events.length; i++) {
-      let begDateTimestamp = this.state.events[i].date[0];
-      let endDateTimestamp = this.state.events[i].date[1];
+
+    for(let i = 0;i < this.state.eventsUser.length; i++) {
+      let begDateTimestamp = this.state.eventsUser[i].date[0];
+      let endDateTimestamp = this.state.eventsUser[i].date[1];
       let date = this.timeToString(begDateTimestamp*1000);
-      if (!this.state.items[date]) {
-        this.state.items[date] = [];
-        this.state.items[date].push({
+      if (!this.state.eventsUserObjectArr[date]) {
+        this.state.eventsUserObjectArr[date] = [];
+        this.state.eventsUserObjectArr[date].push({
           name: 'Item for ' + date,
           height: (endDateTimestamp - begDateTimestamp)/60*5
         });
       } else {
         if(endDateTimestamp - begDateTimestamp != 0) {
-          this.state.items[date].push({
+          this.state.eventsUserObjectArr[date].push({
             name: 'Item for ' + date,
             height: (endDateTimestamp - begDateTimestamp)/60*5
           });
@@ -116,11 +68,38 @@ export default class AgendaScreen extends Component {
       }
     }
     const newItems = {};
-    Object.keys(this.state.items).forEach(key => {newItems[key] = this.state.items[key];});
+    Object.keys(this.state.eventsUserObjectArr).forEach(key => {newItems[key] = this.state.eventsUserObjectArr[key];});
     this.setState({
-      items: newItems
+      eventsUserObjectArr: newItems
     });
+  }
 
+  processEventsAll() {
+
+    for(let i = 0;i < this.state.eventsAll.length; i++) {
+      let begDateTimestamp = this.state.eventsAll[i].date[0];
+      let endDateTimestamp = this.state.eventsAll[i].date[1];
+      let date = this.timeToString(begDateTimestamp*1000);
+      if (!this.state.eventsAllObjectArr[date]) {
+        this.state.eventsAllObjectArr[date] = [];
+        this.state.eventsAllObjectArr[date].push({
+          name: 'Item for ' + date,
+          height: (endDateTimestamp - begDateTimestamp)/60*5
+        });
+      } else {
+        if(endDateTimestamp - begDateTimestamp != 0) {
+          this.state.eventsAllObjectArr[date].push({
+            name: 'Item for ' + date,
+            height: (endDateTimestamp - begDateTimestamp)/60*5
+          });
+        }
+      }
+    }
+    const newItems = {};
+    Object.keys(this.state.eventsAllObjectArr).forEach(key => {newItems[key] = this.state.eventsAllObjectArr[key];});
+    this.setState({
+      eventsAllObjectArr: newItems
+    });
   }
 
   toggleSwitch1 = (value) => {
@@ -129,50 +108,43 @@ export default class AgendaScreen extends Component {
    }
 
   render() {
-    console.log(this.state.items);
     return (
       <View style = {styles.container}>
-      <SwitchButton
-                onValueChange={(val) => this.setState({ activeSwitch: val })}      // this is necessary for this component
-                text1 = 'All Events'                        // optional: first text in switch button --- default ON
-                text2 = 'Your Events'                       // optional: second text in switch button --- default OFF
-                switchWidth = {100}                 // optional: switch width --- default 44
-                switchHeight = {44}                 // optional: switch height --- default 100
-                switchdirection = 'rtl'             // optional: switch button direction ( ltr and rtl ) --- default ltr
-                switchBorderRadius = {100}          // optional: switch border radius --- default oval
-                switchSpeedChange = {500}           // optional: button change speed --- default 100
-                switchBorderColor = '#d4d4d4'       // optional: switch border color --- default #d4d4d4
-                switchBackgroundColor = '#fff'      // optional: switch background color --- default #fff
-                btnBorderColor = '#00a4b9'          // optional: button border color --- default #00a4b9
-                btnBackgroundColor = '#00bcd4'      // optional: button background color --- default #00bcd4
-                fontColor = '#b1b1b1'               // optional: text font color --- default #b1b1b1
-                activeFontColor = '#fff'            // optional: active font color --- default #fff
-                style = {{marginTop: 30, marginLeft: Dimensions.get('window')/2 - 50}}
-            />
-
-            { this.state.activeSwitch === 1 ? console.log('view1') : console.log('view2') }
-         <Agenda
-           items={this.state.items}
-           loadItemsForMonth={this.loadItems.bind(this)}
-           selected={'2019-04-16'}
-           renderItem={this.renderItem.bind(this)}
-           renderEmptyDate={this.renderEmptyDate.bind(this)}
-           rowHasChanged={this.rowHasChanged.bind(this)}
-           // markingType={'period'}
-           // markedDates={{
-           //    '2017-05-08': {textColor: '#666'},
-           //    '2017-05-09': {textColor: '#666'},
-           //    '2017-05-14': {startingDay: true, endingDay: true, color: 'blue'},
-           //    '2017-05-21': {startingDay: true, color: 'blue'},
-           //    '2017-05-22': {endingDay: true, color: 'gray'},
-           //    '2017-05-24': {startingDay: true, color: 'gray'},
-           //    '2017-05-25': {color: 'gray'},
-           //    '2017-05-26': {endingDay: true, color: 'gray'}}}
-            // monthFormat={'yyyy'}
-            // theme={{calendarBackground: 'red', agendaKnobColor: 'green'}}
-           //renderDay={(day, item) => (<Text>{day ? day.day: 'item'}</Text>)}
-         />
-      </View>
+        <SwitchButton
+          onValueChange={(val) => this.setState({ activeSwitch: val })}      // this is necessary for this component
+          text1 = 'All Events'                        // optional: first text in switch button --- default ON
+          text2 = 'Your Events'                       // optional: second text in switch button --- default OFF
+          switchWidth = {100}                 // optional: switch width --- default 44
+          switchHeight = {44}                 // optional: switch height --- default 100
+          switchdirection = 'rtl'             // optional: switch button direction ( ltr and rtl ) --- default ltr
+          switchBorderRadius = {100}          // optional: switch border radius --- default oval
+          switchSpeedChange = {500}           // optional: button change speed --- default 100
+          switchBorderColor = '#d4d4d4'       // optional: switch border color --- default #d4d4d4
+          switchBackgroundColor = '#fff'      // optional: switch background color --- default #fff
+          btnBorderColor = '#00a4b9'          // optional: button border color --- default #00a4b9
+          btnBackgroundColor = '#00bcd4'      // optional: button background color --- default #00bcd4
+          fontColor = '#b1b1b1'               // optional: text font color --- default #b1b1b1
+          activeFontColor = '#fff'            // optional: active font color --- default #fff
+          style = {{marginTop: 30, marginLeft: Dimensions.get('window')/2 - 50}}
+      />
+      { this.state.activeSwitch === 1 ?
+        <Agenda
+          items={this.state.eventsAllObjectArr}
+          loadItemsForMonth={this.loadItems.bind(this)}
+          selected={'2019-04-16'}
+          renderItem={this.renderItem.bind(this)}
+          renderEmptyDate={this.renderEmptyDate.bind(this)}
+          rowHasChanged={this.rowHasChanged.bind(this)}
+        /> :
+        <Agenda
+          items={this.state.eventsUserObjectArr}
+          loadItemsForMonth={this.loadItems.bind(this)}
+          selected={'2019-04-16'}
+          renderItem={this.renderItem.bind(this)}
+          renderEmptyDate={this.renderEmptyDate.bind(this)}
+          rowHasChanged={this.rowHasChanged.bind(this)}
+        /> }
+    </View>
     );
   }
 
@@ -195,9 +167,9 @@ export default class AgendaScreen extends Component {
             />
           </View>
           <View style={{ padding: 10, width: 155 }}>
-            <Text>Title</Text>
+            <Text>{item.name}</Text>
             <Text style={{ color: "#777", paddingTop: 5 }}>
-              Description of the image
+              {item.description}
             </Text>
           </View>
         </View>

@@ -99,7 +99,7 @@ class ShowClubs extends Component {
     this.setState({ loading: true });
     var getClubsAdmin = [];
     var getClubsMember = [];
-    axios.get("http://localhost:3000/api/organizations").then((response) => {
+    axios.get("https://clubster-backend.herokuapp.com/api/organizations").then((response) => {
       const { arrayClubsAdmin, arrayClubsMember } = response.data;
       getClubsAdmin = arrayClubsAdmin;
       for (var i = 0; i < arrayClubsAdmin.length; i++) {

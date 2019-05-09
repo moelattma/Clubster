@@ -18,13 +18,13 @@ export default class Chat extends Component {
 
     componentDidMount() {
       const { screenProps } = this.props;
-      this.socket = io('http://localhost:3000/', { query:  `groupId=${screenProps._id}` });
+      this.socket = io('https://clubster-backend.herokuapp.com/', { query:  `groupId=${screenProps._id}` });
       this.socket.on('output', data => {
         this.setState(previousState => ({
           messages: GiftedChat.append(previousState.messages, data)
         }));
       });
-      axios.get(`http://localhost:3000/api/conversations/${screenProps._id}`).then((response) => {
+      axios.get(`https://clubster-backend.herokuapp.com/api/conversations/${screenProps._id}`).then((response) => {
         this.setState({ messages: response.data.conversation.messages.reverse() });
         this.setState({ userId: response.data.userId });
       }).catch((err) => console.log(err));
@@ -34,7 +34,7 @@ export default class Chat extends Component {
       const { screenProps } = this.props;
       var text = messages[messages.length - 1].text;
 
-      axios.post(`http://localhost:3000/api/messages/${screenProps._id}`, {
+      axios.post(`https://clubster-backend.herokuapp.com/api/messages/${screenProps._id}`, {
         text: text
       }).then((message) => {
         this.socket.emit('input', text);
@@ -44,7 +44,7 @@ export default class Chat extends Component {
     submitChatMessage(messages = []) {
       const { screenProps } = this.props;
       var text = messages[messages.length - 1].text;
-      axios.post(`http://localhost:3000/api/messages/${screenProps._id}`, {
+      axios.post(`https://clubster-backend.herokuapp.com/api/messages/${screenProps._id}`, {
         text: text
       }).then((message) => {
         this.socket.emit("input", messages[0]);

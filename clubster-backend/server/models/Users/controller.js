@@ -121,27 +121,19 @@ exports.retrieveProfile = (req, res) => {
   });
 };
 
-exports.getAllEvents = (req, res) => {
-  Events.find({}, function(err, events) {
-    if (err) {
-      return res.status(404).json({ 'Error': 'error' });
-    }
-    else {
-      return res.status(201).json({ 'events': events })
-    }
-  })
-};  
-
-// get events of orgs that person is a part of 
+// get events of orgs that person is a part of
 exports.getAllUserEvents = (req, res) => {
   console.log("HELLO!");
   let userID = req.user._id;
   let eventsArray = [];
-  User.findById(userID).then(user => {
-    console.log(user.arrayClubsAdmin);
-      Organization.findById(user.arrayClubsAdmin, user.arrayClubsMember).populate('events').then(
-        //orgEvent => console.log(orgEvent) 
-        orgEvent => { return res.status(201).json({ orgEvent }) }
-      )
+  User.findById(userID).populate({path: 'arrayClubsAdmin', populate: {path: 'events'}}).populate({path: 'arrayClubsMember', populate: {path: 'events'}}).then(user => {
+    for(let i = 0;i<user.arrayClubsAdmin.length;i++) {
+      eventsArray.push(user.arrayClubsAdmin[i].events);
+    }
+    for(let j = 0;j<user.arrayClubsMember.length;j++) {
+      eventsArray.push(user.arrayClubsMember[j].events);
+    }
+    eventsArray = eventsArray.flatten()
+    return res.status(201).json({eventsArray});
  })
-};  
+};

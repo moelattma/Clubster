@@ -26,18 +26,18 @@ export default class ClubProfile extends Component {
             description: '',
             isLoading: true,
             joinable: false,
-            img: DefaultImg,            
+            img: DefaultImg,
             noteStatus: true,
             photos: []
         }
     }
 
     async componentWillMount() {
-        await axios.post("http://localhost:3000/api/organizations/isMember", { orgID: this.state.organizationID }).then((response) => {
+        await axios.post("https://clubster-backend.herokuapp.com/api/organizations/isMember", { orgID: this.state.organizationID }).then((response) => {
             this.setState({ joinable: (!response.data.isMember) });
             const { image, name, president, description, _id, photos } = response.data.organization;
 
-            this.setState({ img: (image ? 'https://s3.amazonaws.com/clubster-123/' + image : DefaultImg), 
+            this.setState({ img: (image ? 'https://s3.amazonaws.com/clubster-123/' + image : DefaultImg),
                             name, president, description, _id, photos, isLoading: false });
         });
     }
@@ -52,7 +52,7 @@ export default class ClubProfile extends Component {
     };
 
     handleJoin = (orgID, joinType) => {
-        axios.post("http://localhost:3000/api/notifications/new", { type: joinType, orgID })
+        axios.post("https://clubster-backend.herokuapp.com/api/notifications/new", { type: joinType, orgID })
             .then((response) => {
               if(response.status == 201) {
                 this.setState({ joinable: false})

@@ -19,7 +19,7 @@ exports.getEvents = (req, res) => {
 	Organization.findByIdAndUpdate(organizationID).populate({ path: 'events', populate: { path: 'host', select: 'name image' } }).then((organization) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No events found' });	//organization is null, DNE
-		} else {	
+		} else {
 			return res.status(201).json({ 'events': organization.events, idOfUser: req.user._id }); //returns organization's events along with idOfUser
 		}
 	}).catch((err) => console.log(err));
@@ -163,48 +163,9 @@ exports.addEvent = (req, res) => {
 	});
 
 }
-
-// backend for updating events
-exports.updateEvent = (req, res) => {
-	const { eventID } = req.params;
-	const { name, description, date, time, location, 
-			chosenDate, selectedStartDate, selectedEndDate, 
-			timeDisplay, timeDisplayEnd } = req.body;
-
-	Events.findById(eventID).then((event) => {
-		if (event) {
-			let updatedEvent = {
-				name: name,
-				description: description,
-				//date: date,
-				//time: time,
-				location: location,
-				chosenDate: chosenDate,
-				selectedStartDate: selectedStartDate,
-				selectedEndDate: selectedEndDate,
-				timeDisplay: timeDisplay,
-				timeDisplayEnd:  timeDisplayEnd
-			};
-
-			Events.findByIdAndUpdate(
-				mongoose.Types.ObjectId(eventID),
-				{ $set: updatedEvent },
-				{ new: true }
-			).then((event) => {
-				if (event)
-					return res.status(201).json({ 'event': event });
-				else
-					return res.status(400).json({ 'err': 'err' })
-			})
-		}
-		else {
-			return res.status(400).json({ 'err': 'err' })
-		}
-	}).catch(err => console.log(err));
-}
-
 // exports.changeEventPicture = (req, res) => {
 // 	Events.findOneAndUpdate({ _id: req.params.orgID }, { $set: { "image": req.body.imageURL } }).then((event) => {
+
 // 		if (!event) {
 // 			return res.status(404).json({ 'Error': 'error', 'image': null });
 // 		} else {
@@ -234,6 +195,17 @@ exports.getGoing = (req, res) => {
 		}
 	});
 }
+
+exports.getAllEvents = (req, res) => {
+  Events.find({}, function(err, events) {
+    if (err) {
+      return res.status(404).json({ 'Error': 'error' });
+    }
+    else {
+      return res.status(201).json({ 'events': events })
+    }
+  })
+};
 
 exports.handleLike = (req, res) => {
 	const { eventID } = req.params;	// grabs the eventID from url
@@ -348,8 +320,8 @@ exports.getUserOrgs = (req, res) => {
 
 exports.changeEventPicture = (req, res) => {
 	const { eventid } = req.param;
-	Events.findByIdAndUpdate( 
-		mongoose.Types.ObjectId(eventid), 
+	Events.findByIdAndUpdate(
+		mongoose.Types.ObjectId(eventid),
 		{ $set: { "image": req.body.imageURL } }
 	).then((event) => {
 		if (!event) {
