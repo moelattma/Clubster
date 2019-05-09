@@ -19,28 +19,16 @@ exports.getEvents = (req, res) => {
 	Organization.findByIdAndUpdate(organizationID).populate({ path: 'events', populate: { path: 'host', select: 'name image' } }).then((organization) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No events found' });	//organization is null, DNE
-		} else {
+		} else {	
 			return res.status(201).json({ 'events': organization.events, idOfUser: req.user._id }); //returns organization's events along with idOfUser
 		}
 	}).catch((err) => console.log(err));
 };
 
-exports.changeEventPicture = (req, res) => {
-	const { eventID } = req.params;
-
-	Events.findOneAndUpdate({ _id: eventID },{ $set: {"image": req.body.imageURL} }).then((event) => {
-		if(!event) {
-		  return res.status(404).json({ 'Error': 'error' });
-		} else {
-		  return res.status(201).json({ 'image': req.body.imageURL });
-		}
-	  });
-};
-
 exports.addWentUser = (req, res) => {
 	const { eventID, userID } = req.params;
 	let userObj;
-	if(userID == 'null') {
+	if (userID == 'null') {
 		userObj = {
 			guest_name: req.body.name
 		}
@@ -85,7 +73,7 @@ exports.handleGoing = (req, res) => {
 						if (error) {
 							console.log(error);
 						} else {
-							Organization.modifyActiveScore(event.organization,idOfAttender, -1);
+							Organization.modifyActiveScore(event.organization, idOfAttender, -1);
 							return res.status(201).json({ event });
 						}
 					});
@@ -98,7 +86,7 @@ exports.handleGoing = (req, res) => {
 						if (error) {
 							console.log(error);
 						} else {
-							Organization.modifyActiveScore(event.organization,idOfAttender, 1);
+							Organization.modifyActiveScore(event.organization, idOfAttender, 1);
 							return res.status(201).json({ event });
 						}
 					});
@@ -116,90 +104,97 @@ exports.addEvent = (req, res) => {
 	const { organizationID } = req.params;	//grab the idOfOrganization whose id = idOfOrganization
 	var { name, date, description, location, time, imageURL, chosenDate, selectedStartDate, selectedEndDate, timeDisplay, timeDisplayEnd } = req.body;	//grab data from req.body
 	//Next 4 lines are how to write image info to db. We are going to change this soon. Code is more to memorize
-		//Find Organization whose id = organizationID
-		console.log(timeDisplay, timeDisplayEnd);
-		console.log(parseInt(timeDisplay.substring(0,timeDisplay.indexOf(":"))) + 12);
-		const startDate = selectedStartDate.split("T")[0].split("-");
-		if(selectedStartDate) {
-			year = selectedStartDate.split("T")[0].split("-")[0];
-			startMonth = selectedStartDate.split("T")[0].split("-")[1];
-			startDay = selectedStartDate.split("T")[0].split("-")[2];
-		}
-		if(selectedEndDate) {
-			yearEnd = selectedEndDate.split("T")[0].split("-")[0];
-			endMonth = selectedEndDate.split("T")[0].split("-")[1];
-			endDay = selectedEndDate.split("T")[0].split("-")[2];
-		}
-		var dateStart = new Date(parseInt(year), parseInt(startMonth) - 1, parseInt(startDay), parseInt(timeDisplay.substring(0,timeDisplay.indexOf(":"))) + (timeDisplay.indexOf("PM") == -1) ? 0 : 12, parseInt(timeDisplay.substring(timeDisplay.indexOf(":") + 1, timeDisplay.indexOf(":") + 3))).getTime() / 1000;
-		var dateEnd = new Date(parseInt(yearEnd), parseInt(endMonth) - 1, parseInt(endDay), parseInt(timeDisplayEnd.substring(0,timeDisplayEnd.indexOf(":"))) + (timeDisplayEnd.indexOf("PM") == -1) ? 0 : 12, parseInt(timeDisplayEnd.substring(timeDisplayEnd.indexOf(":") + 1, timeDisplayEnd.indexOf(":") + 3))).getTime() / 1000;
+	//Find Organization whose id = organizationID
+	console.log(timeDisplay, timeDisplayEnd);
+	console.log(parseInt(timeDisplay.substring(0, timeDisplay.indexOf(":"))) + 12);
+	const startDate = selectedStartDate.split("T")[0].split("-");
+	if (selectedStartDate) {
+		year = selectedStartDate.split("T")[0].split("-")[0];
+		startMonth = selectedStartDate.split("T")[0].split("-")[1];
+		startDay = selectedStartDate.split("T")[0].split("-")[2];
+	}
+	if (selectedEndDate) {
+		yearEnd = selectedEndDate.split("T")[0].split("-")[0];
+		endMonth = selectedEndDate.split("T")[0].split("-")[1];
+		endDay = selectedEndDate.split("T")[0].split("-")[2];
+	}
+	var dateStart = new Date(parseInt(year), parseInt(startMonth) - 1, parseInt(startDay), parseInt(timeDisplay.substring(0, timeDisplay.indexOf(":"))) + (timeDisplay.indexOf("PM") == -1) ? 0 : 12, parseInt(timeDisplay.substring(timeDisplay.indexOf(":") + 1, timeDisplay.indexOf(":") + 3))).getTime() / 1000;
+	var dateEnd = new Date(parseInt(yearEnd), parseInt(endMonth) - 1, parseInt(endDay), parseInt(timeDisplayEnd.substring(0, timeDisplayEnd.indexOf(":"))) + (timeDisplayEnd.indexOf("PM") == -1) ? 0 : 12, parseInt(timeDisplayEnd.substring(timeDisplayEnd.indexOf(":") + 1, timeDisplayEnd.indexOf(":") + 3))).getTime() / 1000;
 
 
-		Organization.findByIdAndUpdate(organizationID).then((organization) => {
-			if (!organization) {
-				return res.status(400).json({ 'Error': 'No such organization exists' }); //DNE, doesnt exist
-			} else {
-				//Create clubEvent document and expense document
-				let clubEvent = new Events({
-					organization: organizationID,
-					name: name,
-					date: [dateStart, dateEnd],
-					description: description,
-					host: req.user._id,
-					location: location,
-					going: [req.user._id],
-					likers: [req.user._id],
-					comments: [],
-					image: imageURL,
-					value: 5,
-					totalComments: 0,
-					went: [],
-					totalLikes: 0
-				});
-				console.log('Hi this is date ', clubEvent.date[0].toString());
-				//write clubEvent to db
-				clubEvent.save().then((event) => {
-					// Add event's id to organization's events array
-					Organization.modifyActiveScore(event.organization._id,req.user._id, 1);
-					Organization.addEventToClub(organizationID, event._id);
-					Organization.increaseLikes(event.organization);
-					// Find the Event whose id = event's id and populate it's image
-					Events.findOne({ _id: event._id }).populate('host').then((event) => {
-						return res.status(201).json({ 'event': event }); //return 201, all good
-					}).catch(err => {
-						return res.status(400).json({ 'Error': err });
-					});
-				}).catch((err) => {
+	Organization.findByIdAndUpdate(organizationID).then((organization) => {
+		if (!organization) {
+			return res.status(400).json({ 'Error': 'No such organization exists' }); //DNE, doesnt exist
+		} else {
+			//Create clubEvent document and expense document
+			let clubEvent = new Events({
+				organization: organizationID,
+				name: name,
+				date: [dateStart, dateEnd],
+				description: description,
+				host: req.user._id,
+				location: location,
+				going: [req.user._id],
+				likers: [req.user._id],
+				comments: [],
+				image: imageURL,
+				value: 5,
+				totalComments: 0,
+				went: [],
+				totalLikes: 0
+			});
+			console.log('Hi this is date ', clubEvent.date[0].toString());
+			//write clubEvent to db
+			clubEvent.save().then((event) => {
+				// Add event's id to organization's events array
+				Organization.modifyActiveScore(event.organization._id, req.user._id, 1);
+				Organization.addEventToClub(organizationID, event._id);
+				Organization.increaseLikes(event.organization);
+				// Find the Event whose id = event's id and populate it's image
+				Events.findOne({ _id: event._id }).populate('host').then((event) => {
+					return res.status(201).json({ 'event': event }); //return 201, all good
+				}).catch(err => {
 					return res.status(400).json({ 'Error': err });
 				});
-			}
-		});
+			}).catch((err) => {
+				return res.status(400).json({ 'Error': err });
+			});
+		}
+	});
 
 }
 
 // backend for updating events
 exports.updateEvent = (req, res) => {
 	const { eventID } = req.params;
-	const { name, description, date, time, location } = req.body;
+	const { name, description, date, time, location, 
+			chosenDate, selectedStartDate, selectedEndDate, 
+			timeDisplay, timeDisplayEnd } = req.body;
 
 	Events.findById(eventID).then((event) => {
 		if (event) {
-			let updatedEvent = { 
+			let updatedEvent = {
 				name: name,
 				description: description,
-				date: date,
-				time: time,
-				location: location	
+				//date: date,
+				//time: time,
+				location: location,
+				chosenDate: chosenDate,
+				selectedStartDate: selectedStartDate,
+				selectedEndDate: selectedEndDate,
+				timeDisplay: timeDisplay,
+				timeDisplayEnd:  timeDisplayEnd
 			};
 
 			Events.findByIdAndUpdate(
 				mongoose.Types.ObjectId(eventID),
-				{ $set: updatedEvent },	
+				{ $set: updatedEvent },
 				{ new: true }
 			).then((event) => {
-					if (event)
-						return res.status(201).json({ 'event': event });
-					else	
-						return res.status(400).json({ 'err': 'err' })
+				if (event)
+					return res.status(201).json({ 'event': event });
+				else
+					return res.status(400).json({ 'err': 'err' })
 			})
 		}
 		else {
@@ -207,6 +202,16 @@ exports.updateEvent = (req, res) => {
 		}
 	}).catch(err => console.log(err));
 }
+
+// exports.changeEventPicture = (req, res) => {
+// 	Events.findOneAndUpdate({ _id: req.params.orgID }, { $set: { "image": req.body.imageURL } }).then((event) => {
+// 		if (!event) {
+// 			return res.status(404).json({ 'Error': 'error', 'image': null });
+// 		} else {
+// 			return res.status(201).json({ 'image': req.body.imageURL });
+// 		}
+// 	});
+// }
 
 exports.getLikers = (req, res) => {
 	const { eventID } = req.params;	// grabs the eventID from url
@@ -276,7 +281,7 @@ exports.handleLike = (req, res) => {
 exports.getComments = (req, res) => {
 	const { eventID } = req.params;	// grabs id of organization in route URL.
 	//Find the orgnaization with id = organizationID and populate it's array of events along with each event's image.
-	Events.findByIdAndUpdate(eventID).populate({path: 'comments', populate: {path: 'userID'}}).then((event) => {
+	Events.findByIdAndUpdate(eventID).populate({ path: 'comments', populate: { path: 'userID' } }).then((event) => {
 		if (!event) {
 			return res.status(400).json({ 'Error': 'No events found' });	//organization is null, DNE
 		} else {
@@ -301,29 +306,29 @@ exports.addCommentToEvent = (req, res) => {
 	const { eventID } = req.params;
 	const { text } = req.body;
 	let comment = new Comments({
-  	userID: req.user._id,
+		userID: req.user._id,
 		content: text
 	});
 	comment.save().then((comment) => {
-			if(comment){
-				Events.findOneAndUpdate(
-					{ _id: eventID },
-					{ $push: { comments: comment._id } },
-					{ new: true, upsert: true },
-					function (error, event) {
-						if (error) {
-							console.log(error);
-						} else {
-							Organization.increaseComments(event.organization);
-							Comments.findByIdAndUpdate(comment._id).populate({path: 'userID'}).then((comment) => {
-								return res.status(201).json({ comment });
-							})
-						}
-					});
-			}
-			else {
-				return res.status(400).json({ 'Error': 'No comments found' });
-			}
+		if (comment) {
+			Events.findOneAndUpdate(
+				{ _id: eventID },
+				{ $push: { comments: comment._id } },
+				{ new: true, upsert: true },
+				function (error, event) {
+					if (error) {
+						console.log(error);
+					} else {
+						Organization.increaseComments(event.organization);
+						Comments.findByIdAndUpdate(comment._id).populate({ path: 'userID' }).then((comment) => {
+							return res.status(201).json({ comment });
+						})
+					}
+				});
+		}
+		else {
+			return res.status(400).json({ 'Error': 'No comments found' });
+		}
 	})
 };
 
@@ -339,4 +344,18 @@ exports.getUserOrgs = (req, res) => {
 			return res.status(201).json({ 'events': organization.events, idOfUser: req.user._id }); //returns organization's events along with idOfUser
 		}
 	}).catch((err) => console.log(err));
+};
+
+exports.changeEventPicture = (req, res) => {
+	const { eventid } = req.param;
+	Events.findByIdAndUpdate( 
+		mongoose.Types.ObjectId(eventid), 
+		{ $set: { "image": req.body.imageURL } }
+	).then((event) => {
+		if (!event) {
+			return res.status(404).json({ 'Error': 'error' });
+		} else {
+			return res.status(201).json({ 'image': req.body.imageURL });
+		}
+	})
 };
