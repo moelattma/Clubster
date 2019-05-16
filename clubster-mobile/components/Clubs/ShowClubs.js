@@ -70,7 +70,7 @@ class ShowClubs extends React.Component {
           backgroundColor={'transparent'}
           leftComponent={{ icon: 'add', onPress: () => this.props.navigation.navigate('CreateClub') }}
           centerComponent={
-            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'stretch' }} >
+            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }} >
               <Text>     </Text>
               <Button transparent onPress={() => this.props.toggleClubs(true)} >
                 <Text style={[{ fontSize: 18, fontWeight: '400' }, this.props.showAdminClubs ? { color: '#59cbbd' } : {}]} >Admin</Text>

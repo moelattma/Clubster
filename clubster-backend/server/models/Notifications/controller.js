@@ -55,15 +55,20 @@ exports.joinOrganization = (req, res) => {
 		});
 	}
 
-	Notification.findByIdAndUpdate(_id).then((notification) => {
-		if (!notification) {
-			return res.status(400).json({ 'Error': 'No such notification found' })
-		} else {
-			notification.isActive = false;
-			notification.save();
-		}
+	Notification.findByIdAndDelete(_id).then((notification) => {
+		if (!notification) 
+			return res.status(400).json({ 'Error': 'No such notification found' });
 	});
 };
+
+exports.deleteNotification = (req, res) => {
+	const { _id } = req.body;
+	Notification.findByIdAndDelete(_id).then((notification) => {
+		if (!notification) 
+			return res.status(400).json({ 'Error': 'No such notification found' });
+		return res.status(201).json();
+	});
+}
 
 exports.newNotification = (req, res) => {
 	const { type, orgID, receiverID } = req.body;
@@ -74,7 +79,7 @@ exports.newNotification = (req, res) => {
 		idOfOrganization: orgID,
 		idOfReceivers: [receiverID],
 		type: type,
-		isActive: false,
+		isActive: true,
 		message: ""
 	});
 
@@ -89,7 +94,6 @@ exports.newNotification = (req, res) => {
 					for (var i = 0; i < admins.length; ++i) 
 						notification.idOfReceivers.push(admins[i].admin);
 					notification.message = `${req.user.name} wants to join ${name} as ` + ((type == ORG_JOIN_ADMIN) ? `an admin!` : `a member!`);
-					notification.isActive = true;
 					break;
 
 				case ACCEPT_ADMIN:

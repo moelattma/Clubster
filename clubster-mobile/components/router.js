@@ -29,7 +29,7 @@ export const ClubEventNavigator = createStackNavigator(
     {
         ShowEvents: { screen: ShowEvents, navigationOptions: { header: null } },
         CreateEvent: { screen: CreateEvent },
-        EventProfile: { screen: EventProfile },
+        EventProfile: { screen: EventProfile, navigationOptions: { header: null }  },
         Comments: { screen: Comments }
     },
     {
@@ -83,7 +83,19 @@ export const AdminNavigator = createMaterialTopTabNavigator(
             activeTintColor: '#fff',
             inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
             showIcon: true,
-            showLabel: false
+            showLabel: false,
+            labelStyle: {
+                color: 'black',
+                backgroundColor: 'white',
+                borderColor: 'white',
+                shadowColor: 'white',
+            },
+            tabStyle: {
+                backgroundColor: '#59cbbd',
+            },
+            style: {
+                backgroundColor: '#59cbbd',
+            }
         }
     }
 );
@@ -117,7 +129,19 @@ export const MemberNavigator = createMaterialTopTabNavigator(
             activeTintColor: '#fff',
             inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
             showIcon: true,
-            showLabel: false
+            showLabel: false,
+            labelStyle: {
+                color: 'black',
+                backgroundColor: 'white',
+                borderColor: 'white',
+                shadowColor: 'white',
+            },
+            tabStyle: {
+                backgroundColor: '#59cbbd',
+            },
+            style: {
+                backgroundColor: '#59cbbd',
+            }
         }
     }
 );
@@ -126,7 +150,7 @@ export const ClubPageNavigator = createStackNavigator(
     {
         ShowClubs: { screen: ShowClubs, navigationOptions: { header: null } },
         CreateClub: { screen: CreateClub },
-        ClubSearch: { screen: ClubSearch },
+        ClubSearch: { screen: ClubSearch, navigationOptions: { header: null } },
         ClubProfile: { screen: ClubProfile }
     },
     {
@@ -134,18 +158,37 @@ export const ClubPageNavigator = createStackNavigator(
     }
 )
 
+export const NotesNavigator = createMaterialTopTabNavigator(
+    {
+        Agenda: {
+            screen: AgendaScreen
+        },
+        Inbox: {
+            screen: Notifications
+        },
+    },
+    {
+        initialRouteName: 'Agenda',
+        swipeEnabled: true,
+        animationEnabled: true,
+        backBehavior: 'initialRoute',
+        tabBarOptions: {
+            activeTintColor: '#59cbbd',
+            inactiveTintColor: 'black',
+            tabStyle: {
+                backgroundColor: 'white'
+            },
+            style: {
+                backgroundColor: 'white'
+            },
+        }
+    }
+)
+
 export const HomeNavigator = createMaterialTopTabNavigator(
     {   
-        AgendaScreen: {
-            screen: AgendaScreen,
-            navigationOptions: {
-                tabBarIcon: ({ tintColor }) => (
-                    <MaterialCommunityIcons name={'calendar-today'} size={25} color={tintColor} />
-                )
-            }
-        },
-        Notifications: {
-            screen: Notifications,
+        NotesNavigation: {
+            screen: NotesNavigator,
             navigationOptions: {
                 tabBarIcon: ({ tintColor, focused }) => (
                     <MaterialIcons name={focused ? 'notifications' : 'notifications-none'} size={25} color={tintColor} />
@@ -179,7 +222,19 @@ export const HomeNavigator = createMaterialTopTabNavigator(
             activeTintColor: '#fff',
             inactiveTintColor: 'rgba(0, 0, 0, 0.85)',
             showIcon: true,
-            showLabel: false
+            showLabel: false,
+            labelStyle: {
+                color: 'black',
+                backgroundColor: 'white',
+                borderColor: 'white',
+                shadowColor: 'white',
+            },
+            tabStyle: {
+                backgroundColor: '#59cbbd',
+            },
+            style: {
+                backgroundColor: '#59cbbd',
+            }
         }
     }
 );

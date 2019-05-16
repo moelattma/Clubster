@@ -20,13 +20,10 @@ const Events = new Schema({
     type: String
   },
   date: {
-    type: String
+    type: [Number]
   },
   location: {
     type: String
-  },
-  time: {
-    type:String
   },
   description: {
     type: String,
@@ -53,6 +50,10 @@ const Events = new Schema({
   likers: [{
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'users'
+  }],
+  went: [{
+    _idUser: Schema.Types.ObjectId,
+    guest_name: String
   }],
   rides: [{
     type: Schema.Types.ObjectId,   //Specifiers

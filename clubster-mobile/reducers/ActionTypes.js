@@ -5,6 +5,7 @@ export const USER_CHANGEPROFILE = 'USER_CHANGEPROFILE';
 export const USER_CHANGEPHOTO = 'USER_CHANGEPHOTO';
 export const USER_TOGGLECLUBS = 'USER_TOGGLECLUBS';
 export const USER_NOTIFICATIONSSET = 'USER_NOTIFICATIONSSET';
+export const USER_NOTIFICATIONSDEL = 'USER_NOTIFICATIONSDEL';
 
 // notifications actions
 
@@ -32,6 +33,7 @@ export const EVENTS_SETCURRENT = 'EVENTS_SETCURRENT'; // set current event user 
 export const EVENTS_HANDLEGOING = 'EVENTS_HANDLEGOING'; // handle going for an event
 export const EVENTS_HANDLELIKE = 'EVENTS_HANDLELIKE'; // handle like for an event
 export const EVENTS_HANDLECOMMENT = 'EVENTS_HANDLECOMMENT'; // handle comment for an event
+export const EVENTS_CHANGEPICTURE = 'EVENTS_CHANGEPICTURE'; // change event picture
 
 // riders actions
 export const EVENTS_SETRIDES = 'EVENTS_SETRIDES';

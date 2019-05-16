@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import axios from 'axios';
 import { awsLink } from '../../keys/keys';
 import { DefaultImg } from '../Utils/Defaults';
-import { USER_NOTIFICATIONSSET } from '../../reducers/ActionTypes';
+import { USER_NOTIFICATIONSSET, USER_NOTIFICATIONSDEL } from '../../reducers/ActionTypes';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const itemWidth = WIDTH * 13 / 20;
@@ -38,17 +38,17 @@ export class Notifications extends Component {
     _renderItem = ({ item }) => {
         const { image } = item.idOfSender;
         return (
-            <View style={{ flexDirection: 'row', height: HEIGHT/10, margin: 5, padding: 5 }}>
+            <View style={{ flexDirection: 'row', height: HEIGHT / 10, margin: 5, padding: 5 }}>
                 <View style={{ flexDirection: 'row' }}>
-                <TouchableOpacity>
-                    <Thumbnail source={{ uri: (!image || image == null ? DefaultImg : awsLink + image) }}/>
-                </TouchableOpacity>
-                <View style={{ width: WIDTH/2, alignItems: 'center', marginLeft:4, marginRight:4 }}>
-                    <Text 
-                    style={{ fontSize: 16, textAlign: 'left' }}>
-                        {item.message} 
-                     </Text>
-                </View>
+                    <TouchableOpacity>
+                        <Thumbnail source={{ uri: (!image || image == null ? DefaultImg : awsLink + image) }} />
+                    </TouchableOpacity>
+                    <View style={{ width: WIDTH / 2, alignItems: 'center', marginLeft: 4, marginRight: 4 }}>
+                        <Text
+                            style={{ fontSize: 16, textAlign: 'left' }}>
+                            {item.message}
+                        </Text>
+                    </View>
                 </View>
                 {this._renderButtons(item)}
             </View>
@@ -56,7 +56,7 @@ export class Notifications extends Component {
     }
 
     _renderButtons = (item) => {
-        if (item.isActive) {
+        if (item.type === 'ORG_JOIN_ADMIN' || item.type === 'ORG_JOIN_MEMBER') {
             return (
                 <View style={{ flexDirection: 'column', justifyContent:'space-between' }}>
                     <Button small light style={styles.buttonStyle}
@@ -70,6 +70,14 @@ export class Notifications extends Component {
                 </View>
             );
         }
+        return (
+            <View style={{ flexDirection: 'column', justifyContent:'space-between' }}>
+                <Button small light style={styles.buttonStyle}
+                    onPress={() => this.handleOkay(item)}>
+                    <Text>Okay</Text>
+                </Button>
+            </View>
+        );
     }
 
     handleAccept = (item) => {
@@ -78,16 +86,12 @@ export class Notifications extends Component {
             { _id: item._id, orgID: item.idOfOrganization, joinerID: item.idOfSender, joinType, accepted: true })
             .then((res) => {
                 if (res.status == 201)
-                    item.isActive = false;
+                    this.props.deleteNotification(item._id);
             }).catch((err) => console.log(err));
 
         const acceptType = (joinType == "ORG_JOIN_ADMIN" ? ACCEPT_ADMIN : ACCEPT_MEM);
         axios.post('http://localhost:3000/api/notifications/new',
-            { type: acceptType, orgID: item.idOfOrganization, receiverID: item.idOfSender })
-            .then((res) => {
-                if (res.status == 201)
-                    this._getNotifications();
-            });
+            { type: acceptType, orgID: item.idOfOrganization, receiverID: item.idOfSender });
     }
 
     handleReject = (item) => {
@@ -95,15 +99,17 @@ export class Notifications extends Component {
             { _id: item._id, accepted: false })
             .then((res) => {
                 if (res.status == 201)
-                    item.isActive = false;
+                    this.props.deleteNotification(item._id);
             }).catch((err) => console.log(err));
 
         axios.post('http://localhost:3000/api/notifications/new',
-            { type: REJECT_JOIN, orgID: item.idOfOrganization, receiverID: item.idOfSender })
-            .then((res) => {
-                if (res.status == 201)
-                    this._getNotifications();
-            });
+            { type: REJECT_JOIN, orgID: item.idOfOrganization, receiverID: item.idOfSender });
+    }
+
+    handleOkay = (item) => {
+        axios.post('http://localhost:3000/api/notifications/delete', { _id: item._id }).then((res) => { 
+            if (res.status == 201) this.props.deleteNotification(item._id);
+        });
     }
 
     // separates one list item from the other with a line
@@ -126,6 +132,7 @@ export class Notifications extends Component {
                     renderItem={this._renderItem}
                     keyExtractor={(item) => item._id}
                     ItemSeparatorComponent={this.renderSeparator}
+                    extraData={this.props.rando}
                 />
             </ScrollView>
         );
@@ -133,7 +140,7 @@ export class Notifications extends Component {
 }
 
 const mapStateToProps = (state) => {
-    return { notifications: state.user.notifications };
+    return { notifications: state.user.notifications, rando: Math.random(1) };
 }
 
 const mapDispatchToProps = (dispatch) => {
@@ -141,6 +148,10 @@ const mapDispatchToProps = (dispatch) => {
         setNotifications: (notifications) => dispatch({
             type: USER_NOTIFICATIONSSET,
             payload: { notifications }
+        }),
+        deleteNotification: (notID) => dispatch({
+            type: USER_NOTIFICATIONSDEL,
+            payload: { notID }
         })
     }
 }
@@ -155,7 +166,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 5
     },
     notificationPage: {
-        marginTop: 30,
+        marginTop: 5,
         marginHorizontal: 5,
         marginBottom: 5
     },

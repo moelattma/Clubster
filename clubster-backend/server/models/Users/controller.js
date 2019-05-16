@@ -122,3 +122,19 @@ exports.retrieveProfile = (req, res) => {
     return res.status(201).json({ 'profile': user });
   });
 };
+
+// get events of orgs that person is a part of
+exports.getAllUserEvents = (req, res) => {
+  let userID = req.user._id;
+  let eventsArray = [];
+  User.findById(userID).populate({path: 'arrayClubsAdmin', populate: {path: 'events'}}).populate({path: 'arrayClubsMember', populate: {path: 'events'}}).then(user => {
+    for(let i = 0;i<user.arrayClubsAdmin.length;i++) {
+      eventsArray.push(user.arrayClubsAdmin[i].events);
+    }
+    for(let j = 0;j<user.arrayClubsMember.length;j++) {
+      eventsArray.push(user.arrayClubsMember[j].events);
+    }
+    eventsArray = eventsArray.flatten()
+    return res.status(201).json({eventsArray});
+ })
+};

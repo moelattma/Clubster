@@ -6,6 +6,7 @@ import { Header } from 'react-native-elements';
 import { Card, CardItem, Thumbnail, Text, Button, Icon, Left, Body, Right } from 'native-base';
 import { DefaultImg } from '../Utils/Defaults';
 import { EVENTS_SETCLUB, EVENTS_SETCURRENT, EVENTS_HANDLEGOING, EVENTS_HANDLELIKE } from '../../reducers/ActionTypes'
+var moment = require('moment-timezone');
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
 const EVENT_WIDTH = WIDTH * 9 / 10;
@@ -21,8 +22,7 @@ export class ShowEvents extends React.Component {
       description: '',
       date: '',
       location: '',
-      time: '',
-      imageURL: DefaultImg
+      time: ''
     }
   }
 
@@ -34,6 +34,12 @@ export class ShowEvents extends React.Component {
         this.setState({ loading: false })
       })
       .catch((err) => { console.log('getClubEvents failed'); console.log(err) });
+  }
+
+  convertTime = (timestamp) => {
+    console.log(moment.tz(timestamp, "America/Los_Angeles").format().split('T')[0]);
+    console.log(moment.tz(timestamp, "America/Los_Angeles").format().split('T')[1]);
+    return moment.tz(timestamp, "America/Los_Angeles").format().split('T')[1];
   }
 
   _handleGoing = (item) => {
@@ -77,8 +83,8 @@ export class ShowEvents extends React.Component {
         <CardItem>
           <Left>
             <Body>
-              <Text note>{item.time} on {item.date}</Text>
-              <Text note>{item.location}</Text>
+              <Text note>{this.convertTime(item.date[0])} - {this.convertTime(item.date[1])}</Text>
+              <Text note>at {item.location}</Text>
             </Body>
           </Left>
           <Right>

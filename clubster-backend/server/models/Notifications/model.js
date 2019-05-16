@@ -34,8 +34,7 @@ const Notifications = new Schema({
     default: false
   },
   message: {
-    type: String,
-    required: true
+    type: String
   }
 });
 

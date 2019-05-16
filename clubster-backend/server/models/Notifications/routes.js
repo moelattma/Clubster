@@ -14,6 +14,10 @@ router.post('/notifications/new', passport.authenticate('jwt', { session: false 
 	controller.newNotification(req, res);
 });
 
+router.post('/notifications/delete', (req, res) => {
+	controller.deleteNotification(req, res);
+});
+
 router.post('/notifications/newNoAuthenticate', (req, res) => {
 	controller.newNotification(req, res);
 });

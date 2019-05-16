@@ -29,4 +29,8 @@ router.get('/profile', passport.authenticate('jwt', { session: false }), (req, r
 	controller.retrieveProfile(req, res);
 });
 
+router.get('/user', passport.authenticate('jwt', {session:false}), (req, res) => {
+	controller.getAllUserEvents(req, res);
+});
+
 module.exports = router;

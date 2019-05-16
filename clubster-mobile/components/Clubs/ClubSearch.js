@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { FlatList, TouchableOpacity, View, StyleSheet, ActivityIndicator } from 'react-native';
-import { SearchBar } from 'react-native-elements';
+import { SearchBar, Header } from 'react-native-elements';
 import _ from 'lodash';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import axios from 'axios';
@@ -23,28 +23,6 @@ class SearchClubs extends PureComponent {
             query: ""
         }
     }
-
-    static navigationOptions = ({ navigation }) => {
-        return {
-            header: (
-                <View style={styles.header}>
-                    <TouchableOpacity style={{ marginLeft: 14, marginRight: 4, marginTop: 3 }} onPress={() => navigation.navigate('ShowClubs')} >
-                        <MaterialIcons name="arrow-back" size={24} color={'black'} />
-                    </TouchableOpacity>
-                    <SearchBar
-                        containerStyle={{ flex: 1, alignSelf: 'center', backgroundColor: '#03A9F4', borderBottomWidth: 0 }}
-                        clearIcon
-                        placeholder="Search Clubs"
-                        lightTheme
-                        round
-                        onChangeText={(text) => { navigation.state.params.handleSearch(text); navigation.setParams({ query: text }); }}
-                        value={navigation.state.params && navigation.state.params.query ? navigation.state.params.query : ''}
-                        autoCorrect={false}
-                    />
-                </View>
-            ),
-        };
-      };
 
     componentWillMount() {
         this.getOrganizations();
@@ -110,11 +88,32 @@ class SearchClubs extends PureComponent {
             <FlatList
                 data={this.state.organizations.slice(0, 40)}
                 renderItem={this._renderItem}
-                keyExtractor={organization => organization.name}
+                keyExtractor={organization => organization._id}
                 ItemSeparatorComponent={this.renderSeparator}
                 ListFooterComponent={this.renderFooter}
                 refreshing={this.state.loading}
                 onRefresh={() => this.getOrganizations()}
+                ListHeaderComponent={
+                    <Header
+                        backgroundColor={'transparent'}
+                        leftComponent={{ icon: 'arrow-back', onPress: () => this.props.navigation.goBack() }}
+                        centerComponent={
+                            <SearchBar
+                                containerStyle={{ flex: 1, alignSelf: 'stretch', backgroundColor: 'white', borderBottomWidth: 0, justifyContent: 'center', borderTopColor: 'white' }}
+                                clearIcon
+                                searchIcon={false}
+                                placeholder="Search Clubs"
+                                inputContainerStyle={{ backgroundColor: '#59cbbd' }}
+                                round
+                                showLoading={false}
+                                onChangeText={(text) => this.handleSearch(text) }
+                                value={this.state.query}
+                                autoCorrect={false}
+                            />
+                        }
+                        rightComponent={null}
+                    />
+                }
             />
         );
     }

@@ -340,6 +340,8 @@ class Profile extends React.Component {
 }
 
 const mapStateToProps = (state) => {
+    if (!state.user || !state.user.user)
+        return;
     const { name, major, biography, gallery, hobbies, image } = state.user.user;
     return {
         name: name, major: (major ? major: ''), biography: (biography ? biography : ''), galleryID: gallery._id,

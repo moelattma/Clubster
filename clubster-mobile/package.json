@@ -38,12 +38,14 @@
     "react-native-modal": "^9.0.0",
     "react-native-modal-datetime-picker": "^7.4.0",
     "react-native-pie": "^0.5.0",
+    "react-native-qrcode-svg": "^5.1.2",
     "react-native-svg-charts": "^5.2.0",
     "react-native-vector-icons": "^6.4.2",
     "react-navigation": "^3.9.0",
     "react-redux": "^6.0.0",
     "redux": "^4.0.1",
-    "socket.io-client": "^2.2.0"
+    "socket.io-client": "^2.2.0",
+    "switch-button-react-native": "^1.0.3"
   },
   "devDependencies": {
     "babel-preset-expo": "^5.0.0"

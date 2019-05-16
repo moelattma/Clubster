@@ -25,6 +25,15 @@ const userReducer = (state = userState, action) => {
             if (action.payload.notifications.length != state.notifications.length)
                 state = Object.assign({}, state, { notifications: action.payload.notifications })
             return state;
+        case Actions.USER_NOTIFICATIONSDEL:
+            var { notifications } = state;
+            const { notID } = action.payload;
+            for (var i = 0; i < notifications.length; i++) 
+                if (notifications[i]._id === notID) 
+                    break;
+            notifications.splice(i, 1);
+            state = Object.assign({}, state, { notifications });
+            return state;
         default:
             return state;
     }
