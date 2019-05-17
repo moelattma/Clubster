@@ -34,10 +34,10 @@ export default class AgendaScreen extends Component {
   }
 
   async componentDidMount() {
-    await axios.get('http://localhost:3000/api/user').then((response) => {
+    await axios.get('https://clubster-backend.herokuapp.com/api/user').then((response) => {
       this.setState({ eventsUser: response.data.eventsArray });
     })
-    await axios.get('http://localhost:3000/api/events').then((response) => {
+    await axios.get('https://clubster-backend.herokuapp.com/api/events').then((response) => {
       this.setState({ eventsAll: response.data.events });
     })
   }

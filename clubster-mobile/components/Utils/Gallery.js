@@ -59,7 +59,7 @@ export default class Gallery extends Component {
         await RNS3.put(file, options).then((response) => {
             imageURL = response.body.postResponse.key;
         }).catch((err) => { console.log(err) });
-        axios.post(`http://localhost:3000/api/galleries/${this.state.galleryID}/` + (item ? 'replacePhoto' : 'addPhoto'), 
+        axios.post(`https://clubster-backend.herokuapp.com/api/galleries/${this.state.galleryID}/` + (item ? 'replacePhoto' : 'addPhoto'), 
                                                                       { imageURL, removeImageURL }).then(() => {
           const { photos } = this.state;
           var newPhotos = [];

@@ -85,7 +85,7 @@ export class EventProfile extends React.Component {
             await RNS3.put(file, options).then((response) => {
                 imageURL = response.body.postResponse.key;
             }).catch((err) => { console.log(err) });
-            await axios.post(`http://localhost:3000/api/events/changeEventPicture`, { imageURL, eventID: this.props._id }).then(() => {
+            await axios.post(`https://clubster-backend.herokuapp.com/api/events/changeEventPicture`, { imageURL, eventID: this.props._id }).then(() => {
                 this.props.changeEventPicture(this.props._id, imageURL);
             });
         } catch (error) { console.log(error); }
@@ -93,7 +93,7 @@ export class EventProfile extends React.Component {
 
     // Likers
     openLikersModal() {
-        axios.get(`http://localhost:3000/api/events/${this.props._id}/likers`)
+        axios.get(`https://clubster-backend.herokuapp.com/api/events/${this.props._id}/likers`)
             .then(response => {
                 this.setState({ 
                     likersModal: true,
@@ -119,7 +119,7 @@ export class EventProfile extends React.Component {
 
     // Going
     openGoingModal() {
-        axios.get(`http://localhost:3000/api/events/${this.props._id}/going`)
+        axios.get(`https://clubster-backend.herokuapp.com/api/events/${this.props._id}/going`)
             .then(response => {
                 this.setState({ 
                     goingModal: true,
@@ -145,7 +145,7 @@ export class EventProfile extends React.Component {
 
     // Rides
     openRidesModal() {
-        axios.get(`http://localhost:3000/api/${this.props._id}/rides`)
+        axios.get(`https://clubster-backend.herokuapp.com/api/${this.props._id}/rides`)
             .then(response => {
                 this.setState({
                     ridersModal: true,
@@ -186,7 +186,7 @@ export class EventProfile extends React.Component {
             return;
         } else {
             const { seats, rideTime, rideLocation, description } = this.state;
-            axios.post(`http://localhost:3000/api/${this.props._id}/createRide`, {
+            axios.post(`https://clubster-backend.herokuapp.com/api/${this.props._id}/createRide`, {
                 passengerSeats: seats,
                 time: rideTime,
                 location: rideLocation,
@@ -233,7 +233,7 @@ export class EventProfile extends React.Component {
             });
         } else console.log('userid is null')
         if (!skip) {
-            await axios.post(`http://localhost:3000/api/${item._id}/joinRide`, { rideRemove: removeFromRide });
+            await axios.post(`https://clubster-backend.herokuapp.com/api/${item._id}/joinRide`, { rideRemove: removeFromRide });
             this.closeRidesModal();
         } else this.closeRidesModal();
     }

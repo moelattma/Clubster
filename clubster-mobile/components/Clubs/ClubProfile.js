@@ -33,7 +33,7 @@ export default class ClubProfile extends React.Component {
     }
 
     async componentWillMount() {
-        await axios.post("http://localhost:3000/api/organizations/isMember", { orgID: this.state.organizationID }).then((response) => {
+        await axios.post("https://clubster-backend.herokuapp.com/api/organizations/isMember", { orgID: this.state.organizationID }).then((response) => {
             this.setState({ joinable: (!response.data.isMember) });
             const { image, name, president, description, _id, photos } = response.data.organization;
 
@@ -52,7 +52,7 @@ export default class ClubProfile extends React.Component {
     };
 
     handleJoin = (orgID, joinType) => {
-        axios.post("http://localhost:3000/api/notifications/new", { type: joinType, orgID })
+        axios.post("https://clubster-backend.herokuapp.com/api/notifications/new", { type: joinType, orgID })
             .then((response) => {
                 if (response.status == 201) {
                     this.setState({ joinable: false })

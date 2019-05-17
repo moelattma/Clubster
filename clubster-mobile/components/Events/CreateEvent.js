@@ -156,7 +156,7 @@ export class CreateClubEvent extends React.Component {
 
     createEvent = () => {
         const { name, date, time, description, location, imageURL, chosenDate, selectedStartDate, selectedEndDate, timeDisplay, timeDisplayEnd } = this.state;
-        axios.post(`http://localhost:3000/api/events/${this.props.clubID}/new`, {
+        axios.post(`https://clubster-backend.herokuapp.com/api/events/${this.props.clubID}/new`, {
             name, date, time, description, location, imageURL, chosenDate, selectedStartDate, selectedEndDate, timeDisplay, timeDisplayEnd
         }).then(response => {
             this.props.newClubEvent(response.data.event);

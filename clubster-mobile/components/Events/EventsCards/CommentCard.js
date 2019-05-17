@@ -13,7 +13,7 @@ export default class CommentCard extends React.Component {
 
   componentDidMount() {
     const eventID = this.props.eventInfo._id; //eventID is hardcoded for now
-    axios.get(`http://localhost:3000/api/events/${eventID}/comments`).then((response) => {
+    axios.get(`https://clubster-backend.herokuapp.com/api/events/${eventID}/comments`).then((response) => {
       this.setState({comments: response.data.comments});
     });
   }

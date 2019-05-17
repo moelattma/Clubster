@@ -72,7 +72,7 @@ export class Settings extends React.Component {
         await RNS3.put(file,options).then((response)=> {
            imageURL = response.body.postResponse.key;
         }).catch((err) => {console.log(err)});
-        axios.post(`http://localhost:3000/api/organizations/modifyOrgPicture/${this.props._id}`, { imageURL }).then((response) => {
+        axios.post(`https://clubster-backend.herokuapp.com/api/organizations/modifyOrgPicture/${this.props._id}`, { imageURL }).then((response) => {
             this.setState({ img: (response.data.image ? 'https://s3.amazonaws.com/clubster-123/' + response.data.image : DefaultImg) });
         }).catch((err) => { return; });
         this.props.navigation.navigate('ShowClubs');
@@ -83,7 +83,7 @@ export class Settings extends React.Component {
 
     submitClubChanges() {
         const { _id } = this.props;
-        axios.post(`http://localhost:3000/api/organizations/${_id}`, {
+        axios.post(`https://clubster-backend.herokuapp.com/api/organizations/${_id}`, {
             name: this.state.name,
             description: this.state.description,
         }).then(() => {

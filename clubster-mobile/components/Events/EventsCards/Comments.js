@@ -18,7 +18,7 @@ export default class Comments extends React.Component {
     if(this.props && this.props.navigation.getParam('comments', null)) {
       this.setState({comments: this.props.comments});
     } else {
-      axios.get(`http://localhost:3000/api/events/${this.props.navigation.getParam('eventID', null)}/comments`).then((response) => {
+      axios.get(`https://clubster-backend.herokuapp.com/api/events/${this.props.navigation.getParam('eventID', null)}/comments`).then((response) => {
         this.setState({comments: response.data.comments});
       });
     }
@@ -26,7 +26,7 @@ export default class Comments extends React.Component {
 
   onSub = text => {
     var comments = this.state.comments;
-    axios.post(`http://localhost:3000/api/events/${this.props.navigation.getParam('eventID', null)}/comments`, {
+    axios.post(`https://clubster-backend.herokuapp.com/api/events/${this.props.navigation.getParam('eventID', null)}/comments`, {
       text:text
     }).then((response) => {
       comments.push(response.data.comment);

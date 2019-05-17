@@ -62,7 +62,7 @@ class CreateClub extends Component {
 
     submit = async () => {
         const { name, description, imageURL } = this.state;
-        await axios.post('http://localhost:3000/api/organizations/new', {
+        await axios.post('https://clubster-backend.herokuapp.com/api/organizations/new', {
             name, description, imageURL
         }).then((response) => {
             this.props.createClub(response.data.organization);

@@ -22,7 +22,7 @@ const CLUB_HEIGHT = HEIGHT / 4;
 
 class ShowClubs extends React.Component {
   navigateUser = async (item) => {
-    await axios.get(`http://localhost:3000/api/organizations/getOrg/${item._id}`).then((response) => {
+    await axios.get(`https://clubster-backend.herokuapp.com/api/organizations/getOrg/${item._id}`).then((response) => {
       var club = response.data.org;
       club.isAdmin = this.props.showAdminClubs;
       this.props.setCurrentClub(club);
@@ -52,7 +52,7 @@ class ShowClubs extends React.Component {
   }
 
   refreshUserClubs = () => {
-    axios.get("http://localhost:3000/api/organizations").then((response) => { 
+    axios.get("https://clubster-backend.herokuapp.com/api/organizations").then((response) => { 
       const { arrayClubsAdmin, arrayClubsMember } = response.data;
       this.props.setUserClubs(arrayClubsAdmin, arrayClubsMember);
     });

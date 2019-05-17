@@ -28,7 +28,7 @@ export class ShowEvents extends React.Component {
 
   getClubEvents = () => {
     this.setState({ loading: true })
-    axios.get(`http://localhost:3000/api/events/${this.props.clubID}`)
+    axios.get(`https://clubster-backend.herokuapp.com/api/events/${this.props.clubID}`)
       .then((response) => {
         this.props.setClubEvents(response.data.events);
         this.setState({ loading: false })
@@ -43,13 +43,13 @@ export class ShowEvents extends React.Component {
   }
 
   _handleGoing = (item) => {
-    axios.post(`http://localhost:3000/api/events/${item._id}/going`).then((response) => {
+    axios.post(`https://clubster-backend.herokuapp.com/api/events/${item._id}/going`).then((response) => {
       this.props._handleGoing(item._id, response.data.event.going);
     }).catch((err) => { console.log('error getting Going'); console.log(err) });
   }
 
   _handleLikers = (item) => {
-    axios.post(`http://localhost:3000/api/events/${item._id}/likers`).then((response) => {
+    axios.post(`https://clubster-backend.herokuapp.com/api/events/${item._id}/likers`).then((response) => {
       this.props._handleLikers(item._id, response.data.event.likers);
     }).catch((err) => { console.log('error posting to Likers'); console.log(err) });
   }
@@ -89,7 +89,7 @@ export class ShowEvents extends React.Component {
           </Left>
           <Right>
             <Button bordered onPress={() => {
-                axios.get(`http://localhost:3000/api/events/getClubEvent/${item._id}`).then((response) => {
+                axios.get(`https://clubster-backend.herokuapp.com/api/events/getClubEvent/${item._id}`).then((response) => {
                   this.props._setCurrentEvent(response.data.clubEvent);
                   this.props.navigation.navigate('EventProfile');
                 });

@@ -77,7 +77,7 @@ export class MembersList extends Component {
     }
 
     // post request - we delete user by sending the id of user thats going to be deleted to the backend
-    axios.post(`http://localhost:3000/api/organizations/${orgID}/${idDeleted}`).then((response) => {
+    axios.post(`https://clubster-backend.herokuapp.com/api/organizations/${orgID}/${idDeleted}`).then((response) => {
       // do a delete user thing in redux
     });
   }

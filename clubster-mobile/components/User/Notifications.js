@@ -29,7 +29,7 @@ export class Notifications extends Component {
 
     _getNotifications() {
         this.setState({ refreshing: true });
-        axios.get("http://localhost:3000/api/notifications").then((response) => {
+        axios.get("https://clubster-backend.herokuapp.com/api/notifications").then((response) => {
             this.props.setNotifications(response.data.notifications);
             this.setState({ refreshing: false }); // Setting up state variable
         }).catch((err) => console.log(err));
@@ -82,7 +82,7 @@ export class Notifications extends Component {
 
     handleAccept = (item) => {
         const joinType = (item.message.includes("admin") ? "ORG_JOIN_ADMIN" : "ORG_JOIN_MEMBER");
-        axios.post('http://localhost:3000/api/notifications/joinOrganization',
+        axios.post('https://clubster-backend.herokuapp.com/api/notifications/joinOrganization',
             { _id: item._id, orgID: item.idOfOrganization, joinerID: item.idOfSender, joinType, accepted: true })
             .then((res) => {
                 if (res.status == 201)
@@ -90,24 +90,24 @@ export class Notifications extends Component {
             }).catch((err) => console.log(err));
 
         const acceptType = (joinType == "ORG_JOIN_ADMIN" ? ACCEPT_ADMIN : ACCEPT_MEM);
-        axios.post('http://localhost:3000/api/notifications/new',
+        axios.post('https://clubster-backend.herokuapp.com/api/notifications/new',
             { type: acceptType, orgID: item.idOfOrganization, receiverID: item.idOfSender });
     }
 
     handleReject = (item) => {
-        axios.post('http://localhost:3000/api/notifications/joinOrganization',
+        axios.post('https://clubster-backend.herokuapp.com/api/notifications/joinOrganization',
             { _id: item._id, accepted: false })
             .then((res) => {
                 if (res.status == 201)
                     this.props.deleteNotification(item._id);
             }).catch((err) => console.log(err));
 
-        axios.post('http://localhost:3000/api/notifications/new',
+        axios.post('https://clubster-backend.herokuapp.com/api/notifications/new',
             { type: REJECT_JOIN, orgID: item.idOfOrganization, receiverID: item.idOfSender });
     }
 
     handleOkay = (item) => {
-        axios.post('http://localhost:3000/api/notifications/delete', { _id: item._id }).then((res) => { 
+        axios.post('https://clubster-backend.herokuapp.com/api/notifications/delete', { _id: item._id }).then((res) => { 
             if (res.status == 201) this.props.deleteNotification(item._id);
         });
     }

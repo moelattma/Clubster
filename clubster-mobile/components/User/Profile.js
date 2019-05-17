@@ -49,7 +49,7 @@ class Profile extends React.Component {
 
     async getClubs() {
         var allClubs = [];
-        await axios.get(`http://localhost:3000/api/organizations`).then((response) => {
+        await axios.get(`https://clubster-backend.herokuapp.com/api/organizations`).then((response) => {
           const { arrayClubsAdmin, arrayClubsMember } = response.data;
           allClubs = arrayClubsAdmin;
           allClubs = allClubs.concat(arrayClubsMember);
@@ -124,7 +124,7 @@ class Profile extends React.Component {
 
         const { major, biography } = this.state;
 
-        axios.post('http://localhost:3000/api/profile', {
+        axios.post('https://clubster-backend.herokuapp.com/api/profile', {
             major: this.state.major, hobbies: hobbiesList,
             facebook: this.state.facebook, instagram: this.state.instagram,
             linkedIn: this.state.linkedIn, biography: this.state.biography
@@ -165,7 +165,7 @@ class Profile extends React.Component {
             await RNS3.put(file, options).then((response) => {
                 imageURL = response.body.postResponse.key;
             }).catch((err) => { console.log(err) });
-            await axios.post('http://localhost:3000/api/changePhoto', { imageURL: imageURL }).then((response) => {
+            await axios.post('https://clubster-backend.herokuapp.com/api/changePhoto', { imageURL: imageURL }).then((response) => {
                 this.props.changePhoto(response.data.image);
             });
         } catch (error) { console.log(error); }
@@ -200,11 +200,11 @@ class Profile extends React.Component {
           await RNS3.put(file, options).then((response) => {
               imageURL = response.body.postResponse.key;
           }).catch((err) => { console.log(err) });
-          axios.post('http://localhost:3000/api/profile/photo', {imageURL: imageURL}).then((response) => {
+          axios.post('https://clubster-backend.herokuapp.com/api/profile/photo', {imageURL: imageURL}).then((response) => {
               this.setState({images:response.data.photos});
           });
         } catch (error) { console.log(error); }
-        axios.post('http://localhost:3000/api/profile/photo').then((response) => {
+        axios.post('https://clubster-backend.herokuapp.com/api/profile/photo').then((response) => {
             this.setState({images:response.data.photos});
         });
     };

@@ -17,14 +17,14 @@ export default class SignUp extends Component {
 
   submitData = () => {
     const { email, password, name, username } = this.state;
-    axios.post('http://localhost:3000/api/register', {          //POST with payload
+    axios.post('https://clubster-backend.herokuapp.com/api/register', {          //POST with payload
       email,
       password,
       username,
       name
     }).then(response => {
       if (response.status == 200 || response.status == 201) {
-        axios.post('http://localhost:3000/api/login', { username, password }).then(response => {
+        axios.post('https://clubster-backend.herokuapp.com/api/login', { username, password }).then(response => {
           if (response.status == 200) {
             AsyncStorage.setItem('jwtToken', response.data.token);
             axios.defaults.headers.common['Authorization'] = response.data.token;
@@ -35,7 +35,7 @@ export default class SignUp extends Component {
         }).catch((err) => {
           console.log('Not a valid account: ', err);                                           //Err
         });
-        axios.post("http://localhost:3000/api/notifications/newNoAuthenticate",
+        axios.post("https://clubster-backend.herokuapp.com/api/notifications/newNoAuthenticate",
           { type: CLUBSTER_WELCOME, senderID: response.data.user._id });
       }
     }).catch(err => console.log('Could not sign up', err));

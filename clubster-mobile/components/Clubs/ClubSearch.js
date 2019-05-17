@@ -30,7 +30,7 @@ class SearchClubs extends PureComponent {
 
     getOrganizations() {
         this.setState({ loading: true });
-        axios.get('http://localhost:3000/api/organizations/all')
+        axios.get('https://clubster-backend.herokuapp.com/api/organizations/all')
             .then((response) => {
                 this.setState({ organizations: response.data.organizations, loading: false });
                 this.props.setAllClubs(response.data.organizations);
