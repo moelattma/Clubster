@@ -55,9 +55,7 @@ var url = require('url');
 io.sockets.on('connection', socket => {
   clientId=socket.handshake.query.id;
   socket.on("input", msg => {
-    Conversations.findOne({idOfClub: mongoose.Types.ObjectId(socket.handshake.query.groupId)}).populate({ path: 'messages', populate: { path: 'user' } }).then((conversation) => {
-      socket.emit('output', conversation.messages[conversation.messages.length - 1]);
-    })
+    socket.emit('output', msg);
   });
 });
 
