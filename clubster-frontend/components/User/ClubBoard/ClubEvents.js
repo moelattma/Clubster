@@ -72,22 +72,100 @@ class ShowEvents extends Component {
       description: '',
       date: '',
       location: '',
-<<<<<<< HEAD
       time: null,
-=======
-      time: '',
->>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
+      timeDisplay: null,
+      timeDisplayEnd: null,
+      chosenDate: new Date(),
+      selectedStartDate: null,
+      selectedEndDate: null,
+      isDateTimePickerVisible: false,
+      showDate: false,
+      showTime: false,
+      showTime2: false,
+      photos: [],
+      galleryID: null,
       imageURL: DefaultImg,
-      show:true,
+      show: true,
       displayQRCode: false
     }
-<<<<<<< HEAD
+    this.setDate = this.setDate.bind(this);
+    this.onDateChange = this.onDateChange.bind(this);
     this.svg = ''
-=======
->>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
   }
 
+  _showDateTimePicker = () => this.setState({ showTime: true });
 
+  _hideDateTimePicker = () => this.setState({ showTime: false });
+
+  _hideDateTimePickerTwo = () => this.setState({ showTime2: false });
+
+  hide = () => { return; }
+
+  _showModal = (type) => {
+    (type == 1) ? this.setState({ showDate: true }) : (type == 2) ? this.setState({ showTime: true }) : this.setState({ showTime2: true });
+  }
+  _hideModal = (type) => {
+    (type == 1) ? this.setState({ showDate: false }) : (type == 2) ? this.setState({ showTime: false }) : this.setState({ showTime2: false });
+  }
+
+  _handleDatePicked = (date) => {
+    console.log(date.toString());
+    let hour = parseInt(date.toString().substring(date.toString().indexOf(":") - 2, date.toString().indexOf(":")));
+    let minutes = parseInt(date.toString().substring(date.toString().indexOf(":") + 1, date.toString().indexOf(":") + 3));
+    console.log(hour);
+    let ifPM = (hour >= 12) ? " PM" : " AM";
+    if (hour == 0) hour = 12;
+    else hour -= (hour > 12) ? 12 : 0; //hour = 9, 3:09
+    //strHour = (hour < 10) ? hour.toString() : hour.toString();
+    strMinutes = (minutes < 10) ? "0" + minutes.toString() : minutes.toString();
+    console.log("hour is: ", hour);
+    console.log("minutes is: ", minutes);
+    this.setState({ timeDisplay: hour.toString() + ":" + strMinutes + ifPM, dateTimestampStart: date });
+    this._hideDateTimePicker();
+  };
+
+  _handleDatePickedTwo = (date) => {
+    //04:00
+    console.log(date);
+    let hour = parseInt(date.toString().substring(date.toString().indexOf(":") - 2, date.toString().indexOf(":")));
+    let minutes = parseInt(date.toString().substring(date.toString().indexOf(":") + 1, date.toString().indexOf(":") + 3));
+    let ifPM = (hour >= 12) ? " PM" : " AM";
+    if (hour == 0) hour = 12;
+    else hour -= (hour > 12) ? 12 : 0;
+    //strHour = (hour < 10) ? "0" + hour.toString() : hour.toString();
+    strMinutes = (minutes < 10) ? "0" + minutes.toString() : minutes.toString();
+    console.log("hour is: ", hour);
+    console.log("minutes is: ", minutes);
+    console.log(hour.toString() + ":" + strMinutes + ifPM);
+    this.setState({ timeDisplayEnd: hour.toString() + ":" + strMinutes + ifPM, dateTimestampEnd: date });
+    this._hideDateTimePickerTwo();
+  };
+
+  setDate(newDate) {
+    this.setState({ chosenDate: newDate });
+  }
+
+  onDateChange(date, type) {
+    if (type === 'END_DATE') {
+      this.setState({
+        selectedEndDate: date,
+      });
+    } else {
+      this.setState({
+        selectedStartDate: date,
+        selectedEndDate: null,
+      });
+    }
+  }
+
+  hide = () => { return; }
+
+  onUpdatePhotos(photos) { this.setState({ photos }) }
+
+  askPermissionsAsync = async () => {
+    await Permissions.askAsync(Permissions.CAMERA);
+    await Permissions.askAsync(Permissions.CAMERA_ROLL);
+  };
 
   static navigationOptions = ({ navigation, screenProps }) => {
     rightHeader = (
@@ -116,6 +194,40 @@ class ShowEvents extends Component {
 
   componentWillUnmount() { this._mounted = false; }
 
+  useLibraryHandler = async () => {
+    await this.askPermissionsAsync();
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        base64: false,
+      });
+      if (result.cancelled)
+        return;
+      const key = `${v1()}.jpeg`;
+      const file = {
+        uri: result.uri,
+        type: 'image/jpeg',
+        name: key
+      };
+      const options = {
+        keyPrefix: 's3/',
+        bucket: 'clubster-123',
+        region: 'us-east-1',
+        accessKey: accessKeyId,
+        secretKey: secretAccessKey,
+        successActionStatus: 201
+      }
+      await RNS3.put(file, options).then((response) => {
+        this.setState({
+          imageURL: response.body.postResponse.key,
+          uri: 'https://s3.amazonaws.com/clubster-123/' + response.body.postResponse.key,
+          isImageUploaded: true
+        });
+      }).catch((err) => { console.log('upload image to aws failed'); console.log(err) });
+    } catch (error) { console.log('library handle failed'); console.log(error); }
+  }
+
   getClubEvents = async () => {
     const { _id } = this.props.screenProps;
     this.setState({ loading: true })
@@ -136,25 +248,20 @@ class ShowEvents extends Component {
     this.setState({ clubEvents: events, loading: false });
   }
 
-<<<<<<< HEAD
   // modal for when user enters invalid fields
-  openEditModal() {
-=======
-  // modal for when user enters invalid fields 
-  openEditModal( item ) {
->>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
+  openEditModal(item) {
     this.setState({
-      editModal: true
+      editedItem: item,
+      name: item.name,
     })
   }
 
   emailQRCode = () => {
 
-<<<<<<< HEAD
   }
 
   closeEditModal() { this.setState({ editModal: false }) }
-=======
+
   submitEventChanges = () => {
     let { name, description, time, date, location } = this.state;
     if (name == "")
@@ -170,51 +277,62 @@ class ShowEvents extends Component {
     axios.post(`http://localhost:3000/api/events/${this.state.editedItem._id}`, {
       name: this.state.name,
       description: this.state.description,
-      time: this.state.time,
-      date: this.state.date,
+      chosenDate: this.state.chosenDate,
+      selectedStartDate: this.state.selectedStartDate,
+      selectedEndDate: this.state.selectedEndDate,
+      timeDisplay: this.state.timeDisplay,
+      timeDisplayEnd: this.state.timeDisplayEnd,
       location: this.state.location
     }).then(() => {
       this.setState({ editModal: false });
     }).catch(() => { return; });
   }
 
-  changePicture = async () => {
+  changePicture = async (item) => {
+    console.log("changing pic");
+    this.setState({ editedItem: item });
+    console.log(item.name);
     await this.askPermissionsAsync();
+    console.log("trying");
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
-          allowsEditing: true,
-          aspect: [4, 3],
-          base64: false,
+        allowsEditing: true,
+        aspect: [4, 3],
+        base64: false,
       });
-      if(result.cancelled)
+      console.log("trying iffff?");
+      if (result.cancelled)
         return;
+      console.log("Did not cancel");
       const key = `${v1()}.jpeg`;
       const file = {
-          uri: result.uri,
-          type: 'image/jpeg',
-          name: key
+        uri: result.uri,
+        type: 'image/jpeg',
+        name: key
       };
       const options = {
         keyPrefix: 's3/',
         bucket: 'clubster-123',
         region: 'us-east-1',
-        accessKey:accessKeyId,
+        accessKey: accessKeyId,
         secretKey: secretAccessKey,
-        successActionStatus:201
+        successActionStatus: 201
       }
-      var imageURL;
-      await RNS3.put(file,options).then((response)=> {
-         imageURL = response.body.postResponse.key;
-      }).catch((err) => {console.log(err)});
-      axios.post(`http://localhost:3000/api/events/modifyOrgPicture/${this.props.screenProps._id}`, { imageURL }).then((response) => {
-          this.setState({ img: (response.data.image ? 'https://s3.amazonaws.com/clubster-123/' + response.data.image : DefaultImg) });
+      var img;
+      console.log("did not axios yet");
+      await RNS3.put(file, options).then((response) => {
+        img = response.body.postResponse.key;
+      }).catch((err) => { console.log(err) });
+      console.log("PREPARE URSELF");
+      axios.post(`http://localhost:3000/api/events/${item._id}/changeEventPicture`, { img }).then((response) => {
+        this.setState({ imageURL: (response.data.image ? 'https://s3.amazonaws.com/clubster-123/' + response.data.image : DefaultImg) });
       }).catch((err) => { return; });
-      this.props.navigation.navigate('ShowClubs');
-    } catch(error) {
+      console.log("returning");
+      this.props.navigation.navigate('ShowEvents');
+    } catch (error) {
       console.log(error);
     };
   };
->>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
 
   _handleGoing = (item) => {
     for (var i = 0; i < this.state.clubEvents.length; i++) {
@@ -235,12 +353,12 @@ class ShowEvents extends Component {
   };
 
   callback(dataURL) {
-      console.log(dataURL);
-      let shareImageBase64 = {
-        url: `data:image/png;base64,${dataURL}`,
-        message: 'Share Link', //  for email
-      };
-      Share.share(shareImageBase64).catch(error => console.log(error));
+    console.log(dataURL);
+    let shareImageBase64 = {
+      url: `data:image/png;base64,${dataURL}`,
+      message: 'Share Link', //  for email
+    };
+    Share.share(shareImageBase64).catch(error => console.log(error));
   }
 
   _handleLikers = (item) => {
@@ -257,7 +375,7 @@ class ShowEvents extends Component {
       .catch((err) => { console.log('error posting to Likers'); console.log(err) });
   }
 
-  _setQRCode= (_id) => {
+  _setQRCode = (_id) => {
     console.log(_id);
     this.setState({
       eventClicked: _id,
@@ -269,11 +387,11 @@ class ShowEvents extends Component {
     return (
       <Modal isVisible={this.state.displayQRCode}>
         <View style={styles.formStyle}>
-        <QRCode
-          value={JSON.stringify({test: 'testdata'})}
-          getRef={c => (this.svg = c)}
-        />
-        <TouchableOpacity onPress = {this.saveQRCode}/>
+          <QRCode
+            value={JSON.stringify({ test: 'testdata' })}
+            getRef={c => (this.svg = c)}
+          />
+          <TouchableOpacity onPress={this.saveQRCode} />
         </View>
       </Modal>
     )
@@ -282,6 +400,11 @@ class ShowEvents extends Component {
   _renderItem = ({ item }) => {
     var hostURL;
     var eventURL;
+    const { selectedStartDate, selectedEndDate } = this.state;
+    const minDate = new Date(); // Today
+    const maxDate = new Date(2020, 6, 3);
+    const startDate = selectedStartDate ? selectedStartDate.toString() : '';
+    const endDate = selectedEndDate ? selectedEndDate.toString() : '';
     const { name, date, time, description, location } = this.state;
     if (item.image && item.image != null)
       eventURL = 'https://s3.amazonaws.com/clubster-123/' + item.image;
@@ -297,76 +420,134 @@ class ShowEvents extends Component {
       return (
         <Card>
           <Modal isVisible={this.state.editModal}>
-            <View style={styles.formStyle}>
-              <TouchableOpacity onPress={() => this.closeEditModal()}>
-                <Icon name="ios-arrow-dropleft"
-                  style={styles.modalButton} />
-              </TouchableOpacity>
-              <Form>
-                <Input
-                  style={styles.modalContent}
+            <View style={styles.modalView}>
+              <View>
+                <TouchableOpacity onPress={() => this.closeEditModal()}>
+                  <Icon name="ios-arrow-dropleft"
+                    style={styles.modalButton} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.textInAreaContainer}>
+                <TextInput placeholder='name'
+                  style={styles.textInArea}
                   label='name'
                   onChangeText={(name) => this.setState({ name })}
                   //onChangeText={item.name = name}
-                  value={name}
+                  value={this.state.name}
                 />
-                <Input
-                  style={styles.modalContent}
+              </View>
+              <View style={styles.textInAreaContainer}>
+                <TextInput placeholder='location'
+                  style={styles.textInArea}
                   label='location'
                   onChangeText={(location) => this.setState({ location })}
                   //onChangeText={item.location = location}
-                  value={location}
+                  value={this.state.location}
                 />
-<<<<<<< HEAD
-                <Input
-                  style={styles.modalContent}
-=======
               </View>
-              <View style={styles.textInAreaContainer}>
-                <TextInput placeholder='date'
-                  style={styles.textInArea}
->>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
-                  label='date'
-                  onChangeText={(date) => this.setState({ date })}
-                  //onChangeText={item.date = date}
-                  value={date}
-                />
-                <Input
-                  style={styles.modalContent}
-                  label='time'
-                  onChangeText={(time) => this.setState({ time })}
-                  //onChangeText={item.time = time}
-                  value={time}
-                />
-<<<<<<< HEAD
-                <Input
-                  style={styles.modalContent}
-=======
+              <View style={styles.buttonInAreaContainer}>
+                <TouchableOpacity
+                  onPress={() => {
+                    this._showModal(1)
+                  }}
+                  style={{
+                    // height: 50,
+                    // paddingLeft: 5,
+                    // paddingRight: 5,
+                    // flex: 1,
+                    // flexDirection: 'row',
+                    // alignSelf: 'center',
+                    // alignItems: 'center'
+                  }}>
+                  <Text style={{ color: '#575757', fontSize: 17, flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', alignItems: 'center' }}>Date</Text>
+                </TouchableOpacity>
               </View>
+              <View style={styles.buttonInAreaContainer}>
+                <TouchableOpacity
+                  onPress={() => {
+                    this._showModal(2)
+                  }}
+                  style={{
+                    // height: 50,
+                    // paddingLeft: 5,
+                    // paddingRight: 5,
+                    // flex: 1,
+                    // flexDirection: 'row',
+                    // alignSelf: 'center',
+                    // alignItems: 'center'
+                  }}>
+                  {(this.state.timeDisplay == null) ? <Text style={{ color: '#575757', fontSize: 17, flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', alignItems: 'center' }}>Start Time</Text> : <Text style={{ color: '#575757', fontSize: 17, flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', alignItems: 'center' }}>{this.state.timeDisplay.toString()}</Text>}
+                </TouchableOpacity>
+
+              </View>
+              <View style={styles.buttonInAreaContainer}>
+                <TouchableOpacity
+                  onPress={() => {
+                    this._showModal(3)
+                  }}
+                  style={{
+                    //height: 50,
+                    //paddingLeft: 5,
+                    //paddingRight: 5,
+                    //flex: 1,
+                    //flexDirection: 'row',
+                    //alignSelf: 'center',
+                    //alignItems: 'center'
+                  }}>
+                  {(this.state.timeDisplayEnd == null) ? <Text style={{ color: '#575757', fontSize: 17, flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', alignItems: 'center' }}>End Time</Text> : <Text style={{ color: '#575757', fontSize: 17, flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', alignItems: 'center' }}>{this.state.timeDisplayEnd.toString()}</Text>}
+                </TouchableOpacity>
+
+              </View>
+              <View style={{ flex: 1 }}>
+                <Modal isVisible={this.state.showDate} onRequestClose={this.hide}>
+                  <View style={styles.container}>
+                    <CalendarPicker
+                      startFromMonday={true}
+                      allowRangeSelection={true}
+                      minDate={minDate}
+                      maxDate={maxDate}
+                      todayBackgroundColor="#f2e6ff"
+                      selectedDayColor="#7300e6"
+                      selectedDayTextColor="#FFFFFF"
+                      onDateChange={this.onDateChange}
+                    />
+
+                    <View>
+                      <Text>SELECTED START DATE:{startDate}</Text>
+                      <Text>SELECTED END DATE:{endDate}</Text>
+                    </View>
+                    <Button block onPress={() => { this.setState({ showDate: false }) }} style={styles.button}>
+                      <Text style={{ color: '#fff' }}> Submit </Text>
+                    </Button>
+                    <Button block danger onPress={() => { this.setState({ showDate: false }) }} style={styles.button}>
+                      <Text style={{ color: '#fff' }}> Cancel </Text>
+                    </Button>
+                  </View>
+                </Modal>
+              </View>
+
+              <View style={{ flex: 1 }}>
+                <DateTimePicker
+                  isVisible={this.state.showTime}
+                  mode={'time'}
+                  is24Hour={false}
+                  onConfirm={this._handleDatePicked}
+                  onCancel={this._hideDateTimePicker}
+                />
+              </View>
+
               <View style={styles.textInAreaContainer}>
                 <TextInput placeholder='description'
                   style={styles.textInArea}
->>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
                   label='description'
-                  onChangeText={(description) => this.setState({ name })}
+                  onChangeText={(description) => this.setState({ description })}
                   //onChangeText={item.description = description}
-                  value={description}
+                  value={this.state.description}
                 />
-<<<<<<< HEAD
-              </Form>
-              <Button bordered
-                onPress={this.validateInput}
-                style={{
-                  margin: 20, width: 160,
-                  justifyContent: 'center', alignSelf: 'center'
-                }}>
-                <Text>Create Event!</Text>
-              </Button>
-=======
               </View>
               <View>
                 <Button bordered
-                  onPress={() => {this.submitEventChanges() }}
+                  onPress={() => { this.submitEventChanges() }}
                   style={{
                     margin: 20, width: 160,
                     justifyContent: 'center', alignSelf: 'center'
@@ -374,21 +555,20 @@ class ShowEvents extends Component {
                   <Text>Update Event!</Text>
                 </Button>
               </View>
->>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
             </View>
           </Modal>
-          <Modal isVisible={this.state.displayQRCode} style ={styles.modalStyle}>
-          <View style={styles.container}>
-            <QRCode
-              value={`https://ayunus22198.github.io/ClubstersSignInPage/#/${item._id}`}
-              getRef={c => (this.svg = c)}
-            />
-            <TouchableOpacity onPress={this.saveQRCode}>
-              <View style={styles.instructions}>
-                <Text>Share QR code</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
+          <Modal isVisible={this.state.displayQRCode} style={styles.modalStyle}>
+            <View style={styles.container}>
+              <QRCode
+                value={`https://ayunus22198.github.io/ClubstersSignInPage/#/${item._id}`}
+                getRef={c => (this.svg = c)}
+              />
+              <TouchableOpacity onPress={this.saveQRCode}>
+                <View style={styles.instructions}>
+                  <Text>Share QR code</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </Modal>
 
           <CardItem>
@@ -399,22 +579,12 @@ class ShowEvents extends Component {
               </Body>
             </Left>
             <Right>
-<<<<<<< HEAD
               <Button transparent onPress={() => this.openEditModal()}>
                 <Text> Edit </Text>
               </Button>
               <Button transparent onPress={() => this._setQRCode(item._id)}>
                 <Text> QRCode </Text>
               </Button>
-=======
-              <Button transparent onPress={() => this.openEditModal( item )}>
-                <Text> edit </Text>
-              </Button>
-              <TouchableOpacity onPressIn={this.changePicture}>
-	                    <Thumbnail square style={{ height: 200, width: WIDTH }}
-	                        source={{ uri: this.state.img }} />
-	            </TouchableOpacity>
->>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
             </Right>
           </CardItem>
           <CardItem cardBody>
@@ -566,7 +736,7 @@ class CreateClubEvent extends Component {
       location: '',
       time: null,
       timeDisplay: null,
-      timeDisplayEnd:null,
+      timeDisplayEnd: null,
       imageURL: null,
       uri: 'https://image.flaticon.com/icons/png/512/128/128423.png',
       isImageUploaded: false,
@@ -574,7 +744,7 @@ class CreateClubEvent extends Component {
       selectedStartDate: null,
       selectedEndDate: null,
       isDateTimePickerVisible: false,
-      showDate:false,
+      showDate: false,
       showTime: false,
       showTime2: false,
       showTimeZone: false,
@@ -586,12 +756,12 @@ class CreateClubEvent extends Component {
 
   componentDidMount() {
     var timezoneArr = [];
-    for(let i = 0;i<this.state.timezoneArray.length;i++) {
+    for (let i = 0; i < this.state.timezoneArray.length; i++) {
       timezoneArr.push({
         key: this.state.timezoneArray[i]
       });
     }
-    this.setState({timezoneArray: timezoneArr});
+    this.setState({ timezoneArray: timezoneArr });
   }
 
   _showDateTimePicker = () => this.setState({ showTime: true });
@@ -606,13 +776,13 @@ class CreateClubEvent extends Component {
     (type == 1) ? this.setState({ showDate: true }) : (type == 2) ? this.setState({ showTime: true }) : (type == 3) ? this.setState({ showTimeZone: true }) : this.setState({ showTime2: true });
   }
   _hideModal = (type) => {
-      (type == 1) ? this.setState({ showDate: false }) : (type == 2) ? this.setState({ showTime: false }) : (type == 3) ? this.setState({ showTimeZone: false }) : this.setState({ showTime2: false });
+    (type == 1) ? this.setState({ showDate: false }) : (type == 2) ? this.setState({ showTime: false }) : (type == 3) ? this.setState({ showTimeZone: false }) : this.setState({ showTime2: false });
   }
 
   _handleDatePicked = (date) => {
     console.log(date.toString());
-    let hour  = parseInt(date.toString().substring(date.toString().indexOf(":") - 2, date.toString().indexOf(":")));
-    let minutes  = parseInt(date.toString().substring(date.toString().indexOf(":") + 1, date.toString().indexOf(":") + 3));
+    let hour = parseInt(date.toString().substring(date.toString().indexOf(":") - 2, date.toString().indexOf(":")));
+    let minutes = parseInt(date.toString().substring(date.toString().indexOf(":") + 1, date.toString().indexOf(":") + 3));
     console.log(hour);
     let ifPM = (hour >= 12) ? " PM" : " AM";
     if (hour == 0) hour = 12;
@@ -628,8 +798,8 @@ class CreateClubEvent extends Component {
   _handleDatePickedTwo = (date) => {
     //04:00
     console.log(date);
-    let hour  = parseInt(date.toString().substring(date.toString().indexOf(":") - 2, date.toString().indexOf(":")));
-    let minutes  = parseInt(date.toString().substring(date.toString().indexOf(":") + 1, date.toString().indexOf(":") + 3));
+    let hour = parseInt(date.toString().substring(date.toString().indexOf(":") - 2, date.toString().indexOf(":")));
+    let minutes = parseInt(date.toString().substring(date.toString().indexOf(":") + 1, date.toString().indexOf(":") + 3));
     let ifPM = (hour >= 12) ? " PM" : " AM";
     if (hour == 0) hour = 12;
     else hour -= (hour > 12) ? 12 : 0;
@@ -637,7 +807,7 @@ class CreateClubEvent extends Component {
     strMinutes = (minutes < 10) ? "0" + minutes.toString() : minutes.toString();
     console.log("hour is: ", hour);
     console.log("minutes is: ", minutes);
-    console.log(hour.toString() + ":" + strMinutes +  ifPM);
+    console.log(hour.toString() + ":" + strMinutes + ifPM);
     this.setState({ timeDisplayEnd: hour.toString() + ":" + strMinutes + ifPM, dateTimestampEnd: date });
     this._hideDateTimePickerTwo();
   };
@@ -704,7 +874,7 @@ class CreateClubEvent extends Component {
     const { _id } = this.props.screenProps;
     const { name, date, time, description, location, imageURL, chosenDate, selectedStartDate, selectedEndDate, timeDisplay, timeDisplayEnd } = this.state;
     var newEvent;
-    await axios.post('http://localhost:3000/api/events/'+_id+'/new', {
+    await axios.post('http://localhost:3000/api/events/' + _id + '/new', {
       name, date, time, description, location, imageURL, chosenDate, selectedStartDate, selectedEndDate, timeDisplay, timeDisplayEnd
     }).then(response => {
       newEvent = response.data.event;
@@ -724,9 +894,9 @@ class CreateClubEvent extends Component {
     return;
   }
 
-  _renderItem = ({item}) => {
-    return(
-      <TouchableOpacity onPress={() => this.setState({timezone: item.key, showTimeZone: false})}>
+  _renderItem = ({ item }) => {
+    return (
+      <TouchableOpacity onPress={() => this.setState({ timezone: item.key, showTimeZone: false })}>
         <View>
           <Text>{item.key}</Text>
         </View>
@@ -774,7 +944,7 @@ class CreateClubEvent extends Component {
     let { errors = {} } = this.state;
     const minDate = new Date(); // Today
     const maxDate = new Date(2020, 6, 3);
-    const startDate  =  selectedStartDate ? selectedStartDate.toString() : '';
+    const startDate = selectedStartDate ? selectedStartDate.toString() : '';
     const endDate = selectedEndDate ? selectedEndDate.toString() : '';
     return (
       <Container>
@@ -782,7 +952,7 @@ class CreateClubEvent extends Component {
           <Item>
             <Input placeholder="Name"
               label='name'
-              style={{fontFamily:"sans-serif"}}
+              style={{ fontFamily: "sans-serif" }}
               onChangeText={(name) => this.setState({ name })}
               value={name}
             />
@@ -790,14 +960,14 @@ class CreateClubEvent extends Component {
           <Item>
             <Input placeholder="Location"
               label='location'
-              style={{fontFamily:"sans-serif"}}
+              style={{ fontFamily: "sans-serif" }}
               onChangeText={(location) => this.setState({ location })}
               value={location}
             />
           </Item>
           <Item>
             <Input placeholder="Description"
-              style={{fontFamily:"sans-serif"}}
+              style={{ fontFamily: "sans-serif" }}
               label='description'
               onChangeText={(description) => this.setState({ description })}
               value={description}
@@ -808,7 +978,7 @@ class CreateClubEvent extends Component {
               onPress={() => {
                 this._showModal(1)
               }}
-              style = {{
+              style={{
                 height: 50,
                 paddingLeft: 5,
                 paddingRight: 5,
@@ -817,7 +987,7 @@ class CreateClubEvent extends Component {
                 alignSelf: 'center',
                 alignItems: 'center'
               }}>
-              <Text style = {{color:'#575757',fontSize: 17, flexDirection: 'row',justifyContent: 'center', alignSelf: 'center', alignItems: 'center'}}>Date</Text>
+              <Text style={{ color: '#575757', fontSize: 17, flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', alignItems: 'center' }}>Date</Text>
             </TouchableOpacity>
           </Item>
           <Item>
@@ -825,23 +995,7 @@ class CreateClubEvent extends Component {
               onPress={() => {
                 this._showModal(2)
               }}
-              style = {{
-                height: 50,
-                paddingLeft: 5,
-                paddingRight: 5,
-                flex:0.5,
-                flexDirection: 'row',
-                alignSelf: 'center',
-                alignItems: 'center'
-              }}>
-              {(this.state.timeDisplay == null) ? <Text style = {{color:'#575757',fontSize: 17, flexDirection: 'row',justifyContent: 'center', alignSelf: 'center', alignItems: 'center'}}>Start Time</Text> : <Text style = {{color:'#575757',fontSize: 17, flexDirection: 'row',justifyContent: 'center', alignSelf: 'center', alignItems: 'center'}}>{this.state.timeDisplay.toString()}</Text>}
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => {
-                this._showModal(4)
-              }}
-              style = {{
+              style={{
                 height: 50,
                 paddingLeft: 5,
                 paddingRight: 5,
@@ -850,7 +1004,23 @@ class CreateClubEvent extends Component {
                 alignSelf: 'center',
                 alignItems: 'center'
               }}>
-              {(this.state.timeDisplayEnd == null) ? <Text style = {{color:'#575757',fontSize: 17, flexDirection: 'row',justifyContent: 'center', alignSelf: 'center', alignItems: 'center'}}>End Time</Text> : <Text style = {{color:'#575757',fontSize: 17, flexDirection: 'row',justifyContent: 'center', alignSelf: 'center', alignItems: 'center'}}>{this.state.timeDisplayEnd.toString()}</Text>}
+              {(this.state.timeDisplay == null) ? <Text style={{ color: '#575757', fontSize: 17, flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', alignItems: 'center' }}>Start Time</Text> : <Text style={{ color: '#575757', fontSize: 17, flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', alignItems: 'center' }}>{this.state.timeDisplay.toString()}</Text>}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                this._showModal(4)
+              }}
+              style={{
+                height: 50,
+                paddingLeft: 5,
+                paddingRight: 5,
+                flex: 0.5,
+                flexDirection: 'row',
+                alignSelf: 'center',
+                alignItems: 'center'
+              }}>
+              {(this.state.timeDisplayEnd == null) ? <Text style={{ color: '#575757', fontSize: 17, flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', alignItems: 'center' }}>End Time</Text> : <Text style={{ color: '#575757', fontSize: 17, flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', alignItems: 'center' }}>{this.state.timeDisplayEnd.toString()}</Text>}
             </TouchableOpacity>
 
           </Item>
@@ -859,7 +1029,7 @@ class CreateClubEvent extends Component {
               onPress={() => {
                 this._showModal(3)
               }}
-              style = {{
+              style={{
                 height: 50,
                 paddingLeft: 5,
                 paddingRight: 5,
@@ -868,25 +1038,25 @@ class CreateClubEvent extends Component {
                 alignSelf: 'center',
                 alignItems: 'center'
               }}>
-              {(this.state.timezone == null) ? <Text style = {{color:'#575757',fontSize: 17, flexDirection: 'row',justifyContent: 'center', alignSelf: 'center', alignItems: 'center'}}>Select Timezone</Text> : <Text style = {{color:'#575757',fontSize: 17, flexDirection: 'row',justifyContent: 'center', alignSelf: 'center', alignItems: 'center'}}>{this.state.timezone}</Text>}
+              {(this.state.timezone == null) ? <Text style={{ color: '#575757', fontSize: 17, flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', alignItems: 'center' }}>Select Timezone</Text> : <Text style={{ color: '#575757', fontSize: 17, flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', alignItems: 'center' }}>{this.state.timezone}</Text>}
             </TouchableOpacity>
           </Item>
         </Form>
         <Content>
 
 
-        {this.state.isImageUploaded == false
-        ?
-        <TouchableOpacity onPress={this.useLibraryHandler}>
-          <Thumbnail square small style={styles.uploadIcon}
-              source={{uri: this.state.uri}} />
-        </TouchableOpacity>
-        :
-        <TouchableOpacity onPress={this.useLibraryHandler}>
-            <Thumbnail square style={styles.imageThumbnail}
-                source={{uri: this.state.uri}} />
-          </TouchableOpacity>
-        }
+          {this.state.isImageUploaded == false
+            ?
+            <TouchableOpacity onPress={this.useLibraryHandler}>
+              <Thumbnail square small style={styles.uploadIcon}
+                source={{ uri: this.state.uri }} />
+            </TouchableOpacity>
+            :
+            <TouchableOpacity onPress={this.useLibraryHandler}>
+              <Thumbnail square style={styles.imageThumbnail}
+                source={{ uri: this.state.uri }} />
+            </TouchableOpacity>
+          }
         </Content>
 
         <Modal isVisible={this.state.validModal}>
@@ -905,68 +1075,70 @@ class CreateClubEvent extends Component {
 
         {/* MODAL  */}
         <View style={{ flex: 1 }}>
-            <Modal isVisible={this.state.showDate} onRequestClose={this.hide}>
-              <View style={styles.container}>
-                <CalendarPicker
-                  startFromMonday={true}
-                  allowRangeSelection={true}
-                  minDate={minDate}
-                  maxDate={maxDate}
-                  todayBackgroundColor="#f2e6ff"
-                  selectedDayColor="#7300e6"
-                  selectedDayTextColor="#FFFFFF"
-                  onDateChange={this.onDateChange}
-                />
+          <Modal isVisible={this.state.showDate} onRequestClose={this.hide}>
+            <View style={styles.container}>
+              <CalendarPicker
+                startFromMonday={true}
+                allowRangeSelection={true}
+                minDate={minDate}
+                maxDate={maxDate}
+                todayBackgroundColor="#f2e6ff"
+                selectedDayColor="#7300e6"
+                selectedDayTextColor="#FFFFFF"
+                onDateChange={this.onDateChange}
+              />
 
-                <View>
-                  <Text>SELECTED START DATE:{ startDate }</Text>
-                  <Text>SELECTED END DATE:{ endDate }</Text>
-                </View>
-                <Button block onPress={() => { this.setState({ showDate: false }) }} style={styles.button}>
-                    <Text style={{color: '#fff'}}> Submit </Text>
-                </Button>
-                <Button block danger onPress={() => { this.setState({ showDate: false }) }} style={styles.button}>
-                    <Text style={{color: '#fff'}}> Cancel </Text>
-                </Button>
+              <View>
+                <Text>SELECTED START DATE:{startDate}</Text>
+                <Text>SELECTED END DATE:{endDate}</Text>
               </View>
-            </Modal>
+              <Button block onPress={() => { this.setState({ showDate: false }) }} style={styles.button}>
+                <Text style={{ color: '#fff' }}> Submit </Text>
+              </Button>
+              <Button block danger onPress={() => { this.setState({ showDate: false }) }} style={styles.button}>
+                <Text style={{ color: '#fff' }}> Cancel </Text>
+              </Button>
+            </View>
+          </Modal>
         </View>
 
         <View style={{ flex: 1 }}>
-            <DateTimePicker
-              isVisible={this.state.showTime}
-              mode = {'time'}
-              is24Hour = {false}
-              onConfirm={this._handleDatePicked}
-              onCancel={this._hideDateTimePicker}
-            />
+          <DateTimePicker
+            isVisible={this.state.showTime}
+            mode={'time'}
+            is24Hour={false}
+            onConfirm={this._handleDatePicked}
+            onCancel={this._hideDateTimePicker}
+          />
         </View>
 
         <View style={{ flex: 1 }}>
-            <DateTimePicker
-              isVisible={this.state.showTime2}
-              mode = {'time'}
-              is24Hour = {false}
-              onConfirm={this._handleDatePickedTwo}
-              onCancel={this._hideDateTimePickerTwo}
-            />
+          <DateTimePicker
+            isVisible={this.state.showTime2}
+            mode={'time'}
+            is24Hour={false}
+            onConfirm={this._handleDatePickedTwo}
+            onCancel={this._hideDateTimePickerTwo}
+          />
         </View>
 
         <View style={{ flex: 1 }}>
           <Modal isVisible={this.state.showTimeZone} onRequestClose={this.hide}>
             <View style={styles.containerTime}>
               <FlatList
-                data = {this.state.timezoneArray}
+                data={this.state.timezoneArray}
                 renderItem={this._renderItem}
-                />
+              />
             </View>
           </Modal>
         </View>
 
         <Button bordered
           onPress={this.createEvent}
-          style={{ margin:20, width:160,
-            justifyContent:'center', alignSelf:'center'}}>
+          style={{
+            margin: 20, width: 160,
+            justifyContent: 'center', alignSelf: 'center'
+          }}>
           <Text>Create Event!</Text>
         </Button>
       </Container>
@@ -990,19 +1162,19 @@ const ClubEventNavigator = createStackNavigator(
 
 const styles = StyleSheet.create({
   container: {
-   flex: 1,
-   backgroundColor: '#FFFFFF',
-   marginTop: 100,
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    marginTop: 100,
   },
   containerTime: {
-   flex: 1,
-   backgroundColor: '#FFFFFF',
-   marginTop: 50,
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    marginTop: 50,
   },
   button: {
-      margin: 10,
-      maxWidth: WIDTH,
-      minWidth: WIDTH/2,
+    margin: 10,
+    maxWidth: WIDTH,
+    minWidth: WIDTH / 2,
   },
   eventCard: {
     flex: 1,
@@ -1031,13 +1203,13 @@ const styles = StyleSheet.create({
     marginTop: 25
   },
   modalStyle: {
-      backgroundColor: 'white',
-      padding: 4,
-      marginTop: 50,
-      marginRight: 20,
-      marginBottom: 30,
-      marginLeft: 20,
-      borderRadius: 6
+    backgroundColor: 'white',
+    padding: 4,
+    marginTop: 50,
+    marginRight: 20,
+    marginBottom: 30,
+    marginLeft: 20,
+    borderRadius: 6
   },
   eventTitle: {
     color: 'black',
