@@ -57,13 +57,16 @@ router.post('/events/:eventID/:userID', (req, res) => {
 	controller.addWentUser(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
-router.post('/events/:eventID', (req, res) => {
-	controller.updateEvent(req, res);
-});
-
 router.post('/events/:eventID/changeEventPicture', passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.changeEventPicture(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
+router.post('/events/:eventID', (req, res) => {
+	controller.updateEvent(req, res);
+});
+
+router.post('/events/modifyEventPicture/:eventID', passport.authenticate('jwt', {session:false}), (req, res) => {
+	controller.changeEventPicture(req, res);
+});
 //Export
 module.exports = router;

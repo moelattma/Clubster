@@ -45,39 +45,39 @@ export default class EventProfile extends Component {
         await Permissions.askAsync(Permissions.CAMERA_ROLL);
     };
 
-    // changeEventPicture = async () => {
-    //     await this.askPermissionsAsync();
-    //     try {
-    //         let result = await ImagePicker.launchImageLibraryAsync({
-    //             allowsEditing: true,
-    //             aspect: [4, 3],
-    //             base64: false,
-    //         });
-    //         if (result.cancelled)
-    //             return;
-    //         const key = `${v1()}.jpeg`;
-    //         const file = {
-    //             uri: result.uri,
-    //             type: 'image/jpeg',
-    //             name: key
-    //         };
-    //         const options = {
-    //             keyPrefix: 's3/',
-    //             bucket: 'clubster-123',
-    //             region: 'us-east-1',
-    //             accessKey: accessKeyId,
-    //             secretKey: secretAccessKey,
-    //             successActionStatus: 201
-    //         };
-    //         var imageURL;
-    //         await RNS3.put(file, options).then((response) => {
-    //             imageURL = response.body.postResponse.key;
-    //         }).catch((err) => { console.log(err) });
-    //         await axios.post(`http://localhost:3000/api/events/${this.event._id}/changeEventPicture`, { imageURL }).then((image) => {
-    //             this.setState({ eventImage: 'https://s3.amazonaws.com/clubster-123/' + imageURL });
-    //         });
-    //     } catch (error) { console.log(error); }
-    // }
+    changeEventPicture = async () => {
+        await this.askPermissionsAsync();
+        try {
+            let result = await ImagePicker.launchImageLibraryAsync({
+                allowsEditing: true,
+                aspect: [4, 3],
+                base64: false,
+            });
+            if (result.cancelled)
+                return;
+            const key = `${v1()}.jpeg`;
+            const file = {
+                uri: result.uri,
+                type: 'image/jpeg',
+                name: key
+            };
+            const options = {
+                keyPrefix: 's3/',
+                bucket: 'clubster-123',
+                region: 'us-east-1',
+                accessKey: accessKeyId,
+                secretKey: secretAccessKey,
+                successActionStatus: 201
+            };
+            var imageURL;
+            await RNS3.put(file, options).then((response) => {
+                imageURL = response.body.postResponse.key;
+            }).catch((err) => { console.log(err) });
+            await axios.post(`http://localhost:3000/api/events/${this.event._id}/changeEventPicture`, { imageURL }).then((image) => {
+                this.setState({ eventImage: 'https://s3.amazonaws.com/clubster-123/' + imageURL });
+            });
+        } catch (error) { console.log(error); }
+    }
 
     // Likers
     openLikersModal() {
@@ -279,7 +279,9 @@ export default class EventProfile extends Component {
         return (
             <Container>
                 <ScrollView>
-                    <Image source={{ uri: this.state.eventImage }} style={{ height: 200 }} />
+                    <TouchableWithoutFeedback onPress={() => this.changeEventPicture()}>
+                        <Image source={{ uri: this.state.eventImage }} style={{ height: 200 }} />
+                    </TouchableWithoutFeedback>
                     <InformationCard eventInfo={eventInfo} />
                     <Content padder>
                         <Card >

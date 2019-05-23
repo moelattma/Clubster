@@ -72,12 +72,19 @@ class ShowEvents extends Component {
       description: '',
       date: '',
       location: '',
+<<<<<<< HEAD
       time: null,
+=======
+      time: '',
+>>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
       imageURL: DefaultImg,
       show:true,
       displayQRCode: false
     }
+<<<<<<< HEAD
     this.svg = ''
+=======
+>>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
   }
 
 
@@ -129,8 +136,13 @@ class ShowEvents extends Component {
     this.setState({ clubEvents: events, loading: false });
   }
 
+<<<<<<< HEAD
   // modal for when user enters invalid fields
   openEditModal() {
+=======
+  // modal for when user enters invalid fields 
+  openEditModal( item ) {
+>>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
     this.setState({
       editModal: true
     })
@@ -138,9 +150,71 @@ class ShowEvents extends Component {
 
   emailQRCode = () => {
 
+<<<<<<< HEAD
   }
 
   closeEditModal() { this.setState({ editModal: false }) }
+=======
+  submitEventChanges = () => {
+    let { name, description, time, date, location } = this.state;
+    if (name == "")
+      name = this.state.editedItem.name;
+    if (description == "")
+      description = this.state.editedItem.description;
+    if (time == "")
+      time = this.state.editedItem.time
+    if (date == "")
+      date = this.state.editedItem.date
+    if (location == "")
+      location = this.state.editedItem.location
+    axios.post(`http://localhost:3000/api/events/${this.state.editedItem._id}`, {
+      name: this.state.name,
+      description: this.state.description,
+      time: this.state.time,
+      date: this.state.date,
+      location: this.state.location
+    }).then(() => {
+      this.setState({ editModal: false });
+    }).catch(() => { return; });
+  }
+
+  changePicture = async () => {
+    await this.askPermissionsAsync();
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+          allowsEditing: true,
+          aspect: [4, 3],
+          base64: false,
+      });
+      if(result.cancelled)
+        return;
+      const key = `${v1()}.jpeg`;
+      const file = {
+          uri: result.uri,
+          type: 'image/jpeg',
+          name: key
+      };
+      const options = {
+        keyPrefix: 's3/',
+        bucket: 'clubster-123',
+        region: 'us-east-1',
+        accessKey:accessKeyId,
+        secretKey: secretAccessKey,
+        successActionStatus:201
+      }
+      var imageURL;
+      await RNS3.put(file,options).then((response)=> {
+         imageURL = response.body.postResponse.key;
+      }).catch((err) => {console.log(err)});
+      axios.post(`http://localhost:3000/api/events/modifyOrgPicture/${this.props.screenProps._id}`, { imageURL }).then((response) => {
+          this.setState({ img: (response.data.image ? 'https://s3.amazonaws.com/clubster-123/' + response.data.image : DefaultImg) });
+      }).catch((err) => { return; });
+      this.props.navigation.navigate('ShowClubs');
+    } catch(error) {
+      console.log(error);
+    };
+  };
+>>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
 
   _handleGoing = (item) => {
     for (var i = 0; i < this.state.clubEvents.length; i++) {
@@ -243,8 +317,15 @@ class ShowEvents extends Component {
                   //onChangeText={item.location = location}
                   value={location}
                 />
+<<<<<<< HEAD
                 <Input
                   style={styles.modalContent}
+=======
+              </View>
+              <View style={styles.textInAreaContainer}>
+                <TextInput placeholder='date'
+                  style={styles.textInArea}
+>>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
                   label='date'
                   onChangeText={(date) => this.setState({ date })}
                   //onChangeText={item.date = date}
@@ -257,13 +338,21 @@ class ShowEvents extends Component {
                   //onChangeText={item.time = time}
                   value={time}
                 />
+<<<<<<< HEAD
                 <Input
                   style={styles.modalContent}
+=======
+              </View>
+              <View style={styles.textInAreaContainer}>
+                <TextInput placeholder='description'
+                  style={styles.textInArea}
+>>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
                   label='description'
                   onChangeText={(description) => this.setState({ name })}
                   //onChangeText={item.description = description}
                   value={description}
                 />
+<<<<<<< HEAD
               </Form>
               <Button bordered
                 onPress={this.validateInput}
@@ -273,6 +362,19 @@ class ShowEvents extends Component {
                 }}>
                 <Text>Create Event!</Text>
               </Button>
+=======
+              </View>
+              <View>
+                <Button bordered
+                  onPress={() => {this.submitEventChanges() }}
+                  style={{
+                    margin: 20, width: 160,
+                    justifyContent: 'center', alignSelf: 'center'
+                  }}>
+                  <Text>Update Event!</Text>
+                </Button>
+              </View>
+>>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
             </View>
           </Modal>
           <Modal isVisible={this.state.displayQRCode} style ={styles.modalStyle}>
@@ -297,12 +399,22 @@ class ShowEvents extends Component {
               </Body>
             </Left>
             <Right>
+<<<<<<< HEAD
               <Button transparent onPress={() => this.openEditModal()}>
                 <Text> Edit </Text>
               </Button>
               <Button transparent onPress={() => this._setQRCode(item._id)}>
                 <Text> QRCode </Text>
               </Button>
+=======
+              <Button transparent onPress={() => this.openEditModal( item )}>
+                <Text> edit </Text>
+              </Button>
+              <TouchableOpacity onPressIn={this.changePicture}>
+	                    <Thumbnail square style={{ height: 200, width: WIDTH }}
+	                        source={{ uri: this.state.img }} />
+	            </TouchableOpacity>
+>>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
             </Right>
           </CardItem>
           <CardItem cardBody>
@@ -974,10 +1086,32 @@ const styles = StyleSheet.create({
     fontSize: 40,
     margin: 10
   },
+<<<<<<< HEAD
   formStyle: {
     color: 'black',
     flex: 1,
     backgroundColor: "white",
     margin: 4
   },
+=======
+  modalView: {
+    backgroundColor: "#fff",
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10
+  },
+  textInAreaContainer: {
+    borderColor: 'lightgrey',
+    borderWidth: 1,
+    alignSelf: 'stretch',
+    backgroundColor: 'white',
+    margin: 5,
+    padding: 10,
+    borderRadius: 5
+  },
+  textInArea: {
+    alignSelf: 'stretch',
+    backgroundColor: 'white',
+  }
+>>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
 });
