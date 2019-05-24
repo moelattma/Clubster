@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TouchableHighlight, Share, View, Dimensions, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { TouchableHighlight, Share, View, Dimensions, FlatList, TouchableOpacity, StyleSheet, Image, TextInput } from 'react-native';
 import axios from 'axios';
 import t from 'tcomb-form-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -288,10 +288,11 @@ class ShowEvents extends Component {
     }).catch(() => { return; });
   }
 
-  changePicture = async (item) => {
+  changeEventPicture = async (item) => {
     console.log("changing pic");
     this.setState({ editedItem: item });
     console.log(item.name);
+    console.log(item._id);
     await this.askPermissionsAsync();
     console.log("trying");
     try {
@@ -581,6 +582,9 @@ class ShowEvents extends Component {
             <Right>
               <Button transparent onPress={() => this.openEditModal()}>
                 <Text> Edit </Text>
+              </Button>
+              <Button transparent onPress={() => this.changeEventPicture(item)}>
+                <Text> Change Picture </Text> 
               </Button>
               <Button transparent onPress={() => this._setQRCode(item._id)}>
                 <Text> QRCode </Text>
@@ -1258,32 +1262,10 @@ const styles = StyleSheet.create({
     fontSize: 40,
     margin: 10
   },
-<<<<<<< HEAD
   formStyle: {
     color: 'black',
     flex: 1,
     backgroundColor: "white",
     margin: 4
   },
-=======
-  modalView: {
-    backgroundColor: "#fff",
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10
-  },
-  textInAreaContainer: {
-    borderColor: 'lightgrey',
-    borderWidth: 1,
-    alignSelf: 'stretch',
-    backgroundColor: 'white',
-    margin: 5,
-    padding: 10,
-    borderRadius: 5
-  },
-  textInArea: {
-    alignSelf: 'stretch',
-    backgroundColor: 'white',
-  }
->>>>>>> parent of 90a544ab... added editing for time and date, and not working code for editing image of event
 });

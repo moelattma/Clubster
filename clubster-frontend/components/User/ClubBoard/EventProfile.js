@@ -286,9 +286,9 @@ export default class EventProfile extends Component {
                     <Content padder>
                         <Card >
                             <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 10, marginBottom: 10}}>
-                                <AntDesign.Button color='#59cbbd' backgroundColor='white' name='like1' size={28} onPress={() => this.openLikersModal()}/>
-                                <FontAwesome.Button color='#59cbbd' backgroundColor='white' name='users' size={28} onPress={() => this.openGoingModal()}/>
-                                <FontAwesome.Button color='#59cbbd' backgroundColor='white' name='car' size={28} onPress={() => this.openRidesModal()} />
+                                <AntDesign.Button color='#59cbbd' backgroundColor='white' name='like1' size={28} onPress={() => this.openLikersModal()}>Likers</AntDesign.Button>
+                                <FontAwesome.Button color='#59cbbd' backgroundColor='white' name='users' size={28} onPress={() => this.openGoingModal()}>Going</FontAwesome.Button>
+                                <FontAwesome.Button color='#59cbbd' backgroundColor='white' name='car' size={28} onPress={() => this.openRidesModal()}>Rides</FontAwesome.Button>
                             </View>
                         </Card>
                     </Content>

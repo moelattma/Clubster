@@ -213,16 +213,6 @@ exports.updateEvent = (req, res) => {
 		}
 	}).catch(err => console.log(err));
 }
-// exports.changeEventPicture = (req, res) => {
-// 	Events.findOneAndUpdate({ _id: req.params.orgID }, { $set: { "image": req.body.imageURL } }).then((event) => {
-
-// 		if (!event) {
-// 			return res.status(404).json({ 'Error': 'error', 'image': null });
-// 		} else {
-// 			return res.status(201).json({ 'image': req.body.imageURL });
-// 		}
-// 	});
-// }
 
 exports.getLikers = (req, res) => {
 	const { eventID } = req.params;	// grabs the eventID from url
@@ -354,7 +344,6 @@ exports.addCommentToEvent = (req, res) => {
 	})
 };
 
-
 // get events of orgs that person is a part of
 exports.getUserOrgs = (req, res) => {
 	const { orgID } = req.body;
@@ -369,9 +358,11 @@ exports.getUserOrgs = (req, res) => {
 };
 
 exports.changeEventPicture = (req, res) => {
-	const { eventid } = req.param;
+	const { eventId } = req;
+	console.log("BACKEND:");
+	console.log(eventID);
 	Events.findByIdAndUpdate(
-		mongoose.Types.ObjectId(eventid),
+		mongoose.Types.ObjectId(eventId),
 		{ $set: { "image": req.body.imageURL } }
 	).then((event) => {
 		if (!event) {
