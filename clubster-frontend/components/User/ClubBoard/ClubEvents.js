@@ -51,7 +51,7 @@ export default class ClubEvents extends Component {
   }
 
   render() {
-    const { _id, clubsterNan } = this.props.screenProps;vigation, clubBoardNav, isAdmi
+    const { _id, clubsterNavigation, clubBoardNav, isAdmin } = this.props.screenProps;
     return (
       <ClubEventNavigator screenProps={{ _id, clubsterNavigation, clubBoardNav, isAdmin }} />
     );
