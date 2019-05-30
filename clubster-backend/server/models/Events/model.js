@@ -20,7 +20,7 @@ const Events = new Schema({
     type: String
   },
   date: {
-    type: [Number]
+    type: [String]
   },
   location: {
     type: String

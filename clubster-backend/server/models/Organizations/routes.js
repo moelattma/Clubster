@@ -25,6 +25,11 @@ router.get('/organizations/:orgID/members', passport.authenticate('jwt', {sessio
 	controller.getMembers(req, res);
 });
 
+
+router.get('/organizations/:orgID/admins', passport.authenticate('jwt', {session:false}),  (req, res) => {
+	controller.getAdmins(req, res);
+});
+
 router.post('/organizations/modifyOrgPicture/:orgID', upload.single('fileData'), (req, res) => {
 	controller.changeClubPicture(req, res);
 });

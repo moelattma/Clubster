@@ -62,18 +62,18 @@ export class CreateClubEvent extends React.Component {
     _showDateTimePicker = () => this.setState({ showTime: true });
 
     _hideDateTimePicker = () => this.setState({ showTime: false });
-  
+
     _hideDateTimePickerTwo = () => this.setState({ showTime2: false });
-  
+
     hide = () => { return; }
-  
+
     _showModal = (type) => {
       (type == 1) ? this.setState({ showDate: true }) : (type == 2) ? this.setState({ showTime: true }) : (type == 3) ? this.setState({ showTimeZone: true }) : this.setState({ showTime2: true });
     }
     _hideModal = (type) => {
         (type == 1) ? this.setState({ showDate: false }) : (type == 2) ? this.setState({ showTime: false }) : (type == 3) ? this.setState({ showTimeZone: false }) : this.setState({ showTime2: false });
     }
-  
+
     _handleDatePicked = (date) => {
       let hour  = parseInt(date.toString().substring(date.toString().indexOf(":") - 2, date.toString().indexOf(":")));
       let minutes  = parseInt(date.toString().substring(date.toString().indexOf(":") + 1, date.toString().indexOf(":") + 3));
@@ -84,7 +84,7 @@ export class CreateClubEvent extends React.Component {
       this.setState({ timeDisplay: hour.toString() + ":" + strMinutes + ifPM, dateTimestampStart: date });
       this._hideDateTimePicker();
     };
-  
+
     _handleDatePickedTwo = (date) => {
       let hour  = parseInt(date.toString().substring(date.toString().indexOf(":") - 2, date.toString().indexOf(":")));
       let minutes  = parseInt(date.toString().substring(date.toString().indexOf(":") + 1, date.toString().indexOf(":") + 3));
@@ -95,11 +95,11 @@ export class CreateClubEvent extends React.Component {
       this.setState({ timeDisplayEnd: hour.toString() + ":" + strMinutes + ifPM, dateTimestampEnd: date });
       this._hideDateTimePickerTwo();
     };
-  
+
     setDate(newDate) {
       this.setState({ chosenDate: newDate });
     }
-  
+
     onDateChange(date, type) {
       if (type === 'END_DATE') {
         this.setState({
@@ -112,7 +112,7 @@ export class CreateClubEvent extends React.Component {
         });
       }
     }
-  
+
     hide = () => { return; }
 
     askPermissionsAsync = async () => {
@@ -156,7 +156,7 @@ export class CreateClubEvent extends React.Component {
 
     createEvent = () => {
         const { name, date, time, description, location, imageURL, chosenDate, selectedStartDate, selectedEndDate, timeDisplay, timeDisplayEnd } = this.state;
-        axios.post(`https://clubster-backend.herokuapp.com/api/events/${this.props.clubID}/new`, {
+        axios.post(`http://localhost:3000/api/events/${this.props.clubID}/new`, {
             name, date, time, description, location, imageURL, chosenDate, selectedStartDate, selectedEndDate, timeDisplay, timeDisplayEnd
         }).then(response => {
             this.props.newClubEvent(response.data.event);
@@ -492,4 +492,3 @@ const styles = StyleSheet.create({
         height: HEIGHT / 4
     },
 });
-

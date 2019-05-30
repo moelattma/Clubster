@@ -35,6 +35,10 @@ const Organization = new Schema({
   image: {
     type: String
   },
+  channels: [{
+    type: Schema.Types.ObjectId,   //Specifiers
+    ref: 'channels'
+  }],
   social: {
     facebook: {
       type: String

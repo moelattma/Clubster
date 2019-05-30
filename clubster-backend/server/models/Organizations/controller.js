@@ -75,7 +75,7 @@ exports.getMembers = (req, res) => {
 
 	// finds and return organization id of specific club
 	Organization.findByIdAndUpdate(orgID, 'members admins president')
-	.populate('members.member', 'name image _id' )
+	.populate('members.member', 'name image _id' ).populate('admins.admin', 'name image _id' )
 	.then((organization) => {
 		if (!organization) {
 			return res.status(400).json({ 'Error': 'No organizations found' });
@@ -160,7 +160,7 @@ exports.retrieveOrg = (req, res) => {
 	.populate('members.member', 'name image _id' )
 	.populate('admins.admin', 'name image _id' )
 	.then((organization) => {
-		if (organization) 
+		if (organization)
 			return res.status(201).json({ 'org': organization });
 		else
 			return res.status(400).json({ 'err': 'err' });

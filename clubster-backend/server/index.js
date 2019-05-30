@@ -5,6 +5,7 @@ const organizationRoutes = require('./models/Organizations/routes');
 const eventRoutes = require('./models/Events/routes');
 const ridesRoutes = require('./models/Rides/routes');
 const conversationRoutes = require('./models/Conversations/routes');
+const channelRoutes = require('./models/Channels/routes');
 const galleriesRoutes = require('./models/Galleries/routes');
 const messageRoutes = require('./models/Messages/routes');
 const notificationRoutes = require('./models/Notifications/routes');
@@ -18,7 +19,7 @@ const graphRoutes = require('./models/Graphs/routes');
 
 mongoose.Promise = global.Promise; // let's us use then catch
 mongoose.set('useCreateIndex', true);
-mongoose.connect(`mongodb://${process.env.databaseUsername}:${process.env.databasePassword}@ds131963.mlab.com:31963/clubster`, { useNewUrlParser: true });
+mongoose.connect(`mongodb://clubster123:Clubster123!@ds131963.mlab.com:31963/clubster`, { useNewUrlParser: true });
 mongoose.connection
     .once('open', () => console.log('Mongodb running'))
     .on('error', err => console.log(err)); // to use routes
@@ -28,10 +29,10 @@ const app = express();
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true, parameterLimit:50000}));
 app.use(morgan('dev')); //debugging for HTTP requests
-app.use(function(req, res, next) { 
-  res.header("Access-Control-Allow-Origin", "*"); 
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"); 
-  next(); 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
 });
 
 // Passport middleware
@@ -42,7 +43,7 @@ require('./utils/passport')(passport);
 app.use('/api', [loginRoutes, organizationRoutes,
   notificationRoutes, eventRoutes, ridesRoutes,
   conversationRoutes, messageRoutes, graphRoutes,
-  galleriesRoutes
+  galleriesRoutes, channelRoutes
 ]);
 
 const PORT = process.env.PORT || 3000;
