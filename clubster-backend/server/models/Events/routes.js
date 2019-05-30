@@ -64,9 +64,5 @@ router.post('/events/:eventID/changeEventPicture', passport.authenticate('jwt', 
 router.post('/events/:eventID', (req, res) => {
 	controller.updateEvent(req, res);
 });
-
-router.post('/events/modifyEventPicture/:eventID', passport.authenticate('jwt', {session:false}), (req, res) => {
-	controller.changeEventPicture(req, res);
-});
 //Export
 module.exports = router;

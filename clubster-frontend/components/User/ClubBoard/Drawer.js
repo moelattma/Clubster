@@ -1,3 +1,5 @@
+// drawer feature on the event page
+
 import React, { Component } from 'react';
 import { View, Image, TouchableOpacity} from 'react-native';
 

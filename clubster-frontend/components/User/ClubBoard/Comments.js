@@ -1,3 +1,5 @@
+// comments for an event
+
 import React, { Component } from 'react';
 import { Container, Header, Content, Card, CardItem, Text, Body, List, ListItem, Left, Thumbnail } from "native-base";
 import { View, Dimensions, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';

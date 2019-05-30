@@ -358,9 +358,7 @@ exports.getUserOrgs = (req, res) => {
 };
 
 exports.changeEventPicture = (req, res) => {
-	const { eventId } = req;
-	console.log("BACKEND:");
-	console.log(eventID);
+	const { eventId } = req.body;
 	Events.findByIdAndUpdate(
 		mongoose.Types.ObjectId(eventId),
 		{ $set: { "image": req.body.imageURL } }

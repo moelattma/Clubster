@@ -1,3 +1,5 @@
+// chat room for a club
+
 import React, { Component } from 'react';
 import { TextInput,TouchableOpacity, StyleSheet, Text, View, FlatList, ScrollView, Image } from 'react-native';
 import axios from 'axios';

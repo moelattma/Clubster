@@ -1,3 +1,6 @@
+// graphs page
+// sidegraph, activeness graph, participation graph
+
 import React, { Component, PropTypes } from 'react';
 
 import { View, Dimensions, FlatList, TouchableOpacity, StyleSheet, Image, ART, YellowBox } from 'react-native';

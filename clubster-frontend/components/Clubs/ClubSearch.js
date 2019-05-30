@@ -1,3 +1,5 @@
+// search feature for clubs
+
 import React, { PureComponent } from 'react';
 import { FlatList, TouchableOpacity, View, StyleSheet, ActivityIndicator } from 'react-native';
 import { SearchBar } from 'react-native-elements';

@@ -1,3 +1,5 @@
+// graph of active people in club
+
 import React, { Component } from 'react'
 import {
   StyleSheet,

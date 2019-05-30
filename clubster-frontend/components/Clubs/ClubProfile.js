@@ -1,3 +1,5 @@
+// Profile for club (additional info of club)
+
 import React, { Component } from 'react';
 import { TouchableOpacity, TouchableWithoutFeedback, StyleSheet, View, Dimensions, ScrollView } from 'react-native';
 import axios from 'axios';

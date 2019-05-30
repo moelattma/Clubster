@@ -1,3 +1,6 @@
+// graph that shows total amount of likes, comments, and people
+//       in a club
+
 import React, { Component } from 'react';
 import {
   PropTypes,

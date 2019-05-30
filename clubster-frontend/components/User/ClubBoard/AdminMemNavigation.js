@@ -1,3 +1,5 @@
+// navigation for a club
+
 import React, { Component } from 'react';
 
 import { AdminNavigator, MemberNavigator } from '../../router'

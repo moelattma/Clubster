@@ -1,4 +1,5 @@
-// Gallery.js
+// photo gallery for a club
+
 import React, { Component } from 'react';
 import { FlatList, Dimensions } from 'react-native';
 import { Font, ImagePicker, Permissions, Constants } from 'expo';

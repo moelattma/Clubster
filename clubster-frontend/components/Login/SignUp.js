@@ -1,3 +1,5 @@
+// register page
+
 import React, { Component } from 'react';
 import { StyleSheet, Text, TouchableOpacity, AsyncStorage } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'

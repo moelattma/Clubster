@@ -1,3 +1,6 @@
+// Landing page when user logs in
+// Shows the clubs that the user is in
+
 import React, { Component } from 'react';
 import {
   Image, StyleSheet, Text, TouchableOpacity, View,
@@ -79,12 +82,12 @@ class ShowClubs extends Component {
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }} >
           <Button transparent onPress={() => navigation.setParams({ showAdmin: true })} >
             <Text style={[{ fontSize: 20, fontWeight: 'bold' }, !navigation.state.params ||
-              navigation.state.params.showAdmin ? { color: '#59cbbd' } : {}]} >Admin</Text>
+              navigation.state.params.showAdmin ? { backgroundColor: '#59cbbd' } : {}]} >Admin</Text>
           </Button>
           <Text style={{ fontSize: 32, fontWeight: 'bold' }} >|</Text>
           <Button transparent onPress={() => navigation.setParams({ showAdmin: false })}>
             <Text style={[{ fontSize: 20, fontWeight: 'bold' }, navigation.state.params &&
-              !navigation.state.params.showAdmin ? { color: '#59cbbd' } : {}]} >Member</Text>
+              !navigation.state.params.showAdmin ? { backgroundColor: '#59cbbd' } : {}]} >Member</Text>
           </Button>
         </View>
       )

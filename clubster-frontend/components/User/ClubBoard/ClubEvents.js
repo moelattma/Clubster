@@ -1,3 +1,5 @@
+// shows all events for a given club
+
 import React, { Component } from 'react';
 import { TouchableHighlight, Share, View, Dimensions, FlatList, TouchableOpacity, StyleSheet, Image, TextInput } from 'react-native';
 import axios from 'axios';
@@ -49,7 +51,7 @@ export default class ClubEvents extends Component {
   }
 
   render() {
-    const { _id, clubsterNavigation, clubBoardNav, isAdmin } = this.props.screenProps;
+    const { _id, clubsterNan } = this.props.screenProps;vigation, clubBoardNav, isAdmi
     return (
       <ClubEventNavigator screenProps={{ _id, clubsterNavigation, clubBoardNav, isAdmin }} />
     );
@@ -86,6 +88,7 @@ class ShowEvents extends Component {
       galleryID: null,
       imageURL: DefaultImg,
       show: true,
+      editModal: false,
       displayQRCode: false
     }
     this.setDate = this.setDate.bind(this);
@@ -252,7 +255,8 @@ class ShowEvents extends Component {
   openEditModal(item) {
     this.setState({
       editedItem: item,
-      name: item.name,
+      name: this.name,
+      editModal: true,
     })
   }
 
@@ -289,22 +293,16 @@ class ShowEvents extends Component {
   }
 
   changeEventPicture = async (item) => {
-    console.log("changing pic");
     this.setState({ editedItem: item });
-    console.log(item.name);
-    console.log(item._id);
     await this.askPermissionsAsync();
-    console.log("trying");
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
         allowsEditing: true,
         aspect: [4, 3],
         base64: false,
       });
-      console.log("trying iffff?");
       if (result.cancelled)
         return;
-      console.log("Did not cancel");
       const key = `${v1()}.jpeg`;
       const file = {
         uri: result.uri,
@@ -320,15 +318,12 @@ class ShowEvents extends Component {
         successActionStatus: 201
       }
       var img;
-      console.log("did not axios yet");
       await RNS3.put(file, options).then((response) => {
         img = response.body.postResponse.key;
       }).catch((err) => { console.log(err) });
-      console.log("PREPARE URSELF");
       axios.post(`http://localhost:3000/api/events/${item._id}/changeEventPicture`, { img }).then((response) => {
         this.setState({ imageURL: (response.data.image ? 'https://s3.amazonaws.com/clubster-123/' + response.data.image : DefaultImg) });
       }).catch((err) => { return; });
-      console.log("returning");
       this.props.navigation.navigate('ShowEvents');
     } catch (error) {
       console.log(error);
@@ -421,7 +416,7 @@ class ShowEvents extends Component {
       return (
         <Card>
           <Modal isVisible={this.state.editModal}>
-            <View style={styles.modalView}>
+            <View style={styles.modalStyle}>
               <View>
                 <TouchableOpacity onPress={() => this.closeEditModal()}>
                   <Icon name="ios-arrow-dropleft"
