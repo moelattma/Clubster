@@ -321,7 +321,8 @@ class ShowEvents extends Component {
       await RNS3.put(file, options).then((response) => {
         img = response.body.postResponse.key;
       }).catch((err) => { console.log(err) });
-      axios.post(`http://localhost:3000/api/events/${item._id}/changeEventPicture`, { img }).then((response) => {
+      console.log(img);
+      axios.post(`http://localhost:3000/api/events/modEventPic/${item._id}`, { img }).then((response) => {
         this.setState({ imageURL: (response.data.image ? 'https://s3.amazonaws.com/clubster-123/' + response.data.image : DefaultImg) });
       }).catch((err) => { return; });
       this.props.navigation.navigate('ShowEvents');

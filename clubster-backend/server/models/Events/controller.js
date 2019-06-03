@@ -25,19 +25,8 @@ exports.getEvents = (req, res) => {
 	}).catch((err) => console.log(err));
 };
 
-exports.changeEventPicture = (req, res) => {
-	const { eventID } = req.params;
-
-	Events.findOneAndUpdate({ _id: eventID }, { $set: { "image": req.body.imageURL } }).then((event) => {
-		if (!event) {
-			return res.status(404).json({ 'Error': 'error' });
-		} else {
-			return res.status(201).json({ 'image': req.body.imageURL });
-		}
-	});
-};
-
 exports.addWentUser = (req, res) => {
+	console.log("HELLOADDA");
 	const { eventID, userID } = req.params;
 	let userObj;
 	if (userID == 'null') {
@@ -358,15 +347,24 @@ exports.getUserOrgs = (req, res) => {
 };
 
 exports.changeEventPicture = (req, res) => {
-	const { eventId } = req.body;
-	Events.findByIdAndUpdate(
-		mongoose.Types.ObjectId(eventId),
-		{ $set: { "image": req.body.imageURL } }
-	).then((event) => {
-		if (!event) {
-			return res.status(404).json({ 'Error': 'error' });
+	console.log("YAY?!??");
+	// const { eventID } = req.body;
+	// console.log(eventID);
+	// Events.findByIdAndUpdate(
+	// 	mongoose.Types.ObjectId(eventId),
+	// 	{ $set: { "image": req.body.imageURL } }
+	// ).then((event) => {
+	// 	if (!event) {
+	// 		return res.status(404).json({ 'Error': 'error' });
+	// 	} else {
+	// 		return res.status(201).json({ 'image': req.body.imageURL });
+	// 	}
+	// })
+	Events.findOneAndReplace({ _id: req.params.eventID }, { $set: { "image": req.body.img} }).then((organization) => {
+		if (!organization) {
+			return res.status(404).json({ 'Error': 'error', 'image': null });
 		} else {
-			return res.status(201).json({ 'image': req.body.imageURL });
+			return res.status(201).json({ 'image': req.body.img });
 		}
-	})
+	});
 };
