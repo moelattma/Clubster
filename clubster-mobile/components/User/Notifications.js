@@ -127,13 +127,19 @@ export class Notifications extends Component {
                 refreshing={this.state.refreshing}
                 onRefresh={() => this._getNotifications()}
               />}>
-                <FlatList
-                    data={this.props.notifications.slice(0, 20)}
-                    renderItem={this._renderItem}
-                    keyExtractor={(item) => item._id}
-                    ItemSeparatorComponent={this.renderSeparator}
-                    extraData={this.props.rando}
-                />
+                {
+                    this.props.notifications && this.props.notifications.length > 0?
+                        <FlatList
+                            data={this.props.notifications.slice(0, 20)}
+                            renderItem={this._renderItem}
+                            keyExtractor={(item) => item._id}
+                            ItemSeparatorComponent={this.renderSeparator}
+                            extraData={this.props.rando}
+                        />
+                    :
+                        <Text style={[{ flex: 1 }, styles.noneText]}>Your inbox is empty!</Text>
+                }
+                
             </ScrollView>
         );
     }
@@ -173,5 +179,12 @@ const styles = StyleSheet.create({
     buttonStyle: {
         width: WIDTH / 4,
         justifyContent: 'center'
+    },
+    noneText: {
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        color: 'black',
+        fontSize: 16,
+        marginTop: 10
     }
 });

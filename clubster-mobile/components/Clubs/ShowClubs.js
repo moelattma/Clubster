@@ -34,12 +34,12 @@ class ShowClubs extends React.Component {
 
   _renderItem = ({ item }) => {
     if (item.empty) {
-      return <View style={[styles.eventContainer, { backgroundColor: 'transparent' }]} />;
+      return <View style={[styles.clubContainer, { backgroundColor: 'transparent' }]} />;
     }
     return (
       <TouchableWithoutFeedback onPress={() => this.navigateUser(item)}
         style={{ flexDirection: 'row' }}>
-        <View style={styles.eventContainer} >
+        <View style={styles.clubContainer} >
           <Image style={styles.containerImage} source={{ uri: (!item.image || item.image == null ? DefaultImg : 'https://s3.amazonaws.com/clubster-123/' + item.image) }} />
           <View style={{ margin: 10 }}>
             <Text allowFontScaling numberOfLines={1}
@@ -152,7 +152,7 @@ const mapDispatchToProps = (dispatch) => {
 export default connect(mapStateToProps, mapDispatchToProps)(ShowClubs);
 
 const styles = StyleSheet.create({
-  eventContainer: {
+  clubContainer: {
     flex: 1,
     height: CLUB_HEIGHT,
     position: 'relative',
@@ -160,6 +160,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginRight: 5,
     marginLeft: 5,
+    padding: 3,
     borderRadius: 5,
   },
   containerImage: {

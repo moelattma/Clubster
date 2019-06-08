@@ -22,7 +22,21 @@ export class ShowEvents extends React.Component {
       description: '',
       date: '',
       location: '',
-      time: ''
+      time: '',
+      times: [
+        {
+          day: 'January 13',
+          timeStart: '4:00 PM',
+          timeEnd: '6:00 PM',
+          location: 'Mohamed\'s casa'
+        },
+        {
+          day: 'May 28',
+          timeStart: '8:00 AM',
+          timeEnd: '9:45 AM',
+          location: 'Social Sciences 1 110'
+        }
+      ]
     }
   }
 
@@ -66,6 +80,8 @@ export class ShowEvents extends React.Component {
       hostURL = 'https://s3.amazonaws.com/clubster-123/' + item.host.image;
     else
       hostURL = DefaultImg;
+    
+    const chosen = this.state.times[Math.random() > .5 ? 0 : 1];
 
     return (
       <Card>
@@ -83,8 +99,8 @@ export class ShowEvents extends React.Component {
         <CardItem>
           <Left>
             <Body>
-              <Text note>{this.convertTime(item.date[0])} - {this.convertTime(item.date[1])}</Text>
-              <Text note>at {item.location}</Text>
+              <Text note>{chosen.day}: {chosen.timeStart} - {chosen.timeEnd}</Text>
+              <Text note>at {chosen.location}</Text>
             </Body>
           </Left>
           <Right>
