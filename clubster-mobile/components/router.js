@@ -27,13 +27,14 @@ import Graphs from './Graphs/Graphs';
 
 export const ClubEventNavigator = createStackNavigator(
     {
-        ShowEvents: { screen: ShowEvents, navigationOptions: { header: null } },
+        ShowEvents: { screen: ShowEvents },
         CreateEvent: { screen: CreateEvent },
-        EventProfile: { screen: EventProfile, navigationOptions: { header: null }  },
+        EventProfile: { screen: EventProfile },
         Comments: { screen: Comments }
     },
     {
-        initialRouteName: 'ShowEvents'
+        initialRouteName: 'ShowEvents',
+        headerMode: 'none'
     }
 )
 
@@ -75,8 +76,8 @@ export const AdminNavigator = createMaterialTopTabNavigator(
     },
     {
         initialRouteName: 'ClubEvents',
-        swipeEnabled: true,
         animationEnabled: true,
+        swipeEnabled: false,
         tabBarPosition: 'bottom',
         backBehavior: 'initialRoute',
         tabBarOptions: {
@@ -121,7 +122,7 @@ export const MemberNavigator = createMaterialTopTabNavigator(
     },
     {
         initialRouteName: 'ClubEvents',
-        swipeEnabled: true,
+        swipeEnabled: false,
         animationEnabled: true,
         tabBarPosition: 'bottom',
         backBehavior: 'initialRoute',
@@ -148,13 +149,14 @@ export const MemberNavigator = createMaterialTopTabNavigator(
 
 export const ClubPageNavigator = createStackNavigator(
     {
-        ShowClubs: { screen: ShowClubs, navigationOptions: { header: null } },
+        ShowClubs: { screen: ShowClubs },
         CreateClub: { screen: CreateClub },
-        ClubSearch: { screen: ClubSearch, navigationOptions: { header: null } },
+        ClubSearch: { screen: ClubSearch },
         ClubProfile: { screen: ClubProfile }
     },
     {
-        initialRouteName: 'ShowClubs'
+        initialRouteName: 'ShowClubs',
+        headerMode: 'none'
     }
 )
 
@@ -214,7 +216,7 @@ export const HomeNavigator = createMaterialTopTabNavigator(
     },
     {
         initialRouteName: 'ClubsNavigation',
-        swipeEnabled: true,
+        swipeEnabled: false,
         animationEnabled: true,
         tabBarPosition: 'bottom',
         backBehavior: 'initialRoute',

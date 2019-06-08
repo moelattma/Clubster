@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableWithoutFeedback, StyleSheet, View, Dimensions, ScrollView } from 'react-native';
 import axios from 'axios';
+import { Header } from 'react-native-elements';
 import InformationCard from '../Events/EventsCards/InformationCard';
 import Gallery from '../Utils/Gallery';
 import { Container, Button, Thumbnail, Text } from 'native-base';
@@ -22,11 +23,11 @@ export default class ClubProfile extends React.Component {
             organizationID: orgID,
             name: '',
             president: '',
-            _id:'',
+            _id: '',
             description: '',
             isLoading: true,
             joinable: false,
-            img: DefaultImg,            
+            img: DefaultImg,
             noteStatus: true,
             photos: []
         }
@@ -37,8 +38,10 @@ export default class ClubProfile extends React.Component {
             this.setState({ joinable: (!response.data.isMember) });
             const { image, name, president, description, _id, photos } = response.data.organization;
 
-            this.setState({ img: (image ? 'https://s3.amazonaws.com/clubster-123/' + image : DefaultImg), 
-                            name, president, description, _id, photos, isLoading: false });
+            this.setState({
+                img: (image ? 'https://s3.amazonaws.com/clubster-123/' + image : DefaultImg),
+                name, president, description, _id, photos, isLoading: false
+            });
         });
     }
 
@@ -79,15 +82,19 @@ export default class ClubProfile extends React.Component {
                 );
             }
             return (
-              <Container>
-                <ScrollView>
-                  <TouchableWithoutFeedback >
-                      <Thumbnail source={{ uri: this.state.img }} style={{ height: 200, width: WIDTH, borderRadius: 0 }} />
-                  </TouchableWithoutFeedback>
-                  <InformationCard clubInfo={this.state} />
-                  <Gallery clubInfo={this.state} />
-                </ScrollView>
-                  {joins}
+                <Container>
+                    <Header
+                        backgroundColor={'transparent'}
+                        leftComponent={{ icon: 'arrow-back', onPress: () => this.props.navigation.goBack() }}
+                    />
+                    <ScrollView>
+                        <TouchableWithoutFeedback >
+                            <Thumbnail source={{ uri: this.state.img }} style={{ height: 200, width: WIDTH, borderRadius: 0 }} />
+                        </TouchableWithoutFeedback>
+                        <InformationCard clubInfo={this.state} />
+                        <Gallery clubInfo={this.state} />
+                    </ScrollView>
+                    {joins}
                 </Container>
             );
         }

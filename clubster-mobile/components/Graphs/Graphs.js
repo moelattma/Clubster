@@ -50,6 +50,7 @@ export class Graphs extends React.Component {
         <Header
           backgroundColor={'transparent'}
           leftComponent={{ icon: 'arrow-back', onPress: () => this.props.navigation.navigate('HomeNavigation') }}
+          centerComponent={{ text: 'Club Statistics', style: { fontSize: 21, fontWeight: '500' } }}
         />
         <SideGraph club={this.props.club} />
         <ActiveChart club={this.props.club} />

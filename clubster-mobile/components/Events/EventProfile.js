@@ -257,7 +257,7 @@ export class EventProfile extends React.Component {
                         </Body>
                         {passengerSeats > ridersID.length ?
                             <Right >
-                                <Icon onPress={() => this.addRider(item)} name="ios-add" style={{ marginLeft: 6, color: 'black', fontSize: 24 }} />
+                                <Icon onPress={() => this.addRider(item)} name="add" style={{ marginLeft: 6, color: 'black', fontSize: 24 }} />
                             </Right> : null
                         }
                     </ScrollView>
@@ -307,7 +307,7 @@ export class EventProfile extends React.Component {
             name: this.props.name,
             description: this.props.description,
             location: this.props.location,
-            date: this.props.date,
+            date: 'January 13: 4:00 PM - 6:00 PM',
             comments: this.props.comments,
             photos: this.props.photos
         }
@@ -322,7 +322,7 @@ export class EventProfile extends React.Component {
                     rightComponent={this.props.isAdmin ? 
                         (<View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignSelf: 'center', alignItems: 'center' }}>  
                             <Icon iconStyle={{ alignSelf: 'center', justifyContent: 'center' }} type='material-community' name='qrcode' onPress={() => this.setState({ qrModal: true })} />
-                            <Icon name='edit' onPress={() => this.setState({ editModal: true })} />
+                            <Icon type='MaterialIcons' name='edit' onPress={() => this.setState({ editModal: true })} />
                         </View>) 
                     : null}
                 />
@@ -458,7 +458,7 @@ export class EventProfile extends React.Component {
                                     style={styles.modalButton} />
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => this.addRideDropDown()}>
-                                <Icon name="ios-add"
+                                <Icon name="add"
                                     style={styles.modalButton} />
                             </TouchableOpacity>
                         </View>

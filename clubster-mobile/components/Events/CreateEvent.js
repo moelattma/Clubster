@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Dimensions, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import axios from 'axios';
 import Modal from 'react-native-modal';
+import { Header } from 'react-native-elements';
 import { ImagePicker, Permissions } from 'expo';
 var moment = require('moment-timezone');
 import { Thumbnail, Text, Button, Icon, Form, Item, Input } from 'native-base';
@@ -33,8 +34,8 @@ export class CreateClubEvent extends React.Component {
             timeDisplay: null,
             timeDisplayEnd: null,
             imageURL: null,
-            uri: 'https://image.flaticon.com/icons/png/512/128/128423.png',
-            isImageUploaded: false,
+            defaultURI: 'https://image.flaticon.com/icons/png/512/128/128423.png',
+            uri: null,
             chosenDate: new Date(),
             selectedStartDate: null,
             selectedEndDate: null,
@@ -147,8 +148,7 @@ export class CreateClubEvent extends React.Component {
             await RNS3.put(file, options).then((response) => {
                 this.setState({
                     imageURL: response.body.postResponse.key,
-                    uri: 'https://s3.amazonaws.com/clubster-123/' + response.body.postResponse.key,
-                    isImageUploaded: true
+                    uri: 'https://s3.amazonaws.com/clubster-123/' + response.body.postResponse.key
                 });
             }).catch((err) => { console.log('upload image to aws failed'); console.log(err) });
         } catch (error) { console.log('library handle failed'); console.log(error); }
@@ -227,11 +227,14 @@ export class CreateClubEvent extends React.Component {
 
         return (
             <ScrollView>
+                <Header
+                    backgroundColor={'transparent'}
+                    leftComponent={{ icon: 'arrow-back', onPress: () => this.props.navigation.goBack() }}
+                />
                 <Form>
                     <Item>
                         <Input placeholder="Name"
                             label='name'
-                            style={{ fontFamily: "sans-serif" }}
                             onChangeText={(name) => this.setState({ name })}
                             value={name}
                         />
@@ -239,14 +242,12 @@ export class CreateClubEvent extends React.Component {
                     <Item>
                         <Input placeholder="Location"
                             label='location'
-                            style={{ fontFamily: "sans-serif" }}
                             onChangeText={(location) => this.setState({ location })}
                             value={location}
                         />
                     </Item>
                     <Item>
                         <Input placeholder="Description"
-                            style={{ fontFamily: "sans-serif" }}
                             label='description'
                             onChangeText={(description) => this.setState({ description })}
                             value={description}
@@ -321,18 +322,11 @@ export class CreateClubEvent extends React.Component {
                         </TouchableOpacity>
                     </Item>
                 </Form>
-                    {this.state.isImageUploaded == false
-                        ?
-                        <TouchableOpacity onPress={this.useLibraryHandler}>
-                            <Thumbnail square small style={styles.uploadIcon}
-                                source={{ uri: this.state.uri }} />
-                        </TouchableOpacity>
-                        :
-                        <TouchableOpacity onPress={this.useLibraryHandler}>
-                            <Thumbnail square small style={styles.imageThumbnail}
-                                source={{ uri: this.state.uri }} />
-                        </TouchableOpacity>
-                    }
+                            
+                <TouchableOpacity onPress={this.useLibraryHandler}>
+                    <Thumbnail square small style={!this.state.uri ? styles.uploadIcon : styles.imageThumbnail}
+                        source={{ uri: !this.state.uri ? this.state.defaultURI : this.state.uri }} />
+                </TouchableOpacity>
 
                 <Modal isVisible={this.state.validModal}>
                     <View style={styles.modalStyle}>
@@ -397,17 +391,6 @@ export class CreateClubEvent extends React.Component {
                     />
                 </View>
 
-                <View style={{ flex: 1 }}>
-                    <Modal isVisible={this.state.showTimeZone} onRequestClose={this.hide}>
-                        <View style={styles.containerTime}>
-                            <FlatList
-                                data={this.state.timezoneArray}
-                                renderItem={this._renderItem}
-                            />
-                        </View>
-                    </Modal>
-                </View>
-
                 <Button bordered
                     onPress={this.createEvent}
                     style={{
@@ -439,47 +422,6 @@ const mapDispatchToProps = (dispatch) => {
 export default connect(mapStateToProps, mapDispatchToProps)(CreateClubEvent);
 
 const styles = StyleSheet.create({
-    eventCard: {
-        flex: 1,
-        backgroundColor: 'lavender',
-        marginVertical: 3,
-        borderWidth: 1,
-        borderRadius: 2,
-        borderColor: '#ddd',
-        borderBottomWidth: 0,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.8,
-        shadowRadius: 2,
-        elevation: 1,
-        marginLeft: 5,
-        marginRight: 5,
-        marginTop: 10,
-    },
-    eventContainer: {
-        flex: 1,
-        flexDirection: 'column',
-        borderBottomWidth: 0,
-        height: EVENT_HEIGHT,
-        width: EVENT_WIDTH,
-        alignSelf: 'center',
-        marginTop: 25
-    },
-    eventTitle: {
-        color: 'black',
-        fontWeight: 'bold',
-        fontSize: 20,
-        marginTop: 5,
-        flex: 1
-    },
-    eventTitle2: {
-        position: 'absolute',
-        right: 2,
-        top: 2,
-        color: 'black',
-        fontWeight: 'bold',
-        fontSize: 20
-    },
     uploadIcon: {
         alignSelf: 'center',
         margin: 10,

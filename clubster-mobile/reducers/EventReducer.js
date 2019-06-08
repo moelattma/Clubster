@@ -38,8 +38,10 @@ const eventReducer = (state = eventState, action) => {
                     break;
             }
             clubEvents[i].going = going;
-            state = Object.assign({}, state, { clubEvents: clubEvents });
-            return state;
+            return {
+                ...state,
+                clubEvents
+            };
         case Actions.EVENTS_HANDLELIKE:
             var { corrID, likers } = action.payload;
             var { clubEvents } = state;

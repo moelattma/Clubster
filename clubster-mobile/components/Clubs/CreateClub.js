@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { connect } from 'react-redux'
 import axios from 'axios';
+import { Header } from 'react-native-elements';
 import { ImagePicker, Permissions } from 'expo';
 import v1 from 'uuid/v1';
 import { accessKeyId, secretAccessKey } from '../../keys/keys';
@@ -74,6 +75,10 @@ class CreateClub extends Component {
         const { name, description } = this.state;
         return (
             <Container>
+                <Header
+                    backgroundColor={'transparent'}
+                    leftComponent={{ icon: 'arrow-back', onPress: () => this.props.navigation.goBack() }}
+                />
                 <Form>
                     <Item>
                         <Input placeholder="Name"

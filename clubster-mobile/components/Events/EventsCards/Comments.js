@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Content, Text, Body, List, ListItem, Left, Thumbnail } from "native-base";
-import { StyleSheet } from 'react-native';
+import { Header } from 'react-native-elements';
 import Input from '../EventsUtils/Input';
 import axios from 'axios';
 import { DefaultImg } from '../../Utils/Defaults';
@@ -55,6 +55,10 @@ export default class Comments extends React.Component {
   render() {
     return (
       <Container>
+        <Header
+          backgroundColor={'transparent'}
+          leftComponent={{ icon: 'arrow-back', onPress: () => this.props.navigation.goBack() }}
+        />
         <Content>
           <List>
             {this._renderItem()}
@@ -62,7 +66,6 @@ export default class Comments extends React.Component {
         </Content>
         <Input onSubmit={this.onSub}/>
       </Container>
-
     );
   }
 }

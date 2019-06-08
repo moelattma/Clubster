@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react';
 import { FlatList, TouchableOpacity, View, StyleSheet, ActivityIndicator } from 'react-native';
 import { SearchBar, Header } from 'react-native-elements';
 import _ from 'lodash';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import axios from 'axios';
 import { ListItem, Left, Body, Thumbnail, Text } from 'native-base';
 
@@ -51,9 +50,9 @@ class SearchClubs extends PureComponent {
             <View
                 style={{
                     height: 1,
-                    width: '90%',
+                    width: '100%',
                     backgroundColor: '#CED0CE',
-                    marginLeft: '10%'
+                    marginTop: 8,
                 }}
             />
         );
@@ -66,20 +65,11 @@ class SearchClubs extends PureComponent {
                 <Left>
                     <Thumbnail source={{ uri: url }} />
                 </Left>
-                <Body>
+                <Body style={{ borderBottomWidth: 0 }}>
                     <Text>{item.name}</Text>
                     <Text note>{item.description}</Text>
                 </Body>
             </ListItem>
-        );
-    }
-
-    renderFooter = () => {
-        if (!this.state.loading) return null;
-        return (
-            <View style={{ paddingVertical: 20, borderTopWidth: 1, borderTopColor: '#CED0CE' }}>
-                <ActivityIndicator animating size="large" />
-            </View>
         );
     }
 
@@ -90,7 +80,6 @@ class SearchClubs extends PureComponent {
                 renderItem={this._renderItem}
                 keyExtractor={organization => organization._id}
                 ItemSeparatorComponent={this.renderSeparator}
-                ListFooterComponent={this.renderFooter}
                 refreshing={this.state.loading}
                 onRefresh={() => this.getOrganizations()}
                 ListHeaderComponent={
@@ -99,7 +88,7 @@ class SearchClubs extends PureComponent {
                         leftComponent={{ icon: 'arrow-back', onPress: () => this.props.navigation.goBack() }}
                         centerComponent={
                             <SearchBar
-                                containerStyle={{ flex: 1, alignSelf: 'stretch', backgroundColor: 'white', borderBottomWidth: 0, justifyContent: 'center', borderTopColor: 'white' }}
+                                containerStyle={{ flex: 1, alignSelf: 'stretch', backgroundColor: 'white', borderBottomWidth: 0, justifyContent: 'center', borderTopColor: 'white', width: '80%' }}
                                 clearIcon
                                 searchIcon={false}
                                 placeholder="Search Clubs"
