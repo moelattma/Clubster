@@ -12,6 +12,10 @@ import CreateClub from './Clubs/CreateClub';
 import ClubSearch from './Clubs/ClubSearch';
 import ClubProfile from './Clubs/ClubProfile';
 
+import Channels from './Channels/Channels';
+import ChannelChat from './Channels/ChannelChat';
+import CreateChannel from './Channels/CreateChannel';
+
 import Notifications from './User/Notifications';
 import Profile from './User/Profile';
 import AgendaScreen from './User/AgendaScreen';
@@ -38,6 +42,17 @@ export const ClubEventNavigator = createStackNavigator(
     }
 )
 
+export const ChannelNavigator = createStackNavigator(
+    {
+        Channels: { screen: Channels, navigationOptions: { header: null } },
+        ChannelChat: { screen: ChannelChat },
+        CreateChannel: { screen: CreateChannel }
+    },
+    {
+        initialRouteName: 'Channels'
+    }
+)
+
 export const AdminNavigator = createMaterialTopTabNavigator(
     {
         ClubEvents: {
@@ -49,8 +64,8 @@ export const AdminNavigator = createMaterialTopTabNavigator(
                 header: null
             }
         },
-        Chat: {
-            screen: Chat,
+        Channels: {
+            screen: ChannelNavigator,
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
                     <MaterialCommunityIcons name='wechat' size={25} color={tintColor} />
@@ -108,6 +123,14 @@ export const MemberNavigator = createMaterialTopTabNavigator(
             navigationOptions: {
                 tabBarIcon: ({ tintColor }) => (
                     <MaterialIcons name="event" size={27} color={tintColor} />
+                ),
+            }
+        },
+        Channels: {
+            screen: Channels,
+            navigationOptions: {
+                tabBarIcon: ({ tintColor }) => (
+                    <MaterialCommunityIcons name='wechat' size={25} color={tintColor} />
                 ),
             }
         },
@@ -188,7 +211,7 @@ export const NotesNavigator = createMaterialTopTabNavigator(
 )
 
 export const HomeNavigator = createMaterialTopTabNavigator(
-    {   
+    {
         NotesNavigation: {
             screen: NotesNavigator,
             navigationOptions: {
