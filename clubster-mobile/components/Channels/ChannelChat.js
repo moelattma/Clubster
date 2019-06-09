@@ -1,79 +1,71 @@
-import React, { PureComponent } from 'react';
-import { FlatList, TouchableOpacity, View, StyleSheet, ActivityIndicator } from 'react-native';
-import { SearchBar, Header } from 'react-native-elements';
-import _ from 'lodash';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import axios from 'axios';
-import { ListItem, Left, Body, Right, Thumbnail, Text } from 'native-base';
-import { DefaultImg } from '../Utils/Defaults';
-import { connect } from 'react-redux'
-import Modal from 'react-native-modal';
-import CheckBox from 'react-native-check-box'
-import OptimizedFlatlist from 'react-native-optimized-flatlist';
 //import CheckBox from 'react-native-checkbox-green';
-export class ChannelChat extends PureComponent {
+
+import React from 'react';
+import { StyleSheet } from 'react-native';
+import { connect } from 'react-redux'
+import axios from 'axios';
+import io from "socket.io-client";
+import { GiftedChat } from 'react-native-gifted-chat';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Header } from 'react-native-elements';
+
+class ChannelChat extends React.Component {
     constructor(props) {
-        super(props);
-        const channelID = props.navigation.getParam('_id', null);
-        const channelName = props.navigation.getParam('name', null);
-
-        this.state = {
-          channelID, channelName,
-          members: [],
-          membersClicked: ['5c89550035a0e442480aac1e'],
-          displayMembers: true,
-          isChecked: true,
-          updateMembers: Math.random()
-        }
+      super(props);
+      const channelID = props.navigation.getParam('_id', null);
+      const channelName = props.navigation.getParam('name', null);
+      this.state = {
+        chatMessage: '',
+        messages: [],
+        userId: '',
+        channelID,
+        channelName
+      };
     }
 
-    async componentDidMount() {
-      // const allChannels = [];
-      // axios.get(`http://localhost:3000/api/channels/${this.props.clubID}`).then((response) {
-      //   allChannels = response.data.channelsMember.concat(response.data.channelsAdmin);
-      //   this.setState({ channels: allowsEditing });
-      // })
-      return;
+    componentDidMount() {
+      this.socket = io('https://clubster-backend.herokuapp.com/', { query:  `groupId=${this.props._id}` });
+      this.socket.on('output', data => {
+        this.setState(previousState => ({
+          messages: GiftedChat.append(previousState.messages, data)
+        }));
+      });
+      axios.get(`https://clubster-backend.herokuapp.com/api/channels/${this.props._id}`).then((response) => {
+        this.setState({ messages: response.data.conversation.messages.reverse() });
+        this.setState({ userId: response.data.userId });
+      }).catch((err) => console.log(err));
     }
 
-    _renderItem = (item) => {
-      let url = 'https://s3.amazonaws.com/clubster-123/' + item.item.member.image;
-      return (
-          <ListItem>
-              <Left>
-                  <Thumbnail source={{ uri: url }} />
-              </Left>
-              <Body>
-                  <Text>{item.item.member.name}</Text>
-              </Body>
-              <Right>
-                <CheckBox
-                  style={{flex: 1, padding: 10}}
-                  onClick={() => this.markCandidate(item)}
-                  isChecked={this.state.membersClicked.includes(item.item._id)}
-                  leftText={"CheckBox"}
-                />
-              </Right>
-          </ListItem>
-      );
+    submitChatMessage(messages = []) {
+      var text = messages[messages.length - 1].text;
+      axios.post(`http://localhost:3000/api/messages/${this.props._id}`, {
+        text: text
+      }).then((message) => {
+        this.socket.emit("input", messages[0]);
+      }).catch((err) => console.log(err));
     }
+
 
     render() {
-        return (
-            <View>
-              <Text>{this.state.channelName}</Text>
-              <Modal isVisible={false} style={styles.modalStyle}>
-                <View>
-                  <FlatList
-                    data={this.state.members}
-                    renderItem={this._renderItem}
-                    keyExtractor={member => member._id}
-                    extraData={this.state.updateMembers}
-                  />
-                </View>
-              </Modal>
-            </View>
-        );
+      return (
+        <KeyboardAwareScrollView contentContainerStyle={styles.container} scrollEnabled={true} enableOnAndroid={true}>
+          <GiftedChat
+            messages={this.state.messages}
+            onSend={messages => this.submitChatMessage(messages)}
+            user={{
+              _id: this.state.userId,
+            }}
+          />
+        </KeyboardAwareScrollView>
+      );
+  }
+}
+
+
+const mapStateToProps = (state) => {
+    return {
+        isAdmin: state.clubs.club.isAdmin,
+        clubID: state.clubs.club._id
     }
 }
 
@@ -82,30 +74,12 @@ const mapDispatchToProps = (dispatch) => {
     }
 }
 
-const mapStateToProps = (state) => {
-    return {
-      clubID: state.clubs.club._id
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(ChannelChat);
+export default connect(mapStateToProps, null)(ChannelChat);
 
 
 const styles = StyleSheet.create({
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: '#D6D6D6',
-        backgroundColor: '#03A9F4'
-    },
-    modalStyle: {
-        backgroundColor: 'white',
-        padding: 4,
-        marginTop: 50,
-        marginRight: 20,
-        marginBottom: 30,
-        marginLeft: 20,
-        borderRadius: 6
-    },
+  container: {
+    flex: 1,
+    backgroundColor: '#F5FCFF'
+  },
 });

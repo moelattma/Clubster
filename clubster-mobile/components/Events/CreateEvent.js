@@ -322,7 +322,7 @@ export class CreateClubEvent extends React.Component {
                         </TouchableOpacity>
                     </Item>
                 </Form>
-                            
+
                 <TouchableOpacity onPress={this.useLibraryHandler}>
                     <Thumbnail square small style={!this.state.uri ? styles.uploadIcon : styles.imageThumbnail}
                         source={{ uri: !this.state.uri ? this.state.defaultURI : this.state.uri }} />
