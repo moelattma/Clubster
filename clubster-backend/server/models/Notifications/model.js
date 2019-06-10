@@ -25,7 +25,7 @@ const Notifications = new Schema({
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'users'
   }],
-  eventID: {
+  clubEvent: {
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'events'
   },

@@ -29,10 +29,13 @@ export class Channels extends PureComponent {
     }
 
     getChannels() {
-       return;
+       axios.get(`http://localhost:3000/api/channels/${this.props.clubID}`).then((response) => {
+         this.setState({ channels: response.data.channelsAdmin });
+       })
     }
 
     _renderItem = ({ item }) => {
+        console.log(item);
         let url = (item.image ? 'https://s3.amazonaws.com/clubster-123/' + item.image : DefaultImg);
         return (
             <ListItem avatar onPress={() => this.props.navigation.navigate('ChannelChat', { _id: item._id, name: item.name })}>
@@ -79,7 +82,8 @@ export class Channels extends PureComponent {
 
 const mapStateToProps = (state) => {
     return {
-        isAdmin: state.clubs.club.isAdmin
+        isAdmin: state.clubs.club.isAdmin,
+        clubID: state.clubs.club._id
     }
 }
 

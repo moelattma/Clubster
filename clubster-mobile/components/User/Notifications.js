@@ -81,9 +81,16 @@ export class Notifications extends Component {
     }
 
     handleAccept = (item) => {
+        console.log(item);
         if (item.type == 'EVENT_JOIN_REQ') {
             axios.post('https://clubster-backend.herokuapp.com/api/notifications/new',
-                { type: 'EVENT_JOIN_ACC', orgID: item.idOfOrganization, receiverID: item.idOfSender });
+                { type: 'EVENT_JOIN_ACC', orgID: item.idOfOrganization, receiverID: item.idOfSender, notID: item._id, clubEvent: { name: item.clubEvent.name, _id: item.clubEvent._id } }).then((res) => {
+                    if (res.status == 201) {
+                        axios.post('https://clubster-backend.herokuapp.com/api/notifications/delete', { _id: item._id }).then((res) => { 
+                            if (res.status == 201) this.props.deleteNotification(item._id);
+                        });
+                    }
+                });
         } else {
             const joinType = (item.message.includes("admin") ? "ORG_JOIN_ADMIN" : "ORG_JOIN_MEMBER");
             axios.post('https://clubster-backend.herokuapp.com/api/notifications/joinOrganization',
