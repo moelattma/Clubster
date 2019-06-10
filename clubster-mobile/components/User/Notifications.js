@@ -56,7 +56,7 @@ export class Notifications extends Component {
     }
 
     _renderButtons = (item) => {
-        if (item.type === 'ORG_JOIN_ADMIN' || item.type === 'ORG_JOIN_MEMBER') {
+        if (item.type === 'ORG_JOIN_ADMIN' || item.type === 'ORG_JOIN_MEMBER' || item.type == 'EVENT_JOIN_REQ') {
             return (
                 <View style={{ flexDirection: 'column', justifyContent:'space-between' }}>
                     <Button small light style={styles.buttonStyle}
@@ -81,29 +81,45 @@ export class Notifications extends Component {
     }
 
     handleAccept = (item) => {
-        const joinType = (item.message.includes("admin") ? "ORG_JOIN_ADMIN" : "ORG_JOIN_MEMBER");
-        axios.post('https://clubster-backend.herokuapp.com/api/notifications/joinOrganization',
-            { _id: item._id, orgID: item.idOfOrganization, joinerID: item.idOfSender, joinType, accepted: true })
-            .then((res) => {
-                if (res.status == 201)
-                    this.props.deleteNotification(item._id);
-            }).catch((err) => console.log(err));
+        console.log(item);
+        if (item.type == 'EVENT_JOIN_REQ') {
+            axios.post('https://clubster-backend.herokuapp.com/api/notifications/new',
+                { type: 'EVENT_JOIN_ACC', orgID: item.idOfOrganization, receiverID: item.idOfSender, notID: item._id, clubEvent: { name: item.clubEvent.name, _id: item.clubEvent._id } }).then((res) => {
+                    if (res.status == 201) {
+                        axios.post('https://clubster-backend.herokuapp.com/api/notifications/delete', { _id: item._id }).then((res) => { 
+                            if (res.status == 201) this.props.deleteNotification(item._id);
+                        });
+                    }
+                });
+        } else {
+            const joinType = (item.message.includes("admin") ? "ORG_JOIN_ADMIN" : "ORG_JOIN_MEMBER");
+            axios.post('https://clubster-backend.herokuapp.com/api/notifications/joinOrganization',
+                { _id: item._id, orgID: item.idOfOrganization, joinerID: item.idOfSender, joinType, accepted: true })
+                .then((res) => {
+                    if (res.status == 201)
+                        this.props.deleteNotification(item._id);
+                }).catch((err) => console.log(err));
 
-        const acceptType = (joinType == "ORG_JOIN_ADMIN" ? ACCEPT_ADMIN : ACCEPT_MEM);
-        axios.post('https://clubster-backend.herokuapp.com/api/notifications/new',
-            { type: acceptType, orgID: item.idOfOrganization, receiverID: item.idOfSender });
+            const acceptType = (joinType == "ORG_JOIN_ADMIN" ? ACCEPT_ADMIN : ACCEPT_MEM);
+            axios.post('https://clubster-backend.herokuapp.com/api/notifications/new',
+                { type: acceptType, orgID: item.idOfOrganization, receiverID: item.idOfSender });
+        }
     }
 
     handleReject = (item) => {
-        axios.post('https://clubster-backend.herokuapp.com/api/notifications/joinOrganization',
-            { _id: item._id, accepted: false })
-            .then((res) => {
-                if (res.status == 201)
-                    this.props.deleteNotification(item._id);
-            }).catch((err) => console.log(err));
+        if (item.type == 'EVENT_JOIN_REQ') {
+            this.handleOkay(item);
+        } else {
+            axios.post('https://clubster-backend.herokuapp.com/api/notifications/joinOrganization',
+                { _id: item._id, accepted: false })
+                .then((res) => {
+                    if (res.status == 201)
+                        this.props.deleteNotification(item._id);
+                }).catch((err) => console.log(err));
 
-        axios.post('https://clubster-backend.herokuapp.com/api/notifications/new',
-            { type: REJECT_JOIN, orgID: item.idOfOrganization, receiverID: item.idOfSender });
+            axios.post('https://clubster-backend.herokuapp.com/api/notifications/new',
+                { type: REJECT_JOIN, orgID: item.idOfOrganization, receiverID: item.idOfSender });
+        }
     }
 
     handleOkay = (item) => {

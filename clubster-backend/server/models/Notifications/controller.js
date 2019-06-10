@@ -8,6 +8,7 @@
 const Notification = require('./model');	//import Notification Schema
 const Organization = require('../Organizations/model')	//import Notification Schema
 const User = require('../Users/model');	//import User Model
+const Events = require('../Events/model');	//events schema
 
 //Tags later utilized in code
 const CLUBSTER_WELCOME = "CLUBSTER_WELCOME";
@@ -16,14 +17,15 @@ const ORG_JOIN_MEM = "ORG_JOIN_MEMBER";
 const ACCEPT_ADMIN = "ACCEPT_ADMIN";
 const ACCEPT_MEM = "ACCEPT_MEMBER";
 const REJECT_JOIN = "REJECT_JOIN";
+const EVENT_JOIN_REQ = "EVENT_JOIN_REQ";
+const EVENT_JOIN_ACC = "EVENT_JOIN_ACC";
 
 /*
 * gets all notifications based on the userid
 */
 exports.grabNotifications = (req, res) => {
 	Notification.find({ idOfReceivers: { $in: [req.user._id] } })
-	.populate('idOfOrganization')
-	.populate('idOfSender')
+	.populate('idOfOrganization').populate('idOfSender').populate('clubEvent', 'name _id')
 	.then((notifications) => {
 		if (!notifications) {
 			return res.status(400).json({ 'Error': 'No notifications found' });
@@ -71,7 +73,7 @@ exports.deleteNotification = (req, res) => {
 }
 
 exports.newNotification = (req, res) => {
-	const { type, orgID, receiverID } = req.body;
+	const { type, orgID, receiverID, clubEvent, collabOrgName, notID } = req.body;
 	const senderID = (req.user ? req.user._id : req.body.senderID);
 
 	let notification = ({
@@ -80,7 +82,7 @@ exports.newNotification = (req, res) => {
 		idOfReceivers: [receiverID],
 		type: type,
 		isActive: true,
-		message: ""
+		message: ''
 	});
 
 	if (orgID) {
@@ -103,6 +105,24 @@ exports.newNotification = (req, res) => {
 
 				case REJECT_JOIN:
 					notification.message = `You have been rejected from ${name} :(`;
+					break;
+
+				case EVENT_JOIN_REQ:
+					notification.idOfReceivers = [];
+					for (var i = 0; i < admins.length; ++i) 
+						notification.idOfReceivers.push(admins[i].admin);
+					notification.clubEvent = clubEvent._id;
+					notification.message = `${collabOrgName} invited your club ${name} to their event: ${clubEvent.name}`;
+					break;
+				
+				case EVENT_JOIN_ACC:
+					console.log(name);
+					console.log(clubEvent);
+					console.log(clubEvent._id);
+					notification.message = `${name} joined your event ${clubEvent.name}`;
+					Events.addCollabOrganization(clubEvent._id, orgID);
+					Organization.addEventToClub(orgID, clubEvent._id);
+					Notification.findByIdAndDelete(notID);
 					break;
 			}
 			new Notification(notification).save().then((newNote) => { return res.status(201).json(newNote); });

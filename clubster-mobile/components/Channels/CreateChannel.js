@@ -13,6 +13,7 @@ import { accessKeyId, secretAccessKey } from '../../keys/keys';
 import { RNS3 } from 'react-native-aws3';
 import { EVENTS_CREATE } from '../../reducers/ActionTypes';
 import { ScrollView } from 'react-native-gesture-handler';
+import { OptimizedFlatList } from 'react-native-optimized-flatlist';
 import Tags from "react-native-tags";
 import CheckBox from 'react-native-check-box'
 
@@ -58,34 +59,30 @@ export class CreateChannel extends React.Component {
       this.setState({ showMembers: false });
     }
 
-    markCandidateMember = (item) => {
-        let _id = item.item.member._id;
-        let name = item.item.member.name;
-        console.log(_id);
+    markCandidateMember = (memberID, memberName) => {
         let membersClicked = this.state.membersClicked;
         let membersClickedName = this.state.membersClickedName;
-        if(membersClicked.includes(_id) && membersClickedName.includes(name)) {
-          membersClicked.splice(membersClicked.indexOf(_id),1);
-          membersClickedName.splice(membersClickedName.indexOf(name),1);
+        let memberIndex = membersClicked.indexOf(memberID);
+        if(memberIndex != -1) {
+          membersClicked.splice(memberIndex, 1);
+          membersClickedName.splice(memberIndex, 1);
         } else {
-          membersClicked.push(_id);
-          membersClickedName.push(name);
+          membersClicked.push(memberID);
+          membersClickedName.push(memberName);
         }
         this.setState({ membersClicked, membersClickedName, updateMembers: Math.random()});
-        console.log(this.state.membersClickedName);
     }
 
-    markCandidateAdmin = (item) => {
-        let _id = item.item._id;
-        let name = item.item.name;
+    markCandidateAdmin = (adminID, adminName) => {
         let adminsClicked = this.state.adminsClicked;
         let adminsClickedName = this.state.membersClickedName;
-        if(adminsClicked.includes(_id)) {
-          adminsClicked.splice(adminsClicked.indexOf(_id),1);
-          adminsClickedName.splice(adminsClickedName.indexOf(name),1);
+        let adminIndex = membersClicked.indexOf(adminID);
+        if(adminIndex != -1) {
+          adminsClicked.splice(adminIndex, 1);
+          adminsClickedName.splice(adminIndex, 1);
         } else {
-          adminsClicked.push(_id);
-          adminsClickedName.push(name);
+          adminsClicked.push(adminID);
+          adminsClickedName.push(adminName);
         }
         this.setState({ adminsClicked, adminsClickedName, updateAdmins: Math.random()});
     }
@@ -144,7 +141,6 @@ export class CreateChannel extends React.Component {
     }
 
     _renderItem = (item) => {
-      console.log(item);
       let url = 'https://s3.amazonaws.com/clubster-123/' + item.item.member.image;
       return (
           <ListItem>
@@ -156,8 +152,8 @@ export class CreateChannel extends React.Component {
               </Body>
               <Right>
                 <CheckBox
-                  style={{flex: 1, padding: 10}}
-                  onClick={() => this.markCandidateMember(item)}
+                  style={{flex: 1, padding: 1}}
+                  onClick={() => this.markCandidateMember(item.item.member._id, item.item.member.name)}
                   isChecked={this.state.membersClicked.includes(item.item.member._id)}
                   leftText={"CheckBox"}
                 />
@@ -179,8 +175,8 @@ export class CreateChannel extends React.Component {
               <Right>
                 <CheckBox
                   style={{flex: 1, padding: 10}}
-                  onClick={() => this.markCandidateAdmin(item)}
-                  isChecked={this.state.adminsClicked.includes(item.item._id)}
+                  onClick={() => this.markCandidateAdmin(item.item.admin._id, item.item.admin.name)}
+                  isChecked={this.state.adminsClicked.includes(item.item.admin._id)}
                   leftText={"CheckBox"}
                 />
               </Right>
@@ -279,7 +275,7 @@ export class CreateChannel extends React.Component {
 
               <Modal isVisible={this.state.showMembers} style={styles.modalStyle}>
                 <View>
-                  <FlatList
+                  <OptimizedFlatList
                     data={this.state.members}
                     renderItem={this._renderItem}
                     keyExtractor={member => member._id}
@@ -294,7 +290,7 @@ export class CreateChannel extends React.Component {
 
               <Modal isVisible={this.state.showAdmins} style={styles.modalStyle}>
                 <View>
-                  <FlatList
+                  <OptimizedFlatList
                     data={this.state.admins}
                     renderItem={this._renderItemAdmin}
                     keyExtractor={admins => admins._id}

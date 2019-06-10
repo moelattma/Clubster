@@ -88,7 +88,7 @@ class SearchClubs extends PureComponent {
                         leftComponent={{ icon: 'arrow-back', onPress: () => this.props.navigation.goBack() }}
                         centerComponent={
                             <SearchBar
-                                containerStyle={{ flex: 1, alignSelf: 'stretch', backgroundColor: 'white', borderBottomWidth: 0, justifyContent: 'center', borderTopColor: 'white', width: '80%' }}
+                            //    containerStyle={{ flex: 1, alignSelf: 'stretch', backgroundColor: 'white', borderBottomWidth: 0, justifyContent: 'center', borderTopColor: 'white', width: '0%' }}
                                 clearIcon
                                 searchIcon={false}
                                 placeholder="Search Clubs"

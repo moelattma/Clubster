@@ -25,6 +25,10 @@ const Notifications = new Schema({
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'users'
   }],
+  clubEvent: {
+    type: Schema.Types.ObjectId,   //Specifiers
+    ref: 'events'
+  },
   type: {
     type: String,
     required: true

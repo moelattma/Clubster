@@ -26,7 +26,14 @@ export default class AgendaScreen extends Component {
   }
 
   timeToString(time) {
-    return moment.tz(time, "America/Los_Angeles").format().split('T')[0];
+    let date = new Date(time);
+    return date.toISOString().split('T')[0];
+  }
+
+  timeToStringTime(time) {
+    let date = new Date(time);
+    console.log('Here is date ', date);
+    return date.toISOString().split('T')[1];
   }
 
   timeToStringTime(time) {
@@ -42,22 +49,37 @@ export default class AgendaScreen extends Component {
     })
   }
 
+  doesEventExist = (date, _id) => {
+    for (let i = 0; i < this.state.eventsUserObjectArr[date].length; i++) {
+      if(this.state.eventsUserObjectArr[date][i].idOfEvent == _id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   processEvents() {
     for (let i = 0; i < this.state.eventsUser.length; i++) {
       let begDateTimestamp = this.state.eventsUser[i].date[0];
       let endDateTimestamp = this.state.eventsUser[i].date[1];
-      let date = this.timeToString(begDateTimestamp * 1000);
+      let date = this.timeToString(begDateTimestamp);
+      let timeStart = this.timeToStringTime(begDateTimestamp);
+      let timeEnd = this.timeToStringTime(endDateTimestamp);
       if (!this.state.eventsUserObjectArr[date]) {
         this.state.eventsUserObjectArr[date] = [];
         this.state.eventsUserObjectArr[date].push({
-          name: 'Item for ' + date,
-          height: (endDateTimestamp - begDateTimestamp) / 60 * 5
+          name: this.state.eventsUser[i].name,
+          height: 60,
+          idOfEvent: this.state.eventsUser[i]._id,
+          image: this.state.eventsUser[i].image,
         });
       } else {
-        if (endDateTimestamp - begDateTimestamp != 0) {
+        if(!this.doesEventExist(date, this.state.eventsUser[i]._id)) {
           this.state.eventsUserObjectArr[date].push({
-            name: 'Item for ' + date,
-            height: (endDateTimestamp - begDateTimestamp) / 60 * 5
+            name: this.state.eventsUser[i].name,
+            height:  60,
+            idOfEvent: this.state.eventsUser[i]._id,
+            image: this.state.eventsUser[i].image,
           });
         }
       }
@@ -73,18 +95,18 @@ export default class AgendaScreen extends Component {
     for (let i = 0; i < this.state.eventsAll.length; i++) {
       let begDateTimestamp = this.state.eventsAll[i].date[0];
       let endDateTimestamp = this.state.eventsAll[i].date[1];
-      let date = this.timeToString(begDateTimestamp * 1000);
+      let date = begDateTimestamp.toISOString().split['T'][0];
       if (!this.state.eventsAllObjectArr[date]) {
         this.state.eventsAllObjectArr[date] = [];
         this.state.eventsAllObjectArr[date].push({
           name: 'Item for ' + date,
-          height: (endDateTimestamp - begDateTimestamp) / 60 * 5
+          height: 60
         });
       } else {
         if (endDateTimestamp - begDateTimestamp != 0) {
           this.state.eventsAllObjectArr[date].push({
             name: 'Item for ' + date,
-            height: (endDateTimestamp - begDateTimestamp) / 60 * 5
+            height: 60
           });
         }
       }
@@ -147,13 +169,14 @@ export default class AgendaScreen extends Component {
   }
 
   renderItem(item) {
+    console.log(item);
     return (
       <View style={{ flexDirection: 'row' }}>
         <View style={{ backgroundColor: "#eee", borderRadius: 10, overflow: "hidden" }}>
           <View>
             <Image
               source={{
-                uri: 'https://s3.amazonaws.com/clubster-123/s3/ed98fa20-61a3-11e9-b39a-0bdefcda8e19.jpeg'
+                uri: 'https://s3.amazonaws.com/clubster-123/' + item.image
               }}
               style={{
                 height: 135,

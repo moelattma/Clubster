@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import _ from 'lodash';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import axios from 'axios';
+import { OptimizedFlatList } from 'react-native-optimized-flatlist';
 import { ListItem, Left, Body, Thumbnail, Text } from 'native-base';
 import { DefaultImg } from '../Utils/Defaults';
 
@@ -28,23 +29,13 @@ export class Channels extends PureComponent {
     }
 
     getChannels() {
-       return;
-    }
-
-    renderSeparator = () => {
-        return (
-            <View
-                style={{
-                    height: 1,
-                    width: '90%',
-                    backgroundColor: '#CED0CE',
-                    marginLeft: '10%'
-                }}
-            />
-        );
+       axios.get(`http://localhost:3000/api/channels/${this.props.clubID}`).then((response) => {
+         this.setState({ channels: response.data.channelsAdmin });
+       })
     }
 
     _renderItem = ({ item }) => {
+        console.log(item);
         let url = (item.image ? 'https://s3.amazonaws.com/clubster-123/' + item.image : DefaultImg);
         return (
             <ListItem avatar onPress={() => this.props.navigation.navigate('ChannelChat', { _id: item._id, name: item.name })}>
@@ -76,11 +67,10 @@ export class Channels extends PureComponent {
               centerComponent={{ text: 'Channels', style: { fontSize: 21, fontWeight: '500' } }}
               rightComponent={this.props.isAdmin ? { icon: 'add', onPress: (() => this.props.navigation.navigate('CreateChannel' )) } : null}
             />
-            <FlatList
+            <OptimizedFlatList
                 data={this.state.channels.slice(0, 40)}
                 renderItem={this._renderItem}
                 keyExtractor={organization => organization._id}
-                ItemSeparatorComponent={this.renderSeparator}
                 ListFooterComponent={this.renderFooter}
                 refreshing={this.state.loading}
                 onRefresh={() => this.getChannels()}
@@ -92,7 +82,8 @@ export class Channels extends PureComponent {
 
 const mapStateToProps = (state) => {
     return {
-        isAdmin: state.clubs.club.isAdmin
+        isAdmin: state.clubs.club.isAdmin,
+        clubID: state.clubs.club._id
     }
 }
 
