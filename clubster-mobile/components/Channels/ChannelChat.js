@@ -38,9 +38,10 @@ class ChannelChat extends React.Component {
 
     submitChatMessage(messages = []) {
       var text = messages[messages.length - 1].text;
-      axios.post(`http://localhost:3000/api/messages/${this.props._id}`, {
+      axios.post(`http://localhost:3000/api/messages/${this.state.channelID}`, {
         text: text
       }).then((message) => {
+        console.log(message);
         this.socket.emit("input", messages[0]);
       }).catch((err) => console.log(err));
     }

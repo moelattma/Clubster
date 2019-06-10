@@ -37,9 +37,9 @@ const Channel = new Schema({
   }]
 });
 
-// Channel.statics.addMessage = async function(message, idOfChannel) {
-//   await this.findByIdAndUpdate(idOfChannel, { $push: { messages: message._id } });
-// }
+Channel.statics.addMessage = async function(message, idOfChannel) {
+  await this.findByIdAndUpdate(idOfChannel, { $push: { messages: message._id } });
+}
 /*
 * Export so that other js files can use this schema
 */
