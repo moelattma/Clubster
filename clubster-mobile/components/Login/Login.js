@@ -3,7 +3,7 @@ import { TouchableOpacity, StyleSheet, Text, AsyncStorage } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { TextField } from 'react-native-material-textfield';
 import { connect } from 'react-redux'
-import { USER_LOGIN, CLUBS_SET } from '../../reducers/ActionTypes'
+import { USER_LOGIN, CLUBS_SET, CLUBS_SETALL } from '../../reducers/ActionTypes'
 
 import axios from 'axios';
 
@@ -32,6 +32,9 @@ class Login extends React.Component {
             this.props.setClubs(user.arrayClubsAdmin, user.arrayClubsMember);
             delete user.arrayClubsAdmin;
             delete user.arrayClubsMember;
+            axios.get('https://clubster-backend.herokuapp.com/api/organizations/all').then((response) => {
+                this.props.setAllClubs(response.data.organizations);
+            })
             this.props.userLogin(user);
           }
         })
@@ -92,6 +95,10 @@ const mapDispatchToProps = (dispatch) => {
     setClubs: (clubsAdmin, clubsMember) => dispatch({
       type: CLUBS_SET,
       payload: { clubsAdmin, clubsMember }
+    }),
+    setAllClubs: (allClubs) => dispatch({
+      type: CLUBS_SETALL,
+      payload: { allClubs }
     })
   }
 }

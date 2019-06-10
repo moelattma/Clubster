@@ -101,36 +101,3 @@ export default class ClubProfile extends React.Component {
         return null;
     }
 }
-
-const styles = StyleSheet.create({
-    background: {
-        flex: 1
-    },
-    joinButton: {
-        justifyContent: 'center',
-        backgroundColor: '#59cbbd',
-        height: 60,
-        width: WIDTH / 3
-    },
-    joinButtonDark: {
-        justifyContent: 'center',
-        backgroundColor: 'rgba(0,0,0,.6)',
-        height: 60,
-        width: WIDTH / 3
-    },
-    imageAvatar: {
-        width: 200,
-        height: 200,
-        borderColor: "white",
-        borderRadius: 100,
-        alignSelf: 'center',
-        position: 'relative'
-    },
-    joinText: {
-        fontSize: 24,
-        fontWeight: '500',
-        color: 'white',
-        textAlign: 'center',
-        textAlignVertical: 'center'
-    }
-});

@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import _ from 'lodash';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import axios from 'axios';
+import { OptimizedFlatList } from 'react-native-optimized-flatlist';
 import { ListItem, Left, Body, Thumbnail, Text } from 'native-base';
 import { DefaultImg } from '../Utils/Defaults';
 
@@ -29,19 +30,6 @@ export class Channels extends PureComponent {
 
     getChannels() {
        return;
-    }
-
-    renderSeparator = () => {
-        return (
-            <View
-                style={{
-                    height: 1,
-                    width: '90%',
-                    backgroundColor: '#CED0CE',
-                    marginLeft: '10%'
-                }}
-            />
-        );
     }
 
     _renderItem = ({ item }) => {
@@ -76,11 +64,10 @@ export class Channels extends PureComponent {
               centerComponent={{ text: 'Channels', style: { fontSize: 21, fontWeight: '500' } }}
               rightComponent={this.props.isAdmin ? { icon: 'add', onPress: (() => this.props.navigation.navigate('CreateChannel' )) } : null}
             />
-            <FlatList
+            <OptimizedFlatList
                 data={this.state.channels.slice(0, 40)}
                 renderItem={this._renderItem}
                 keyExtractor={organization => organization._id}
-                ItemSeparatorComponent={this.renderSeparator}
                 ListFooterComponent={this.renderFooter}
                 refreshing={this.state.loading}
                 onRefresh={() => this.getChannels()}

@@ -1,11 +1,10 @@
 import React from 'react';
-import { View, Dimensions, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Dimensions, TouchableOpacity, StyleSheet } from 'react-native';
 import axios from 'axios';
 import Modal from 'react-native-modal';
 import { Header } from 'react-native-elements';
 import { ImagePicker, Permissions } from 'expo';
-var moment = require('moment-timezone');
-import { Thumbnail, Text, Button, Icon, Form, Item, Input } from 'native-base';
+import { Thumbnail, Text, Button, Icon, Form, Item, Input, ListItem, Left, Body, Right } from 'native-base';
 import v1 from 'uuid/v1';
 import CalendarPicker from 'react-native-calendar-picker';
 import DateTimePicker from 'react-native-modal-datetime-picker';
@@ -14,10 +13,12 @@ import { accessKeyId, secretAccessKey } from '../../keys/keys';
 import { RNS3 } from 'react-native-aws3';
 import { EVENTS_CREATE } from '../../reducers/ActionTypes';
 import { ScrollView } from 'react-native-gesture-handler';
+import { DefaultImg } from '../Utils/Defaults';
+import { OptimizedFlatList } from 'react-native-optimized-flatlist';
+import Tags from "react-native-tags";
+import CheckBox from 'react-native-check-box'
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get('window');
-const EVENT_WIDTH = WIDTH * 9 / 10;
-const EVENT_HEIGHT = HEIGHT * 3 / 7;
 
 export class CreateClubEvent extends React.Component {
     constructor(props) {
@@ -26,8 +27,6 @@ export class CreateClubEvent extends React.Component {
         this.state = {
             name: '',
             description: '',
-            timezone: null,
-            timezoneArray: moment.tz.names(),
             date: '',
             location: '',
             time: null,
@@ -43,21 +42,13 @@ export class CreateClubEvent extends React.Component {
             showDate: false,
             showTime: false,
             showTime2: false,
-            showTimeZone: false,
-            validModal: false
+            validModal: false,
+            addClubsModal: false,
+            clubsSelected: [],
+            clubsSelectedNames: []
         }
         this.setDate = this.setDate.bind(this);
         this.onDateChange = this.onDateChange.bind(this);
-    }
-
-    componentDidMount() {
-        var timezoneArr = [];
-        for (let i = 0; i < this.state.timezoneArray.length; i++) {
-            timezoneArr.push({
-                key: this.state.timezoneArray[i]
-            });
-        }
-        this.setState({ timezoneArray: timezoneArr });
     }
 
     _showDateTimePicker = () => this.setState({ showTime: true });
@@ -156,30 +147,63 @@ export class CreateClubEvent extends React.Component {
 
     createEvent = () => {
         const { name, date, time, description, location, imageURL, chosenDate, selectedStartDate, selectedEndDate, timeDisplay, timeDisplayEnd } = this.state;
-        axios.post(`http://localhost:3000/api/events/${this.props.clubID}/new`, {
+        axios.post(`https://clubster-backend.herokuapp.com/api/events/${this.props.clubID}/new`, {
             name, date, time, description, location, imageURL, chosenDate, selectedStartDate, selectedEndDate, timeDisplay, timeDisplayEnd
         }).then(response => {
-            this.props.newClubEvent(response.data.event);
+            const { event } = response.data;
+            this.state.clubsSelected.forEach(invitedClubID => {
+                axios.post(`https://clubster-backend.herokuapp.com/api/notifications/new`, 
+                    { clubEvent: { _id: event._id, name: event.name }, type: 'EVENT_JOIN_REQ', orgID: invitedClubID, collabOrgName: this.props.name });
+            });
+            this.props.newClubEvent(event);
             this.props.navigation.navigate('ShowEvents');
         }).catch(error => console.log(error + 'ruh roh'));
     }
 
-    setTimeZone = (timezone) => {
-        // this.setState({
-        //   timezone: timezone,
-        //   showTimeZone: false
-        // })
-        return;
+    _renderItem = ({ item }) => {
+        let url = 'https://s3.amazonaws.com/clubster-123/' + item.image;
+        if (!item.image) url = DefaultImg;
+        return (
+            <ListItem>
+                <Left>
+                    <Thumbnail source={{ uri: url }} />
+                </Left>
+                <Body>
+                    <Text>{item.name}</Text>
+                </Body>
+                <Right>
+                    <CheckBox
+                        style={{ flex: 1, padding: 1 }}
+                        onClick={() => this.selectClub(item._id, item.name)}
+                        isChecked={this.state.clubsSelected.includes(item._id)}
+                        leftText={"CheckBox"}
+                    />
+                </Right>
+            </ListItem>
+        )
     }
 
-    _renderItem = ({ item }) => {
-        return (
-            <TouchableOpacity onPress={() => this.setState({ timezone: item.key, showTimeZone: false })}>
-                <View>
-                    <Text>{item.key}</Text>
-                </View>
-            </TouchableOpacity>
-        )
+    selectClub = (clubID, clubName) => {
+        let clubsSelected = this.state.clubsSelected;
+        let clubsSelectedNames = this.state.clubsSelectedNames;
+        let selectedIndex = clubsSelected.indexOf(clubID);
+        if(selectedIndex != -1) {
+            clubsSelected.splice(selectedIndex, 1);
+            clubsSelectedNames.splice(selectedIndex, 1);
+        } else {
+            clubsSelected.push(clubID);
+            clubsSelectedNames.push(clubName)
+        }
+        this.setState({ clubsSelected, clubsSelectedNames, extraDataClubs: Math.random() });
+    }
+
+    findClubImage = (name) => {
+        var orgs = this.props.allOrganizations;
+        for (var i = 0; i < orgs.length; i++) 
+            if (orgs[i].name == name) 
+                return orgs[i].image ? 'https://s3.amazonaws.com/clubster-123/' + orgs[i].image : DefaultImg;
+            
+        return DefaultImg;
     }
 
     // modal for when user enters invalid fields
@@ -190,6 +214,9 @@ export class CreateClubEvent extends React.Component {
     }
 
     closeValidModal() { this.setState({ validModal: false }) }
+
+    openClubsModal() { this.setState({ addClubsModal: true }) }
+    closeClubsModal() { this.setState({ addClubsModal: false }) }
 
     validateInput = () => {
         let errors = {};
@@ -230,7 +257,25 @@ export class CreateClubEvent extends React.Component {
                 <Header
                     backgroundColor={'transparent'}
                     leftComponent={{ icon: 'arrow-back', onPress: () => this.props.navigation.goBack() }}
+                    rightComponent={{ icon: 'group-add', onPress: () => this.openClubsModal() }}
                 />
+                <Modal isVisible={this.state.addClubsModal} style={styles.modalStyle} onBackdropPress={() => this.closeClubsModal()} >
+                    <View style={{ flex: 1, margin: 2 }}>
+                        <View style={styles.modalButtons}>
+                            <TouchableOpacity onPress={() => this.closeClubsModal()}>
+                                <Icon type='Ionicons' name="ios-arrow-dropleft"
+                                    style={styles.modalButton} />
+                            </TouchableOpacity>
+                        </View>
+                        <OptimizedFlatList
+                            data={this.props.allOrganizations}
+                            renderItem={this._renderItem}
+                            keyExtractor={organization => organization._id}
+                            ItemSeparatorComponent={this.renderSeparator}
+                            extraData={this.props.extraDataClubs + this.state.extraDataClubs}
+                        />
+                    </View>
+                </Modal>
                 <Form>
                     <Item>
                         <Input placeholder="Name"
@@ -302,27 +347,24 @@ export class CreateClubEvent extends React.Component {
                             }}>
                             {(this.state.timeDisplayEnd == null) ? <Text style={{ color: '#575757', fontSize: 17, flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', alignItems: 'center' }}>End Time</Text> : <Text style={{ color: '#575757', fontSize: 17, flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', alignItems: 'center' }}>{this.state.timeDisplayEnd.toString()}</Text>}
                         </TouchableOpacity>
-
-                    </Item>
-                    <Item>
-                        <TouchableOpacity
-                            onPress={() => {
-                                this._showModal(3)
-                            }}
-                            style={{
-                                height: 50,
-                                paddingLeft: 5,
-                                paddingRight: 5,
-                                flex: 1,
-                                flexDirection: 'row',
-                                alignSelf: 'center',
-                                alignItems: 'center'
-                            }}>
-                            {(this.state.timezone == null) ? <Text style={{ color: '#575757', fontSize: 17, flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', alignItems: 'center' }}>Select Timezone</Text> : <Text style={{ color: '#575757', fontSize: 17, flexDirection: 'row', justifyContent: 'center', alignSelf: 'center', alignItems: 'center' }}>{this.state.timezone}</Text>}
-                        </TouchableOpacity>
                     </Item>
                 </Form>
-                            
+
+                <ScrollView horizontal>
+                    <Tags
+                        initialTags={this.state.clubsSelectedNames}
+                        containerStyle={{ justifyContent: 'center' }}
+                        readonly={true}
+                        inputStyle={{ backgroundColor: 'white' }}
+                        renderTag={({ tag, index }) => (
+                            <TouchableOpacity disabled={true} key={`${tag}-${index}`} style={styles.tag}>
+                                <Thumbnail small source={{ uri: this.findClubImage(tag) }} />
+                                <Text> {tag}</Text>
+                            </TouchableOpacity>
+                        )}
+                    />
+                </ScrollView>
+                           
                 <TouchableOpacity onPress={this.useLibraryHandler}>
                     <Thumbnail square small style={!this.state.uri ? styles.uploadIcon : styles.imageThumbnail}
                         source={{ uri: !this.state.uri ? this.state.defaultURI : this.state.uri }} />
@@ -405,8 +447,17 @@ export class CreateClubEvent extends React.Component {
 }
 
 const mapStateToProps = (state) => {
+    const { _id, name } = state.clubs.club;
+    var allClubs = state.clubs.allClubs;
+    if (!allClubs) return { clubID: _id }
+
+    for (var i = 0; i < allClubs.length; ++i) 
+        if (allClubs[i]._id == _id)
+            break;
+    if (i < allClubs.length) 
+        allClubs.splice(i, 1);
     return {
-        clubID: state.clubs.club._id
+        clubID: _id, name, allOrganizations: allClubs, extraDataClubs: Math.random()
     }
 }
 
@@ -433,4 +484,34 @@ const styles = StyleSheet.create({
         width: WIDTH / 1.5,
         height: HEIGHT / 4
     },
+    modalStyle: {
+        backgroundColor: 'white',
+        padding: 4,
+        marginTop: 50,
+        marginRight: 20,
+        marginBottom: 30,
+        marginLeft: 20,
+        borderRadius: 6
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+    modalButton: {
+        color: 'black',
+        fontSize: 40,
+        margin: 10
+    },
+    tag: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        alignContent: 'center',
+        alignSelf: 'center',
+        backgroundColor: "#e0e0e0",
+        borderRadius: 16,
+        padding: 5,
+        margin: 4
+      },
 });

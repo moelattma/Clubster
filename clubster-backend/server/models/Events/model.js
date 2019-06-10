@@ -16,6 +16,10 @@ const Events = new Schema({
     type: Schema.Types.ObjectId,   //Specifiers
     ref: 'organizations'
   },
+  collabOrganizations: [{
+    type: Schema.Types.ObjectId,   //Specifiers
+    ref: 'organizations'
+  }],
   name: {
     type: String
   },
@@ -88,6 +92,10 @@ Events.statics.addEventRide = async function(eventID, rideID) {
 
 Events.statics.removeEventRide = async function(eventID, rideID) {
   await this.findByIdAndUpdate(eventID, { $pull: { rides: rideID } });
+}
+
+Events.statics.addCollabOrganization = async function(eventID, orgID) {
+  await this.findByIdAndUpdate(eventID, { $push: { collabOrganizations: orgID } });
 }
 
 /*
