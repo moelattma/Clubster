@@ -177,7 +177,7 @@ export class EventProfile extends React.Component {
             console.log(img);
             console.log(item._id);
             console.log(item.name);
-            await axios.post(`https://clubster-backend.herokuapp.com/api/events/modEventPic/${item._id}`, { img }).then((response) => {
+            await axios.post(`https://localhost:3000/api/events/modEventPic/${item._id}`, { img }).then((response) => {
                 this.setState({ imageURL: (response.data.image ? 'https://s3.amazonaws.com/clubster-123/' + response.data.image : DefaultImg) });
             }).catch((err) => { console.log(err); return; });
             this.props.navigation.navigate('ShowEvents');
@@ -204,7 +204,7 @@ export class EventProfile extends React.Component {
             description = item.description;
         if (location == "")
             location = this.state.editedItem.location
-        axios.post(`https://clubster-backend.herokuapp.com/api/events/${item._id}`, {
+        axios.post(`https://localhost:3000/api/events/${item._id}`, {
             name: this.state.name,
             description: this.state.description,
             chosenDate: this.state.chosenDate,
