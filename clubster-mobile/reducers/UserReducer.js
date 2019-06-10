@@ -5,6 +5,7 @@ let userState = { user: null, showAdminClubs: true, notifications: [] };
 const userReducer = (state = userState, action) => {
     switch (action.type) {
         case Actions.USER_LOGIN:
+            console.log("logged in");
             state = Object.assign({}, state, { user: action.payload.user } )
             return state;
         case Actions.USER_LOGOUT:

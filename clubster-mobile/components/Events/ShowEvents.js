@@ -100,7 +100,7 @@ export class ShowEvents extends React.Component {
           <Left>
             <Body>
               <Text note>{chosen.day}: {chosen.timeStart} - {chosen.timeEnd}</Text>
-              <Text note>at {chosen.location}</Text>
+              <Text note>at {item.location}</Text>
             </Body>
           </Left>
           <Right>

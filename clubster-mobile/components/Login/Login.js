@@ -27,12 +27,13 @@ class Login extends React.Component {
             // Set token to ls\
             AsyncStorage.setItem('jwtToken', token);
             axios.defaults.headers.common['Authorization'] = token;
-            this.props.navigation.navigate('ClubsterNavigation');               //Navigate to Clubs page if successful
             
             this.props.setClubs(user.arrayClubsAdmin, user.arrayClubsMember);
             delete user.arrayClubsAdmin;
             delete user.arrayClubsMember;
             this.props.userLogin(user);
+            this.props.navigation.navigate('ClubsterNavigation');               //Navigate to Clubs page if successful
+
           }
         })
         .catch((err) => {

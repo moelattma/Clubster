@@ -59,8 +59,12 @@ class ShowClubs extends React.Component {
   }
 
   render() {
+    console.log("TESTING");
     if (this.props.loading)
-      return <AppLoading/>
+      return <AppLoading
+        startAsync={console.log("Loading?dad")}
+        onError={console.log("errrrorrr")}
+      />
     return (
       <ScrollView refreshControl={<RefreshControl
         refreshing={this.props.loading}
@@ -73,11 +77,11 @@ class ShowClubs extends React.Component {
             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }} >
               <Text>     </Text>
               <Button transparent onPress={() => this.props.toggleClubs(true)} >
-                <Text style={[{ fontSize: 18, fontWeight: '400' }, this.props.showAdminClubs ? { color: '#59cbbd' } : {}]} >Admin</Text>
+                <Text style={[{ fontSize: 18, fontWeight: '400' }, this.props.showAdminClubs ? { backgroundColor: '#59cbbd' } : {}]} >Admin</Text>
               </Button>
               <Text style={{ fontSize: 30, fontWeight: '400' }} >|</Text>
               <Button transparent onPress={() => this.props.toggleClubs(false)}>
-                <Text style={[{ fontSize: 18, fontWeight: '400' }, !this.props.showAdminClubs ? { color: '#59cbbd' } : {}]} >Member</Text>
+                <Text style={[{ fontSize: 18, fontWeight: '400' }, !this.props.showAdminClubs ? { backgroundColor: '#59cbbd' } : {}]} >Member</Text>
               </Button>
             </View>
           }
@@ -114,8 +118,11 @@ class ShowClubs extends React.Component {
 }
 
 const mapStateToProps = (state) => {
+  console.log("loading?:");
+  console.log(state.user);
   if (!state.user.user)
     return { loading: true };
+  console.log("donezo");
   var clubsAdmin = state.clubs.clubsAdmin.slice(0);
   var clubsMember = state.clubs.clubsMember.slice(0);
   if (clubsAdmin && clubsAdmin != null && clubsAdmin.length % 2 != 0) 

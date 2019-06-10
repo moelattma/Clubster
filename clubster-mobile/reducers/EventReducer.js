@@ -53,27 +53,27 @@ const eventReducer = (state = eventState, action) => {
             state = Object.assign({}, state, { clubEvents: clubEvents });
             return state;
         case Actions.EVENTS_CHANGEPICTURE: 
-            var { eventID, imageURL } = action.payload;
+            var { eventID, img } = action.payload;
             var { allEvents, userEvents, clubEvents } = state;
             for (var i = 0; i < allEvents.length; i++) {
                 if (allEvents[i]._id === eventID) {
-                    allEvents[i].image = imageURL;
+                    allEvents[i].image = img;
                     break;
                 }
             }
             for (var i = 0; i < userEvents.length; i++) {
                 if (userEvents[i]._id === eventID) {
-                    userEvents[i].image = imageURL;
+                    userEvents[i].image = img;
                     break;
                 }
             }
             for (var i = 0; i < clubEvents.length; i++) {
                 if (clubEvents[i]._id === eventID) {
-                    clubEvents[i].image = imageURL;
+                    clubEvents[i].image = img;
                     break;
                 }
             }
-            state = Object.assign({}, state, { thisEvent: { ...state.thisEvent, image: imageURL }, clubEvents, userEvents, allEvents });
+            state = Object.assign({}, state, { thisEvent: { ...state.thisEvent, image: img }, clubEvents, userEvents, allEvents });
             return state;
         default:
             return state;

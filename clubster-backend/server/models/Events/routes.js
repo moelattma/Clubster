@@ -9,6 +9,10 @@ const passport = require('passport');	//import passport, useful for authenticati
 const multer = require('multer');	//multer, needed for image uploading
 var upload = multer({ dest: 'uploads/' });	//upload in this folder
 
+router.post('/events/:eventID/delete', (req, res) => {
+	controller.delEvent(req, res);
+});
+
 router.get('/events/:organizationID', passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.getEvents(req, res); // If url is of the form ../events/jewiofheifjwof the getEvents method will run
 });
@@ -53,11 +57,7 @@ router.post('/events/:eventID/comments', passport.authenticate('jwt', {session:f
 	controller.addCommentToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
-router.post('/events/:eventID/:userID', (req, res) => {
-	controller.addWentUser(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
-});
-
-router.post('/events/changeEventPicture', passport.authenticate('jwt', {session:false}), (req, res) => {
+router.post('/events/modEventPic/:eventID', upload.single('fileData'), (req, res) => {
 	controller.changeEventPicture(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
@@ -67,6 +67,11 @@ router.post('/events/:eventID', (req, res) => {
 
 router.get('/events/getClubEvent/:eventID', (req, res) => {
 	controller.getClubEvent(req, res);
+});
+
+
+router.post('/events/:eventID/:userID', (req, res) => {
+	controller.addWentUser(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
 //Export
