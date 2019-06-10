@@ -8,10 +8,11 @@ exports.findChannels = (req, res) => {
 	let channelsAdmin = [];
   Channels.find({organization: groupID}).populate('messages').then((channels) => {
     if(channels) {
+
       for(var i = 0;i<channels.length;i++) {
-        if(channels[i].admins.includes(req.user._id)) {
+				if(channels[i].admins.indexOf(req.user._id) > -1) {
 					channelsAdmin.push(channels[i]);
-        } else if(channels[i].members.includes(req.user._id) && !channels[i].admins.includes(req.user._id)) {
+        } else if((channels[i].members.indexOf(req.user._id) > -1) && !channels[i].admins.includes(req.user._id)) {
           channelsMember.push(channels[i]);
         }
       }

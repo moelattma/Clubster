@@ -76,7 +76,7 @@ export class CreateChannel extends React.Component {
     markCandidateAdmin = (adminID, adminName) => {
         let adminsClicked = this.state.adminsClicked;
         let adminsClickedName = this.state.membersClickedName;
-        let adminIndex = membersClicked.indexOf(adminID);
+        let adminIndex = adminsClicked.indexOf(adminID);
         if(adminIndex != -1) {
           adminsClicked.splice(adminIndex, 1);
           adminsClickedName.splice(adminIndex, 1);
