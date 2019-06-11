@@ -204,7 +204,7 @@ export class EventProfile extends React.Component {
             description = item.description;
         if (location == "")
             location = this.state.editedItem.location
-        axios.post(`https://localhost:3000/api/events/${item._id}`, {
+        axios.post(`https://clubster-backend.herokuapp.com/api/events/${item._id}`, {
             name: this.state.name,
             description: this.state.description,
             chosenDate: this.state.chosenDate,
@@ -219,7 +219,7 @@ export class EventProfile extends React.Component {
     }
 
     deleteEvent = async (item) => {
-        await axios.post(`https://localhost:3000/api/events/${item._id}/delete`).then(() => {
+        await axios.post(`https://clubster-backend.herokuapp.com/api/events/${item._id}/delete`).then(() => {
             this.setState({ confirmDel: false });
         }).catch((error) => {
             if (error.response) {
@@ -793,16 +793,16 @@ const mapStateToProps = (state) => {
     }
 }
 
-// const mapDispatchToProps = (dispatch) => {
-//     return {
-//         changeEventPicture: (eventID, img) => dispatch({
-//             type: EVENTS_CHANGEPICTURE,
-//             payload: { eventID, img }
-//         }),
-//     }
-// }
+const mapDispatchToProps = (dispatch) => {
+    return {
+        changeEventPicture: (eventID, img) => dispatch({
+            type: EVENTS_CHANGEPICTURE,
+            payload: { eventID, img }
+        }),
+    }
+}
 
-export default connect(mapStateToProps, /*mapDispatchToProps*/ null)(EventProfile);
+export default connect(mapStateToProps, mapDispatchToProps)(EventProfile);
 
 const styles = StyleSheet.create({
     aboutText: {

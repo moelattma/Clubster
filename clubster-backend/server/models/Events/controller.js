@@ -338,6 +338,7 @@ exports.changeEventPicture = (req, res) => {
 };
 
 exports.updateEvent = (req, res) => {
+	console.log("upating");
 	const { eventID } = req.params;
 	const { name, description, date, time, location,
 		chosenDate, selectedStartDate, selectedEndDate,

@@ -9,9 +9,9 @@ const passport = require('passport');	//import passport, useful for authenticati
 const multer = require('multer');	//multer, needed for image uploading
 var upload = multer({ dest: 'uploads/' });	//upload in this folder
 
-router.post('/events/:eventID/delete', (req, res) => {
-	controller.delEvent(req, res);
-});
+// router.post('/events/:eventID/delete', (req, res) => {
+// 	controller.delEvent(req, res);
+// });
 
 router.get('/events/:organizationID', passport.authenticate('jwt', {session:false}), (req, res) => {
 	controller.getEvents(req, res); // If url is of the form ../events/jewiofheifjwof the getEvents method will run
