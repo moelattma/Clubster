@@ -80,8 +80,111 @@ export class ShowEvents extends React.Component {
       hostURL = 'https://s3.amazonaws.com/clubster-123/' + item.host.image;
     else
       hostURL = DefaultImg;
-    
+
     const chosen = this.state.times[Math.random() > .5 ? 0 : 1];
+
+    const startYear = item.date.toString().split("Z")[0].split("T")[0].split("-")[0];
+    var startMonth = item.date.toString().split("Z")[0].split("T")[0].split("-")[1];
+    const startDay = item.date.toString().split("Z")[0].split("T")[0].split("-")[2];
+
+    const endYear = item.date.toString().split("Z")[1].split("T")[0].split("-")[0];
+    var endMonth = item.date.toString().split("Z")[1].split("T")[0].split("-")[1];
+    const endDay = item.date.toString().split("Z")[1].split("T")[0].split("-")[2];
+
+    const startHour = item.date.toString().split("Z")[0].split("T")[1].split(":")[0];
+    const startMin = item.date.toString().split("Z")[0].split("T")[1].split(":")[1];
+
+    const endHour = item.date.toString().split("Z")[1].split("T")[1].split(":")[0];
+    const endMin = item.date.toString().split("Z")[1].split("T")[1].split(":")[1];
+
+    switch (startMonth) {
+      case "01":
+        startMonth = "January";
+        break;
+      case "02":
+        startMonth = "February";
+        break;
+      case "03":
+        startMonth = "March";
+        break;
+      case "04":
+        startMonth = "April";
+        break;
+      case "05":
+        startMonth = "May";
+        break;
+      case "06":
+        startMonth = "June";
+        break;
+      case "07":
+        startMonth = "July";
+        break;
+      case "08":
+        startMonth = "August";
+        break;
+      case "09":
+        startMonth = "September";
+        break;
+      case "10":
+        startMonth = "October";
+        break;
+      case "11":
+        startMonth = "November";
+        break;
+      case "12":
+        startMonth = "December";
+        break;
+      default:
+        startMonth = "January";
+        break;
+    }
+
+    switch (endMonth) {
+      case "01":
+        endMonth = "January";
+        break;
+      case "02":
+        endMonth = "February";
+        break;
+      case "03":
+        endMonth = "March";
+        break;
+      case "04":
+        endMonth = "April";
+        break;
+      case "05":
+        endMonth = "May";
+        break;
+      case "06":
+        endMonth = "June";
+        break;
+      case "07":
+        endMonth = "July";
+        break;
+      case "08":
+        endMonth = "August";
+        break;
+      case "09":
+        endMonth = "September";
+        break;
+      case "10":
+        endMonth = "October";
+        break;
+      case "11":
+        endMonth = "November";
+        break;
+      case "12":
+        endMonth = "December";
+        break;
+      default:
+        endMonth = "January";
+        break;
+    }
+
+    const printDate = startMonth + " " + startDay + ", " + startYear + " at " +
+      startHour + ":" + startMin + " to " + endMonth + " " + endDay + endYear + " at " +
+      endHour + ":" + endMin;
+    item.date = printDate;
 
     return (
       <Card>
@@ -99,17 +202,17 @@ export class ShowEvents extends React.Component {
         <CardItem>
           <Left>
             <Body>
-              <Text note>{chosen.day}: {chosen.timeStart} - {chosen.timeEnd}</Text>
+              <Text note>{printDate}</Text>
               <Text note>at {item.location}</Text>
             </Body>
           </Left>
           <Right>
             <Button bordered onPress={() => {
-                axios.get(`https://clubster-backend.herokuapp.com/api/events/getClubEvent/${item._id}`).then((response) => {
-                  this.props._setCurrentEvent(response.data.clubEvent);
-                  this.props.navigation.navigate('EventProfile');
-                });
-              }}>
+              axios.get(`https://clubster-backend.herokuapp.com/api/events/getClubEvent/${item._id}`).then((response) => {
+                this.props._setCurrentEvent(response.data.clubEvent);
+                this.props.navigation.navigate('EventProfile');
+              });
+            }}>
               <Text>Know More</Text>
             </Button>
           </Right>
@@ -270,5 +373,5 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 16,
     marginTop: 10
-}
+  }
 });
