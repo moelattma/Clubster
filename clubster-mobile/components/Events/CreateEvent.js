@@ -387,7 +387,7 @@ export class CreateClubEvent extends React.Component {
                 {/* MODAL  */}
                 <View style={{ flex: 1 }}>
                     <Modal isVisible={this.state.showDate} onRequestClose={this.hide}>
-                        <View style={styles.container}>
+                        <View style={{ backgroundColor: 'white' }}>
                             <CalendarPicker
                                 startFromMonday={true}
                                 allowRangeSelection={true}

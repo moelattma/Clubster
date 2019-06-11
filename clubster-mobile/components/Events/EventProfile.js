@@ -53,6 +53,7 @@ export class EventProfile extends React.Component {
             location: '',
             time: '',
             date: '',
+            imageURL: DefaultImg,
             editedItem: null,
             time: null,
             timeDisplay: null,
@@ -145,8 +146,7 @@ export class EventProfile extends React.Component {
         await Permissions.askAsync(Permissions.CAMERA_ROLL);
     };
 
-    changeEventPicture = async (item) => {
-        this.setState({ editedItem: item });
+    changeEventPicture = async () => {
         await this.askPermissionsAsync();
         try {
             let result = await ImagePicker.launchImageLibraryAsync({
@@ -170,15 +170,12 @@ export class EventProfile extends React.Component {
                 secretKey: secretAccessKey,
                 successActionStatus: 201
             }
-            var img;
+            var imageURL;
             await RNS3.put(file, options).then((response) => {
-                img = response.body.postResponse.key;
+                imageURL = response.body.postResponse.key;
             }).catch((err) => { console.log(err) });
-            console.log(img);
-            console.log(item._id);
-            console.log(item.name);
-            await axios.post(`https://localhost:3000/api/events/modEventPic/${item._id}`, { img }).then((response) => {
-                this.setState({ imageURL: (response.data.image ? 'https://s3.amazonaws.com/clubster-123/' + response.data.image : DefaultImg) });
+            axios.post(`https://clubster-backend.herokuapp.com/api/events/modifyEventPicture/${this.props._id}`, { imageURL }).then((response) => {
+                this.setState({ img: (response.data.image ? 'https://s3.amazonaws.com/clubster-123/' + response.data.image : DefaultImg) });
             }).catch((err) => { console.log(err); return; });
             this.props.navigation.navigate('ShowEvents');
         } catch (error) {
@@ -481,7 +478,7 @@ export class EventProfile extends React.Component {
                         : null}
                 />
                 <ScrollView>
-                    <TouchableWithoutFeedback onPress={() => this.changeEventPicture(eventInfo)}>
+                    <TouchableWithoutFeedback onPress={() => this.changeEventPicture()}>
                         <Image source={{ uri: !this.props.image || this.props.image == null ? DefaultImg : 'https://s3.amazonaws.com/clubster-123/' + this.props.image }} style={{ height: 200 }} />
                     </TouchableWithoutFeedback>
                     <InformationCard eventInfo={eventInfo} />
@@ -793,16 +790,16 @@ const mapStateToProps = (state) => {
     }
 }
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        changeEventPicture: (eventID, img) => dispatch({
-            type: EVENTS_CHANGEPICTURE,
-            payload: { eventID, img }
-        }),
-    }
-}
+// const mapDispatchToProps = (dispatch) => {
+//     return {
+//         changeEventPicture: (eventID, img) => dispatch({
+//             type: EVENTS_CHANGEPICTURE,
+//             payload: { eventID, img }
+//         }),
+//     }
+// }
 
-export default connect(mapStateToProps, mapDispatchToProps)(EventProfile);
+export default connect(mapStateToProps, /*mapDispatchToProps*/ null)(EventProfile);
 
 const styles = StyleSheet.create({
     aboutText: {

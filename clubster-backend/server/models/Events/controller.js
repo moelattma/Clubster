@@ -328,11 +328,11 @@ exports.getClubEvent = (req, res) => {
 };
 
 exports.changeEventPicture = (req, res) => {
-	Events.findOneAndReplace({ _id: req.params.eventID }, { $set: { "image": req.body.img } }).then((event) => {
+	Events.findOneAndUpdate({ _id: req.params.eventID }, { $set: { "image": req.body.imageURL } }).then((event) => {
 		if (!event) {
 			return res.status(404).json({ 'Error': 'error', 'image': null });
 		} else {
-			return res.status(201).json({ 'image': req.body.img });
+			return res.status(201).json({ 'image': req.body.imageURL });
 		}
 	});
 };

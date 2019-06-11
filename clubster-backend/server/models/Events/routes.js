@@ -57,7 +57,7 @@ router.post('/events/:eventID/comments', passport.authenticate('jwt', {session:f
 	controller.addCommentToEvent(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
-router.post('/events/modEventPic/:eventID', upload.single('fileData'), (req, res) => {
+router.post('/events/modifyEventPicture/:eventID', upload.single('fileData'), (req, res) => {
 	controller.changeEventPicture(req, res); // If url is of the form ../events/nekfmwefelfk;3lf3w the addMemberToEvent method will run
 });
 
