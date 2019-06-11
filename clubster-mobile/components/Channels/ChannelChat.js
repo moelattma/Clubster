@@ -38,7 +38,7 @@ class ChannelChat extends React.Component {
 
     submitChatMessage(messages = []) {
       var text = messages[messages.length - 1].text;
-      axios.post(`http://localhost:3000/api/messages/${this.state.channelID}`, {
+      axios.post(`https://clubster-backend.herokuapp.com/api/messages/${this.state.channelID}`, {
         text: text
       }).then((message) => {
         this.socket.emit("input", messages[0]);

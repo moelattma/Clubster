@@ -58,6 +58,15 @@ export default class AgendaScreen extends Component {
     return false;
   }
 
+  doesEventExistAll = (date, _id) => {
+    for (let i = 0; i < this.state.eventsAllObjectArr[date].length; i++) {
+      if(this.state.eventsAllObjectArr[date][i].idOfEvent == _id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   processEvents() {
     for (let i = 0; i < this.state.eventsUser.length; i++) {
       let begDateTimestamp = this.state.eventsUser[i].date[0];
@@ -95,18 +104,24 @@ export default class AgendaScreen extends Component {
     for (let i = 0; i < this.state.eventsAll.length; i++) {
       let begDateTimestamp = this.state.eventsAll[i].date[0];
       let endDateTimestamp = this.state.eventsAll[i].date[1];
-      let date = begDateTimestamp.toISOString().split['T'][0];
+      let date = this.timeToString(begDateTimestamp);
+      let timeStart = this.timeToStringTime(begDateTimestamp);
+      let timeEnd = this.timeToStringTime(endDateTimestamp);
       if (!this.state.eventsAllObjectArr[date]) {
         this.state.eventsAllObjectArr[date] = [];
         this.state.eventsAllObjectArr[date].push({
-          name: 'Item for ' + date,
-          height: 60
+          name: this.state.eventsAll[i].name,
+          height: 60,
+          idOfEvent: this.state.eventsAll[i]._id,
+          image: this.state.eventsAll[i].image,
         });
       } else {
-        if (endDateTimestamp - begDateTimestamp != 0) {
+        if(!this.doesEventExistAll(date, this.state.eventsUser[i]._id)) {
           this.state.eventsAllObjectArr[date].push({
-            name: 'Item for ' + date,
-            height: 60
+            name: this.state.eventsAll[i].name,
+            height:  60,
+            idOfEvent: this.state.eventsAll[i]._id,
+            image: this.state.eventsAll[i].image,
           });
         }
       }
@@ -146,8 +161,8 @@ export default class AgendaScreen extends Component {
         {this.state.activeSwitch === 1 ?
           <Agenda
             items={this.state.eventsAllObjectArr}
-            loadItemsForMonth={this.loadItems.bind(this)}
-            selected={'2019-04-16'}
+            loadItemsForMonth={this.loadItemsAll.bind(this)}
+            selected={Date.now()}
             renderItem={this.renderItem.bind(this)}
             renderEmptyDate={this.renderEmptyDate.bind(this)}
             rowHasChanged={this.rowHasChanged.bind(this)}
@@ -155,7 +170,7 @@ export default class AgendaScreen extends Component {
           <Agenda
             items={this.state.eventsUserObjectArr}
             loadItemsForMonth={this.loadItems.bind(this)}
-            selected={'2019-04-16'}
+            selected={Date.now()}
             renderItem={this.renderItem.bind(this)}
             renderEmptyDate={this.renderEmptyDate.bind(this)}
             rowHasChanged={this.rowHasChanged.bind(this)}
@@ -166,6 +181,10 @@ export default class AgendaScreen extends Component {
 
   loadItems(day) {
     this.processEvents();
+  }
+
+  loadItemsAll(day) {
+    this.processEventsAll();
   }
 
   renderItem(item) {

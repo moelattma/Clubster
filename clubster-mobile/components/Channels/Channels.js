@@ -29,7 +29,7 @@ export class Channels extends PureComponent {
     }
 
     getChannels() {
-       axios.get(`http://localhost:3000/api/channels/${this.props.clubID}`).then((response) => {
+       axios.get(`https://clubster-backend.herokuapp.com/api/channels/${this.props.clubID}`).then((response) => {
          this.setState({ channels: response.data.channelsAdmin });
        })
     }

@@ -452,7 +452,7 @@ export class EventProfile extends React.Component {
             name: this.props.name,
             description: this.props.description,
             location: this.props.location,
-            date: 'January 13: 4:00 PM - 6:00 PM',
+            date: 'June 17: 4:00 PM - 6:00 PM',
             comments: this.props.comments,
             photos: this.props.photos
         }
