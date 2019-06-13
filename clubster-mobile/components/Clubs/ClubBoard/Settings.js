@@ -150,12 +150,12 @@ export class Settings extends React.Component {
 
                 {(this.state.photosDisplay)
                     //Photos tab
-                    ? <Gallery galleryID={this.props.galleryID} photos={this.props.photos} isAdmin={this.props.isAdmin} 
+                    ? <Gallery galleryID={this.props.galleryID} photos={this.props.photos} isAdmin={this.props.isAdmin}
                                onUpdatePhotos={this.onUpdatePhotos.bind(this)} />
                     //members tab
                     : ((this.state.members) ? <View>
                         <View style={{ margin: 10 }}>
-                            <MembersList members={this.props.members} president={this.props.president} 
+                            <MembersList members={this.props.members} president={this.props.president}
                                 style={{ margin: 10 }}/>
                         </View>
                     </View>
@@ -226,11 +226,11 @@ const mapStateToProps = (state) => {
 
     return {
         name, description, isAdmin, _id, president,
-        img: (image ? 'https://s3.amazonaws.com/clubster-123/' + image : DefaultImg), 
+        img: (image ? 'https://s3.amazonaws.com/clubster-123/' + image : DefaultImg),
         photos: (gallery.photos.length > 5 ? gallery.photos.slice(0, 6) : gallery.photos.concat({ addPhotoIcon: true })),
     }
 }
-  
+
 //   const mapDispatchToProps = (dispatch) => {
 //     return {
 //         setUserClubs: (clubsAdmin, clubsMember) => dispatch({
@@ -250,14 +250,6 @@ const styles = StyleSheet.create({
     mainContainer: {
     width: WIDTH / 2,
         flexDirection: 'column'
-    },
-    screen: {
-        paddingVertical: 20,
-        paddingHorizontal: 5,
-    },
-    editButton:{
-        alignSelf: 'flex-end',
-        margin: 10
     },
     pageTitle: {
         justifyContent: 'center',
@@ -288,9 +280,6 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch',
         backgroundColor: 'white',
     },
-    descriptionArea: {
-        justifyContent: 'flex-start'
-    },
     modalView: {
         backgroundColor: "#fff",
         justifyContent: 'center',
@@ -306,26 +295,5 @@ const styles = StyleSheet.create({
     buttonText:{
         margin: 10,
         marginBottom: 0
-    },
-    avatar: {
-        // width: WIDTH / 3,
-        // height: WIDTH / 3,
-        // borderRadius: WIDTH / 6,
-        borderWidth: 4,
-        borderColor: 'white',
-        marginBottom: 10,
-        alignSelf: 'center',
-        position: 'absolute',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: HEIGHT / 4 - WIDTH / 6
-    },
-    imageAvatar: {
-        width: WIDTH / 3,
-        height: WIDTH / 3,
-        borderColor: 'white',
-        borderRadius: WIDTH / 6,
-        alignSelf: 'center',
-        // position: 'relative'
-    },
+    }
 });

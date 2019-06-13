@@ -136,19 +136,6 @@ const mapDispatchToProps = (dispatch) => {
 export default connect(null, mapDispatchToProps)(CreateClub);
 
 const styles = StyleSheet.create({
-    containerImage: {
-        alignItems: 'center',
-        borderColor: '#d6d7da',
-        flex: 1,
-        borderRadius: 5,
-    },
-    eventTitle: {
-        color: 'black',
-        fontWeight: 'bold',
-        fontSize: 20,
-        textAlign: 'center',
-        textAlignVertical: 'center'
-    },
     row: {
         flex: 1,
         flexDirection: 'row'
@@ -158,18 +145,6 @@ const styles = StyleSheet.create({
         width: 100,
         justifyContent: 'center',
         alignSelf: 'center'
-    },
-    modalContent: {
-        backgroundColor: 'white',
-        padding: 82,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 4,
-        borderColor: 'rgba(0, 0, 0, 0.1)',
-    },
-    bottomModal: {
-        justifyContent: 'flex-end',
-        margin: 0,
     },
     container: {
         flex: 1,
@@ -186,81 +161,11 @@ const styles = StyleSheet.create({
         width: WIDTH / 2,
         height: HEIGHT / 3.5
     },
-    btn: {
-        position: 'absolute',
-        width: 50,
-        height: 50,
-        backgroundColor: '#03A9F4',
-        borderRadius: 30,
-        bottom: 0,
-        right: 0,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    plus: {
-        fontSize: 40,
-        color: 'white'
-    },
     item: {
         backgroundColor: '#009900',
         alignItems: 'center',
         justifyContent: 'center',
         flex: 1,
         margin: 1
-    },
-    itemInvisible: {
-        backgroundColor: 'transparent',
-    },
-    itemText: {
-        textAlign: 'center',
-        marginLeft: 25,
-        marginRight: 25,
-        marginTop: 10,
-        marginBottom: 10
-    },
-    root: {
-        flexDirection: 'row',
-        flexWrap: 'wrap'
-    },
-    titleContainer: {
-        flex: 0.1,
-        paddingHorizontal: '2.5%',
-        paddingVertical: '2.5%',
-    },
-    title: {
-        color: '#fff',
-        fontSize: 25,
-    },
-    contentContainer: {
-        flex: 1,
-    },
-    meetupCardTopContainer: {
-        flex: 1,
-        position: 'absolute',
-    },
-    meetupCardTitle: {
-        position: 'relative',
-        color: '#0000ff'
-    },
-    meetupCardBottomContainer: {
-        flex: 0.4,
-        width: window.width / 2 - 1,
-        backgroundColor: '#fff',
-        justifyContent: 'center',
-        paddingHorizontal: '2.5%',
-
-    },
-    meetupCardMetaName: {
-        fontSize: 15
-    },
-    meetupCardMetaDate: {
-        fontSize: 13
-    },
-    noneText: {
-        textAlign: 'center',
-        textAlignVertical: 'center',
-        color: 'black',
-        fontSize: 16,
-        marginTop: 10
     }
-});  
+});
